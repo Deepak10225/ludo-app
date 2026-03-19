@@ -1,0 +1,579 @@
+<%- include('../partials/header') %>
+
+    <div class="withdraw-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <!-- Header -->
+                    <div class="withdraw-header">
+                        <a href="/wallet" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Wallet
+                        </a>
+                        <h1 class="withdraw-title">Withdraw Funds</h1>
+                        <p class="withdraw-subtitle">Transfer your winnings to your bank account</p>
+                    </div>
+
+                    <!-- Withdrawal Form -->
+                    <div class="withdraw-card">
+                        <div class="current-balance">
+                            <span class="balance-label">Available Balance</span>
+                            <span class="balance-amount">₹<%= user.walletBalance.toFixed(2) %></span>
+                        </div>
+
+                        <form action="/wallet/withdraw" method="POST" class="withdraw-form"
+                            onsubmit="return validateWithdrawal()">
+                            <!-- Amount Input -->
+                            <div class="form-group">
+                                <label for="amount">
+                                    <i class="fas fa-rupee-sign"></i>
+                                    Withdrawal Amount
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">₹</span>
+                                    <input type="number" class="form-control" id="amount" name="amount" min="100"
+                                        max="<%= user.walletBalance %>" step="1" required
+                                        placeholder="Enter amount to withdraw">
+                                </div>
+                                <small class="text-muted">Minimum withdrawal: ₹100</small>
+                            </div>
+
+                            <!-- Quick Amount Presets -->
+                            <div class="amount-presets">
+                                <button type="button" class="preset-btn" onclick="setAmount(500)">₹500</button>
+                                <button type="button" class="preset-btn" onclick="setAmount(1000)">₹1000</button>
+                                <button type="button" class="preset-btn" onclick="setAmount(5000)">₹5000</button>
+                                <button type="button" class="preset-btn" onclick="setAmount(10000)">₹10000</button>
+                            </div>
+
+                            <!-- Bank Details -->
+                            <div class="bank-details-section">
+                                <h4>Bank Account Details</h4>
+
+                                <div class="form-group">
+                                    <label for="accountHolderName">Account Holder Name</label>
+                                    <input type="text" class="form-control" id="accountHolderName"
+                                        name="accountHolderName" required placeholder="Enter name as per bank records">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="accountNumber">Account Number</label>
+                                    <input type="text" class="form-control" id="accountNumber" name="accountNumber"
+                                        required placeholder="Enter your account number" pattern="[0-9]{9,18}">
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="ifscCode">IFSC Code</label>
+                                            <input type="text" class="form-control" id="ifscCode" name="ifscCode"
+                                                required placeholder="e.g., SBIN0001234"
+                                                pattern="^[A-Z]{4}0[A-Z0-9]{6}$">
+                                            <small class="text-muted">11 characters (e.g., SBIN0001234)</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="bankName">Bank Name</label>
+                                            <input type="text" class="form-control" id="bankName" name="bankName"
+                                                required placeholder="Enter bank name">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="upiId">UPI ID (Optional)</label>
+                                    <input type="text" class="form-control" id="upiId" name="upiId"
+                                        placeholder="e.g., username@okhdfcbank">
+                                </div>
+                            </div>
+
+                            <!-- Withdrawal Info -->
+                            <div class="withdrawal-info">
+                                <h5>Important Information</h5>
+                                <ul>
+                                    <li><i class="fas fa-check-circle text-success"></i> Withdrawals are processed
+                                        within 24 hours</li>
+                                    <li><i class="fas fa-check-circle text-success"></i> Minimum withdrawal amount is
+                                        ₹100</li>
+                                    <li><i class="fas fa-check-circle text-success"></i> Amount will be credited to your
+                                        bank account</li>
+                                    <li><i class="fas fa-check-circle text-success"></i> You'll receive an SMS
+                                        confirmation once processed</li>
+                                </ul>
+                            </div>
+
+                            <!-- Terms Checkbox -->
+                            <div class="terms-checkbox">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="terms" required>
+                                    <span class="checkbox-custom"></span>
+                                    <span class="checkbox-text">
+                                        I confirm that the bank details provided are correct and I agree to the
+                                        <a href="#">withdrawal terms and conditions</a>
+                                    </span>
+                                </label>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn-withdraw" id="submitBtn">
+                                <span>Request Withdrawal</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Recent Withdrawals -->
+                    <% if (recentWithdrawals && recentWithdrawals.length> 0) { %>
+                        <div class="recent-withdrawals">
+                            <h4>Recent Withdrawal Requests</h4>
+                            <div class="withdrawals-list">
+                                <% recentWithdrawals.forEach(withdrawal=> { %>
+                                    <div class="withdrawal-item">
+                                        <div class="withdrawal-details">
+                                            <div class="withdrawal-amount">₹<%= withdrawal.amount.toFixed(2) %>
+                                            </div>
+                                            <div class="withdrawal-date">
+                                                <%= new Date(withdrawal.createdAt).toLocaleDateString('en-IN', {
+                                                    day: 'numeric' , month: 'short' , year: 'numeric' }) %>
+                                            </div>
+                                        </div>
+                                        <div class="withdrawal-status <%= withdrawal.status %>">
+                                            <%= withdrawal.status %>
+                                        </div>
+                                    </div>
+                                    <% }) %>
+                            </div>
+                        </div>
+                        <% } else { %>
+                            <!-- Optional: Show message when no recent withdrawals -->
+                            <div class="no-withdrawals"
+                                style="text-align: center; padding: 20px; background: #f8f9fc; border-radius: 10px; margin-top: 20px;">
+                                <i class="fas fa-history fa-2x text-muted mb-2"></i>
+                                <p class="text-muted">No recent withdrawal requests</p>
+                            </div>
+                            <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .withdraw-container {
+            padding: 40px 0;
+            background: #f8f9fc;
+            min-height: calc(100vh - 76px);
+        }
+
+        /* Header */
+        .withdraw-header {
+            margin-bottom: 30px;
+        }
+
+        .back-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.95rem;
+            display: inline-block;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            transform: translateX(-5px);
+            color: #764ba2;
+        }
+
+        .withdraw-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .withdraw-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        /* Withdraw Card */
+        .withdraw-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .current-balance {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .balance-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .balance-amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-group label i {
+            margin-right: 8px;
+            color: #667eea;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: #f8f9fc;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            outline: none;
+            background: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-group-text {
+            background: #f0f0f0;
+            border: 2px solid #e0e0e0;
+            border-right: none;
+            border-radius: 10px 0 0 10px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .input-group .form-control {
+            border-left: none;
+            border-radius: 0 10px 10px 0;
+        }
+
+        /* Amount Presets */
+        .amount-presets {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .preset-btn {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .preset-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        /* Bank Details Section */
+        .bank-details-section {
+            background: #f8f9fc;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .bank-details-section h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Withdrawal Info */
+        .withdrawal-info {
+            background: #e8f4fd;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .withdrawal-info h5 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .withdrawal-info ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .withdrawal-info li {
+            margin-bottom: 10px;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        .withdrawal-info li i {
+            margin-right: 10px;
+        }
+
+        /* Checkbox */
+        .terms-checkbox {
+            margin-bottom: 25px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            cursor: pointer;
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .checkbox-label input {
+            display: none;
+        }
+
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            position: relative;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .checkbox-label input:checked+.checkbox-custom {
+            background: #667eea;
+            border-color: #667eea;
+        }
+
+        .checkbox-label input:checked+.checkbox-custom::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 0.7rem;
+        }
+
+        .checkbox-text a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .checkbox-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* Submit Button */
+        .btn-withdraw {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-withdraw:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(28, 200, 138, 0.3);
+        }
+
+        .btn-withdraw i {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-withdraw:hover i {
+            transform: translateX(5px);
+        }
+
+        .btn-withdraw:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Recent Withdrawals */
+        .recent-withdrawals {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .recent-withdrawals h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .withdrawals-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .withdrawal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fc;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .withdrawal-item:hover {
+            transform: translateX(5px);
+            background: #f0f2f5;
+        }
+
+        .withdrawal-amount {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .withdrawal-date {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        .withdrawal-status {
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .withdrawal-status.pending {
+            background: rgba(246, 194, 62, 0.1);
+            color: #f6c23e;
+        }
+
+        .withdrawal-status.completed {
+            background: rgba(28, 200, 138, 0.1);
+            color: #1cc88a;
+        }
+
+        .withdrawal-status.failed {
+            background: rgba(231, 74, 59, 0.1);
+            color: #e74a3b;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .withdraw-card {
+                padding: 25px;
+            }
+
+            .amount-presets {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .balance-amount {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+
+    <script>
+        function setAmount(amount) {
+            document.getElementById('amount').value = amount;
+            validateAmount();
+        }
+
+        function validateAmount() {
+            const amount = document.getElementById('amount').value;
+            const balance = <%= user.walletBalance %>;
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (amount < 100) {
+                submitBtn.disabled = true;
+                return false;
+            }
+
+            if (amount > balance) {
+                submitBtn.disabled = true;
+                alert('Amount cannot exceed your available balance');
+                return false;
+            }
+
+            submitBtn.disabled = false;
+            return true;
+        }
+
+        function validateWithdrawal() {
+            const amount = document.getElementById('amount').value;
+            const balance = <%= user.walletBalance %>;
+            const terms = document.getElementById('terms').checked;
+
+            if (amount < 100) {
+                alert('Minimum withdrawal amount is ₹100');
+                return false;
+            }
+
+            if (amount > balance) {
+                alert('Insufficient balance');
+                return false;
+            }
+
+            if (!terms) {
+                alert('Please accept the terms and conditions');
+                return false;
+            }
+
+            return confirm('Are you sure you want to withdraw ₹' + amount + '?');
+        }
+
+        // Real-time validation
+        document.getElementById('amount').addEventListener('input', validateAmount);
+    </script>
+
+    <%- include('../partials/footer') %>

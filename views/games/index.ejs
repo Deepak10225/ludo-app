@@ -1,0 +1,780 @@
+<%- include('../partials/header') %>
+
+    <div class="games-container">
+        <div class="container">
+            <!-- Header -->
+            <div class="games-header">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="games-title">
+                            <i class="fas fa-dice"></i> Play Ludo
+                        </h1>
+                        <p class="games-subtitle">Choose your bet amount and start playing</p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <div class="wallet-quick-info">
+                            <span class="wallet-label">Your Balance:</span>
+                            <span class="wallet-amount">₹<%= user.walletBalance.toFixed(2) %></span>
+                            <a href="/wallet" class="btn btn-sm btn-outline-primary ms-2">
+                                <i class="fas fa-plus-circle"></i> Add
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bet Range Selection -->
+            <div class="range-selector">
+                <div class="btn-group w-100" role="group">
+                    <a href="/games?range=100-25000" class="range-btn <%= range === '100-25000' ? 'active' : '' %>">
+                        <span class="range-icon">🎲</span>
+                        <span class="range-text">Beginner</span>
+                        <span class="range-value">₹100 - ₹25,000</span>
+                    </a>
+                    <a href="/games?range=25000-100000"
+                        class="range-btn <%= range === '25000-100000' ? 'active' : '' %>">
+                        <span class="range-icon">👑</span>
+                        <span class="range-text">Pro</span>
+                        <span class="range-value">₹25,000 - ₹1,00,000</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Left Column - Game Options -->
+                <div class="col-lg-8">
+                    <!-- Quick Bet Cards -->
+                    <div class="quick-bets-card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-bolt"></i> Quick Bet</h4>
+                            <p>Select your bet amount</p>
+                        </div>
+                        <div class="card-body">
+                            <div class="bet-options">
+                                <% options.forEach(function(amount) { %>
+                                    <button class="bet-option" onclick="showCreateModal(<%= amount %>)">
+                                        <span class="bet-amount">₹<%= amount.toLocaleString() %></span>
+                                        <span class="bet-win">Win ₹<%= (amount * 2).toLocaleString() %></span>
+                                    </button>
+                                    <% }); %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Join with Room ID -->
+                    <div class="join-card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-sign-in-alt"></i> Join with Room ID</h4>
+                            <p>Enter the 6-digit room code</p>
+                        </div>
+                        <div class="card-body">
+                            <form action="/games/join" method="POST" class="join-form"
+                                onsubmit="return validateRoomId()">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-hashtag"></i>
+                                    </span>
+                                    <input type="text" name="roomId" id="roomId" class="form-control room-input"
+                                        placeholder="Enter 6-digit Room ID" pattern="[0-9]{6}" maxlength="6"
+                                        autocomplete="off" required>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-sign-in-alt"></i> Join Game
+                                    </button>
+                                </div>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle"></i> Enter the 6-digit room code from Ludo King
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Waiting Games -->
+                    <% if (waitingGames && waitingGames.length> 0) { %>
+                        <div class="waiting-games-card">
+                            <div class="card-header">
+                                <h4><i class="fas fa-clock"></i> Games Waiting for Players</h4>
+                                <p>
+                                    <%= waitingGames.length %> game(s) available
+                                </p>
+                            </div>
+                            <div class="card-body">
+                                <div class="waiting-games-list">
+                                    <% waitingGames.forEach(function(game) { %>
+                                        <% // Only show games that don't have player2 and are waiting var
+                                            showGame=(!game.player2 && game.status==='waiting' ); %>
+                                            <% if (showGame) { %>
+                                                <div class="waiting-game-item">
+                                                    <div class="game-info">
+                                                        <div class="player-info">
+                                                            <div class="player-avatar">
+                                                                <%= game.player1.username.charAt(0).toUpperCase() %>
+                                                            </div>
+                                                            <div class="player-details">
+                                                                <span class="player-name">
+                                                                    <%= game.player1.username %>
+                                                                </span>
+                                                                <span class="game-time">
+                                                                    <i class="far fa-clock"></i>
+                                                                    <%= new Date(game.createdAt).toLocaleTimeString() %>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="bet-info">
+                                                            <span class="bet-label">Bet</span>
+                                                            <span class="bet-amount">₹<%=
+                                                                    game.betAmount.toLocaleString() %></span>
+                                                            <span class="win-amount">Win ₹<%= (game.betAmount *
+                                                                    2).toLocaleString() %></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="game-actions">
+                                                        <span class="room-code-badge">
+                                                            <i class="fas fa-door-open"></i>
+                                                            <%= game.roomId %>
+                                                        </span>
+                                                        <form action="/games/join" method="POST" class="d-inline">
+                                                            <input type="hidden" name="roomId"
+                                                                value="<%= game.roomId %>">
+                                                            <button type="submit" class="btn btn-success btn-sm">
+                                                                <i class="fas fa-play"></i> Join Now
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                                <% } %>
+                                                    <% }); %>
+                                </div>
+                            </div>
+                        </div>
+                        <% } else { %>
+                            <div class="no-games-card">
+                                <div class="card-body text-center py-5">
+                                    <i class="fas fa-dice fa-4x text-muted mb-3"></i>
+                                    <h5>No games waiting</h5>
+                                    <p class="text-muted">Be the first to create a game!</p>
+                                </div>
+                            </div>
+                            <% } %>
+                </div>
+
+                <!-- Right Column - Info & Stats -->
+                <div class="col-lg-4">
+                    <!-- How to Play Card -->
+                    <div class="info-card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-info-circle"></i> How to Play</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="step-list">
+                                <div class="step-item">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h6>Create or Join</h6>
+                                        <p>Create a game or enter room ID</p>
+                                    </div>
+                                </div>
+                                <div class="step-item">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h6>Get Room ID</h6>
+                                        <p>Share the 6-digit code with opponent</p>
+                                    </div>
+                                </div>
+                                <div class="step-item">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h6>Play in Ludo King</h6>
+                                        <p>Open app and enter room ID</p>
+                                    </div>
+                                </div>
+                                <div class="step-item">
+                                    <div class="step-number">4</div>
+                                    <div class="step-content">
+                                        <h6>Upload Screenshot</h6>
+                                        <p>Winner uploads proof to get paid</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Card -->
+                    <div class="stats-card mt-4">
+                        <div class="card-header">
+                            <h4><i class="fas fa-chart-line"></i> Platform Stats</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-item">
+                                <span class="stat-label">Active Players</span>
+                                <span class="stat-value">1,234</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Games Today</span>
+                                <span class="stat-value">567</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total Winnings</span>
+                                <span class="stat-value text-success">₹12,34,567</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Support Card -->
+                    <div class="support-card mt-4">
+                        <div class="card-body text-center">
+                            <i class="fas fa-headset fa-3x text-primary mb-3"></i>
+                            <h5>Need Help?</h5>
+                            <p class="text-muted small">24/7 Customer Support</p>
+                            <a href="#" class="btn btn-outline-primary btn-sm" onclick="showSupport()">
+                                <i class="fas fa-comment"></i> Live Chat
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Game Modal -->
+    <div class="modal fade" id="createGameModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus-circle text-primary"></i> Create New Game
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="/games/create" method="POST">
+                    <input type="hidden" name="betRange" value="<%= range %>">
+                    <input type="hidden" name="betAmount" id="modalBetAmount">
+
+                    <div class="modal-body">
+                        <div class="text-center mb-4">
+                            <div class="bet-preview">
+                                <span class="preview-label">Bet Amount</span>
+                                <span class="preview-amount" id="modalAmountDisplay">₹0</span>
+                            </div>
+                        </div>
+
+                        <div class="game-preview-info">
+                            <div class="preview-item">
+                                <i class="fas fa-tag"></i>
+                                <span>Range: <strong>
+                                        <%= range %>
+                                    </strong></span>
+                            </div>
+                            <div class="preview-item">
+                                <i class="fas fa-trophy"></i>
+                                <span>Win: <strong id="modalWinDisplay">₹0</strong></span>
+                            </div>
+                            <div class="preview-item">
+                                <i class="fas fa-wallet"></i>
+                                <span>Your Balance: <strong>₹<%= user.walletBalance.toFixed(2) %></strong></span>
+                            </div>
+                        </div>
+
+                        <% if (user.walletBalance < 100) { %>
+                            <div class="alert alert-warning mt-3">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Low balance! Please <a href="/wallet">add funds</a> to play.
+                            </div>
+                            <% } %>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary" <%=user.walletBalance < 100 ? 'disabled' : '' %>>
+                            <i class="fas fa-play"></i> Create Game
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Games Container */
+        .games-container {
+            padding: 40px 0;
+            background: #f8f9fc;
+            min-height: calc(100vh - 76px);
+        }
+
+        /* Header */
+        .games-header {
+            margin-bottom: 30px;
+        }
+
+        .games-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .games-title i {
+            color: #667eea;
+        }
+
+        .games-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .wallet-quick-info {
+            background: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            display: inline-block;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .wallet-label {
+            color: #666;
+            margin-right: 5px;
+        }
+
+        .wallet-amount {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        /* Range Selector */
+        .range-selector {
+            margin-bottom: 30px;
+        }
+
+        .range-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .range-btn:first-child {
+            border-radius: 15px 0 0 15px;
+        }
+
+        .range-btn:last-child {
+            border-radius: 0 15px 15px 0;
+        }
+
+        .range-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+        }
+
+        .range-btn.active .range-icon,
+        .range-btn.active .range-text,
+        .range-btn.active .range-value {
+            color: white;
+        }
+
+        .range-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            color: #667eea;
+        }
+
+        .range-text {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .range-value {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Cards */
+        .quick-bets-card,
+        .join-card,
+        .waiting-games-card,
+        .no-games-card,
+        .info-card,
+        .stats-card,
+        .support-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fc, #ffffff);
+            padding: 20px 25px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .card-header h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .card-header h4 i {
+            color: #667eea;
+            margin-right: 8px;
+        }
+
+        .card-header p {
+            color: #999;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        /* Bet Options */
+        .bet-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+        }
+
+        .bet-option {
+            background: linear-gradient(135deg, #f8f9fc, #ffffff);
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .bet-option:hover {
+            transform: translateY(-3px);
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .bet-amount {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .bet-win {
+            display: block;
+            font-size: 0.8rem;
+            color: #1cc88a;
+            font-weight: 500;
+        }
+
+        /* Join Form */
+        .join-form .input-group {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .join-form .input-group-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        .room-input {
+            border: 2px solid #e0e0e0;
+            padding: 15px;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .room-input:focus {
+            border-color: #667eea;
+            box-shadow: none;
+        }
+
+        .form-text {
+            margin-top: 8px;
+            color: #999;
+        }
+
+        /* Waiting Games */
+        .waiting-games-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .waiting-game-item {
+            background: #f8f9fc;
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .waiting-game-item:hover {
+            transform: translateX(5px);
+            border-color: #667eea;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .player-avatar {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .player-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .player-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .game-time {
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        .bet-info {
+            text-align: right;
+        }
+
+        .bet-label {
+            display: block;
+            font-size: 0.7rem;
+            color: #999;
+        }
+
+        .bet-amount {
+            font-weight: 700;
+            color: #e74a3b;
+            margin-right: 5px;
+        }
+
+        .win-amount {
+            font-size: 0.8rem;
+            color: #1cc88a;
+        }
+
+        .game-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .room-code-badge {
+            background: #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        /* Step List */
+        .step-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .step-content h6 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .step-content p {
+            font-size: 0.85rem;
+            color: #999;
+            margin: 0;
+        }
+
+        /* Stats */
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #666;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: #333;
+        }
+
+        /* Modal */
+        .bet-preview {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+        }
+
+        .preview-label {
+            display: block;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .preview-amount {
+            display: block;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .game-preview-info {
+            background: #f8f9fc;
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .preview-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+        }
+
+        .preview-item i {
+            width: 20px;
+            color: #667eea;
+        }
+
+        .preview-item span {
+            color: #333;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .bet-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .game-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .bet-info {
+                text-align: left;
+                width: 100%;
+            }
+
+            .game-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .room-code-badge {
+                width: 100%;
+                text-align: center;
+            }
+
+            .game-actions form {
+                width: 100%;
+            }
+
+            .game-actions .btn {
+                width: 100%;
+            }
+        }
+    </style>
+
+    <script>
+        function showCreateModal(amount) {
+            document.getElementById('modalBetAmount').value = amount;
+            document.getElementById('modalAmountDisplay').innerText = '₹' + amount.toLocaleString();
+
+            var winAmount = amount * 2;
+            document.getElementById('modalWinDisplay').innerText = '₹' + winAmount.toLocaleString();
+
+            var modal = new bootstrap.Modal(document.getElementById('createGameModal'));
+            modal.show();
+        }
+
+        function validateRoomId() {
+            var roomId = document.getElementById('roomId').value;
+            if (!/^\d{6}$/.test(roomId)) {
+                alert('Please enter a valid 6-digit room ID');
+                return false;
+            }
+            return true;
+        }
+
+        function showSupport() {
+            alert('Live chat coming soon! Please contact support@ludowin.com');
+        }
+
+        // Auto-refresh waiting games every 30 seconds
+        setTimeout(function () {
+            location.reload();
+        }, 30000);
+    </script>
+
+    <%- include('../partials/footer') %>

@@ -1,0 +1,1132 @@
+<%- include('../partials/header') %>
+
+    <div class="wallet-container">
+        <div class="container">
+            <!-- Wallet Header -->
+            <div class="wallet-header">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="wallet-title">
+                            <i class="fas fa-wallet"></i> My Wallet
+                        </h1>
+                        <p class="wallet-subtitle">Manage your funds and transactions</p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <button class="btn btn-primary" onclick="showDepositModal()">
+                            <i class="fas fa-plus-circle"></i> Add Money
+                        </button>
+                        <a href="/wallet/withdraw" class="btn btn-outline-primary ms-2">
+                            <i class="fas fa-arrow-up"></i> Withdraw
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Balance Card -->
+            <div class="balance-card">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="balance-label">Available Balance</div>
+                        <div class="balance-amount">₹<%= user.walletBalance.toFixed(2) %>
+                        </div>
+                        <div class="balance-note">Instant withdrawals available</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value">
+                                    <%= user.totalGames || 0 %>
+                                </div>
+                                <div class="stat-label">Total Games</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">
+                                    <%= user.totalWins || 0 %>
+                                </div>
+                                <div class="stat-label">Wins</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">₹<%= (user.totalEarnings || 0).toFixed(2) %>
+                                </div>
+                                <div class="stat-label">Total Earnings</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions - Enhanced UI -->
+            <div class="quick-actions">
+                <div class="quick-actions-header">
+                    <h4 class="quick-actions-title">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h4>
+                    <p class="quick-actions-subtitle">Frequently used operations</p>
+                </div>
+
+                <div class="quick-actions-grid">
+                    <!-- Add Money Card -->
+                    <div class="quick-action-card" onclick="showDepositModal()">
+                        <div class="card-content">
+                            <div class="card-icon bg-gradient-primary">
+                                <i class="fas fa-plus-circle"></i>
+                            </div>
+                            <div class="card-text">
+                                <h5>Add Money</h5>
+                                <p>Deposit to wallet</p>
+                            </div>
+                            <div class="card-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                        <div class="card-hover-effect"></div>
+                    </div>
+
+                    <!-- Withdraw Card -->
+                    <a href="/wallet/withdraw" class="quick-action-card">
+                        <div class="card-content">
+                            <div class="card-icon bg-gradient-success">
+                                <i class="fas fa-arrow-up"></i>
+                            </div>
+                            <div class="card-text">
+                                <h5>Withdraw</h5>
+                                <p>Transfer to bank</p>
+                            </div>
+                            <div class="card-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                        <div class="card-hover-effect"></div>
+                    </a>
+
+                    <!-- Play Now Card -->
+                    <a href="/games" class="quick-action-card">
+                        <div class="card-content">
+                            <div class="card-icon bg-gradient-warning">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                            <div class="card-text">
+                                <h5>Play Now</h5>
+                                <p>Join a game</p>
+                            </div>
+                            <div class="card-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                        <div class="card-hover-effect"></div>
+                    </a>
+
+                    <!-- Transaction History Card -->
+                    <a href="/wallet/transactions" class="quick-action-card">
+                        <div class="card-content">
+                            <div class="card-icon bg-gradient-info">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <div class="card-text">
+                                <h5>History</h5>
+                                <p>View transactions</p>
+                            </div>
+                            <div class="card-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                        <div class="card-hover-effect"></div>
+                    </a>
+
+                    <!-- Refer & Earn Card -->
+                    <div class="quick-action-card" onclick="showReferModal()">
+                        <div class="card-content">
+                            <div class="card-icon bg-gradient-danger">
+                                <i class="fas fa-gift"></i>
+                            </div>
+                            <div class="card-text">
+                                <h5>Refer & Earn</h5>
+                                <p>Earn ₹100 per friend</p>
+                            </div>
+                            <div class="card-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                        <div class="card-hover-effect"></div>
+                    </div>
+
+                    <!-- Support Card -->
+                    <div class="quick-action-card" onclick="showSupportModal()">
+                        <div class="card-content">
+                            <div class="card-icon bg-gradient-secondary">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <div class="card-text">
+                                <h5>24/7 Support</h5>
+                                <p>Get help</p>
+                            </div>
+                            <div class="card-arrow">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                        <div class="card-hover-effect"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="recent-transactions">
+                <div class="section-header">
+                    <h4>Recent Transactions</h4>
+                    <a href="/wallet/transactions" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <% if (recentTransactions && recentTransactions.length> 0) { %>
+                    <div class="transactions-list">
+                        <% recentTransactions.forEach(transaction=> { %>
+                            <div class="transaction-item">
+                                <div class="transaction-icon <%= transaction.type %>">
+                                    <% if (transaction.type==='deposit' ) { %>
+                                        <i class="fas fa-arrow-down"></i>
+                                        <% } else if (transaction.type==='withdrawal' ) { %>
+                                            <i class="fas fa-arrow-up"></i>
+                                            <% } else if (transaction.type==='bet' ) { %>
+                                                <i class="fas fa-gamepad"></i>
+                                                <% } else if (transaction.type==='win' ) { %>
+                                                    <i class="fas fa-trophy"></i>
+                                                    <% } else { %>
+                                                        <i class="fas fa-exchange-alt"></i>
+                                                        <% } %>
+                                </div>
+                                <div class="transaction-details">
+                                    <div class="transaction-title">
+                                        <%= transaction.description || transaction.type.charAt(0).toUpperCase() +
+                                            transaction.type.slice(1) %>
+                                    </div>
+                                    <div class="transaction-date">
+                                        <%= new Date(transaction.createdAt).toLocaleDateString('en-IN', { day: 'numeric'
+                                            , month: 'short' , hour: '2-digit' , minute: '2-digit' }) %>
+                                    </div>
+                                </div>
+                                <div class="transaction-amount <%= transaction.type %>">
+                                    <%= transaction.type==='withdrawal' || transaction.type==='bet' ? '-' : '+' %>
+                                        ₹<%= transaction.amount.toFixed(2) %>
+                                </div>
+                                <div class="transaction-status">
+                                    <span class="status-badge <%= transaction.status %>">
+                                        <%= transaction.status %>
+                                    </span>
+                                </div>
+                            </div>
+                            <% }) %>
+                    </div>
+                    <% } else { %>
+                        <div class="empty-state">
+                            <i class="fas fa-exchange-alt fa-3x text-muted mb-3"></i>
+                            <h5>No Transactions Yet</h5>
+                            <p>Your transaction history will appear here</p>
+                            <button class="btn btn-primary" onclick="showDepositModal()">
+                                Make Your First Deposit
+                            </button>
+                        </div>
+                        <% } %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deposit Modal -->
+    <div class="modal fade" id="depositModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Money to Wallet</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/wallet/deposit" method="POST" id="depositForm">
+                        <div class="amount-presets">
+                            <button type="button" class="preset-btn" onclick="setAmount(100)">₹100</button>
+                            <button type="button" class="preset-btn" onclick="setAmount(500)">₹500</button>
+                            <button type="button" class="preset-btn" onclick="setAmount(1000)">₹1000</button>
+                            <button type="button" class="preset-btn" onclick="setAmount(5000)">₹5000</button>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <label for="amount">Enter Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                <input type="number" class="form-control" id="amount" name="amount" min="100" step="1"
+                                    required placeholder="Minimum ₹100">
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="paymentMethod">Payment Method</label>
+                            <select class="form-control" id="paymentMethod" name="paymentMethod" required>
+                                <option value="">Select payment method</option>
+                                <option value="razorpay">Razorpay (UPI/Card/NetBanking)</option>
+                                <option value="paytm">Paytm</option>
+                                <option value="phonepe">PhonePe</option>
+                                <option value="bank">Bank Transfer</option>
+                            </select>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary w-100 py-3">
+                                <i class="fas fa-lock me-2"></i>Proceed to Payment
+                            </button>
+                        </div>
+
+                        <p class="text-muted text-center mt-3 small">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            Secure 256-bit encrypted payment
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Refer Modal -->
+    <div class="modal fade" id="referModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Refer & Earn</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="fas fa-gift fa-4x text-primary mb-3"></i>
+                    <h4>Refer a Friend, Earn ₹100</h4>
+                    <p class="text-muted">Share your referral code with friends and earn ₹100 when they sign up and make
+                        their first deposit.</p>
+
+                    <div class="referral-code-box">
+                        <span class="referral-label">Your Referral Code:</span>
+                        <div class="referral-code">
+                            <strong>
+                                <%= user.referralCode || 'LUDO' + (user._id ? user._id.toString().slice(-6) : '123456' )
+                                    %>
+                            </strong>
+                            <button class="btn btn-sm btn-outline-primary" onclick="copyReferralCode()">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="share-buttons mt-4">
+                        <h6>Share via</h6>
+                        <div class="d-flex justify-content-center gap-3">
+                            <button class="btn btn-outline-primary" onclick="shareWhatsApp()">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="shareTelegram()">
+                                <i class="fab fa-telegram"></i> Telegram
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Modal -->
+    <div class="modal fade" id="supportModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">24/7 Customer Support</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="support-options">
+                        <div class="support-option">
+                            <i class="fas fa-phone-alt fa-2x text-primary"></i>
+                            <div>
+                                <h6>Phone Support</h6>
+                                <p class="text-muted">+91 98765 43210</p>
+                            </div>
+                        </div>
+
+                        <div class="support-option">
+                            <i class="fas fa-envelope fa-2x text-primary"></i>
+                            <div>
+                                <h6>Email Support</h6>
+                                <p class="text-muted">support@ludowin.com</p>
+                            </div>
+                        </div>
+
+                        <div class="support-option">
+                            <i class="fas fa-comment fa-2x text-primary"></i>
+                            <div>
+                                <h6>Live Chat</h6>
+                                <p class="text-muted">Available 24/7</p>
+                            </div>
+                        </div>
+
+                        <div class="support-option">
+                            <i class="fab fa-whatsapp fa-2x text-primary"></i>
+                            <div>
+                                <h6>WhatsApp</h6>
+                                <p class="text-muted">+91 98765 43210</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-preview mt-4">
+                        <h6>Frequently Asked Questions</h6>
+                        <div class="faq-item">
+                            <a href="#">How fast are withdrawals?</a>
+                        </div>
+                        <div class="faq-item">
+                            <a href="#">How do I start playing?</a>
+                        </div>
+                        <div class="faq-item">
+                            <a href="#">Is my money safe?</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary w-100" onclick="startLiveChat()">
+                        <i class="fas fa-comment-dots me-2"></i>Start Live Chat
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Wallet Container */
+        .wallet-container {
+            padding: 40px 0;
+            background: #f8f9fc;
+            min-height: calc(100vh - 76px);
+        }
+
+        /* Wallet Header */
+        .wallet-header {
+            margin-bottom: 30px;
+        }
+
+        .wallet-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .wallet-title i {
+            color: #667eea;
+        }
+
+        .wallet-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        /* Balance Card */
+        .balance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 40px;
+            color: white;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .balance-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .balance-amount {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 10px;
+        }
+
+        .balance-note {
+            opacity: 0.8;
+            font-size: 0.95rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(5px);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Quick Actions Section */
+        .quick-actions {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-actions::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            border-radius: 50%;
+            transform: translate(50%, -50%);
+            pointer-events: none;
+        }
+
+        .quick-actions-header {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .quick-actions-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .quick-actions-title i {
+            color: #667eea;
+            font-size: 1.4rem;
+        }
+
+        .quick-actions-subtitle {
+            color: #999;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        /* Quick Actions Grid */
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            position: relative;
+        }
+
+        /* Quick Action Card */
+        .quick-action-card {
+            position: relative;
+            background: linear-gradient(145deg, #ffffff, #f8f9fc);
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            overflow: hidden;
+            z-index: 1;
+            display: block;
+            color: inherit;
+        }
+
+        .quick-action-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(102, 126, 234, 0.3);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.15);
+        }
+
+        .card-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Card Icon */
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .quick-action-card:hover .card-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* Gradient Backgrounds */
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .bg-gradient-success {
+            background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);
+        }
+
+        .bg-gradient-warning {
+            background: linear-gradient(135deg, #f6c23e 0%, #d4ac0d 100%);
+        }
+
+        .bg-gradient-info {
+            background: linear-gradient(135deg, #36b9cc 0%, #258391 100%);
+        }
+
+        .bg-gradient-danger {
+            background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%);
+        }
+
+        .bg-gradient-secondary {
+            background: linear-gradient(135deg, #858796 0%, #60616f 100%);
+        }
+
+        /* Card Text */
+        .card-text {
+            flex: 1;
+        }
+
+        .card-text h5 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #333;
+            margin: 0 0 5px 0;
+            transition: color 0.3s ease;
+        }
+
+        .quick-action-card:hover .card-text h5 {
+            color: #667eea;
+        }
+
+        .card-text p {
+            font-size: 0.85rem;
+            color: #999;
+            margin: 0;
+            transition: color 0.3s ease;
+        }
+
+        .quick-action-card:hover .card-text p {
+            color: #666;
+        }
+
+        /* Card Arrow */
+        .card-arrow {
+            width: 35px;
+            height: 35px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action-card:hover .card-arrow {
+            background: #667eea;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        /* Hover Effect */
+        .card-hover-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(102, 126, 234, 0.1), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .quick-action-card:hover .card-hover-effect {
+            opacity: 1;
+        }
+
+        /* Recent Transactions */
+        .recent-transactions {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h4 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+
+        .view-all {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .view-all:hover {
+            color: #764ba2;
+            transform: translateX(5px);
+        }
+
+        /* Transaction List */
+        .transactions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 12px;
+            background: #f8f9fc;
+            transition: all 0.3s ease;
+        }
+
+        .transaction-item:hover {
+            transform: translateX(5px);
+            background: #f0f2f5;
+        }
+
+        .transaction-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+        }
+
+        .transaction-icon.deposit {
+            background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);
+        }
+
+        .transaction-icon.withdrawal {
+            background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%);
+        }
+
+        .transaction-icon.bet {
+            background: linear-gradient(135deg, #f6c23e 0%, #d4ac0d 100%);
+        }
+
+        .transaction-icon.win {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .transaction-date {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin: 0 20px;
+        }
+
+        .transaction-amount.deposit,
+        .transaction-amount.win {
+            color: #1cc88a;
+        }
+
+        .transaction-amount.withdrawal,
+        .transaction-amount.bet {
+            color: #e74a3b;
+        }
+
+        .transaction-status {
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .status-badge.completed {
+            background: rgba(28, 200, 138, 0.1);
+            color: #1cc88a;
+        }
+
+        .status-badge.pending {
+            background: rgba(246, 194, 62, 0.1);
+            color: #f6c23e;
+        }
+
+        .status-badge.failed {
+            background: rgba(231, 74, 59, 0.1);
+            color: #e74a3b;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state h5 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #999;
+            margin-bottom: 20px;
+        }
+
+        /* Deposit Modal */
+        .amount-presets {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .preset-btn {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .preset-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        /* Referral Modal */
+        .referral-code-box {
+            background: #f8f9fc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .referral-label {
+            display: block;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .referral-code {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .referral-code strong {
+            font-size: 1.5rem;
+            color: #667eea;
+            letter-spacing: 2px;
+        }
+
+        .share-buttons h6 {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        /* Support Modal */
+        .support-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .support-option {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            background: #f8f9fc;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .support-option:hover {
+            transform: translateX(5px);
+            background: #f0f2f5;
+        }
+
+        .support-option h6 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .support-option p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .faq-preview {
+            background: #f8f9fc;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .faq-preview h6 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .faq-item {
+            margin-bottom: 8px;
+        }
+
+        .faq-item a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: block;
+            padding: 5px 0;
+        }
+
+        .faq-item a:hover {
+            color: #764ba2;
+            padding-left: 5px;
+        }
+
+        /* Animation for cards */
+        @keyframes cardAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .quick-action-card {
+            animation: cardAppear 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .quick-action-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .quick-action-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .quick-action-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .quick-action-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .quick-action-card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .quick-action-card:nth-child(6) {
+            animation-delay: 0.6s;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 1200px) {
+            .quick-actions-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .quick-actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .balance-card {
+                padding: 25px;
+            }
+
+            .balance-amount {
+                font-size: 2.5rem;
+            }
+
+            .stats-grid {
+                margin-top: 20px;
+            }
+
+            .transaction-item {
+                flex-wrap: wrap;
+            }
+
+            .transaction-status {
+                width: 100%;
+                text-align: left;
+                margin-top: 10px;
+                margin-left: 60px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .quick-actions {
+                padding: 20px;
+            }
+
+            .quick-actions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+
+            .card-text h5 {
+                font-size: 1rem;
+            }
+
+            .amount-presets {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+
+    <script>
+        function showDepositModal() {
+            new bootstrap.Modal(document.getElementById('depositModal')).show();
+        }
+
+        function showReferModal() {
+            new bootstrap.Modal(document.getElementById('referModal')).show();
+        }
+
+        function showSupportModal() {
+            new bootstrap.Modal(document.getElementById('supportModal')).show();
+        }
+
+        function setAmount(amount) {
+            document.getElementById('amount').value = amount;
+        }
+
+        function copyReferralCode() {
+            const code = document.querySelector('.referral-code strong').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Referral code copied to clipboard!');
+            });
+        }
+
+        function shareWhatsApp() {
+            const code = document.querySelector('.referral-code strong').innerText;
+            const text = `Join LudoWin and get ₹100 bonus! Use my referral code: ${code}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function shareTelegram() {
+            const code = document.querySelector('.referral-code strong').innerText;
+            const text = `Join LudoWin and get ₹100 bonus! Use my referral code: ${code}`;
+            window.open(`https://t.me/share/url?url=${encodeURIComponent('https://ludowin.com')}&text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function startLiveChat() {
+            alert('Live chat coming soon! Please contact support via email or phone.');
+        }
+
+        // Format currency input
+        document.getElementById('amount')?.addEventListener('input', function (e) {
+            let value = parseInt(e.target.value);
+            if (value < 100) {
+                e.target.setCustomValidity('Minimum amount is ₹100');
+            } else {
+                e.target.setCustomValidity('');
+            }
+        });
+    </script>
+
+    <%- include('../partials/footer') %>

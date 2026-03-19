@@ -1,0 +1,113 @@
+<%- include('partials/header') %>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="row min-vh-75 align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    Play Ludo, <span class="text-primary">Win Real Money!</span>
+                </h1>
+                <p class="lead mb-4">
+                    Join thousands of players and win cash prizes. Instant withdrawals,
+                    secure payments, and 24/7 support.
+                </p>
+                <% if (!user) { %>
+                    <div class="d-grid gap-2 d-md-flex">
+                        <a href="/register" class="btn btn-primary btn-lg px-4 me-md-2">
+                            <i class="fas fa-user-plus"></i> Register Now
+                        </a>
+                        <a href="/login" class="btn btn-outline-primary btn-lg px-4">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                    </div>
+                    <% } else { %>
+                        <a href="/games" class="btn btn-primary btn-lg px-4">
+                            <i class="fas fa-gamepad"></i> Start Playing
+                        </a>
+                        <% } %>
+            </div>
+            <div class="col-lg-6">
+                <img src="https://via.placeholder.com/600x400" alt="Ludo Game" class="img-fluid rounded">
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="row my-5 py-5">
+            <h2 class="text-center mb-5">Why Choose Us?</h2>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center p-4">
+                    <i class="fas fa-bolt fa-3x text-primary mb-3"></i>
+                    <h5>Instant Games</h5>
+                    <p>Quick matchmaking with players around the world</p>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center p-4">
+                    <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                    <h5>Secure Payments</h5>
+                    <p>Your money is safe with our encrypted payment system</p>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center p-4">
+                    <i class="fas fa-trophy fa-3x text-primary mb-3"></i>
+                    <h5>Real Rewards</h5>
+                    <p>Withdraw your winnings directly to your bank account</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="row my-5 py-5 bg-light rounded">
+            <h2 class="text-center mb-5">How It Works</h2>
+
+            <div class="col-md-3 text-center">
+                <div class="step-number">1</div>
+                <h5>Register</h5>
+                <p>Create your free account</p>
+            </div>
+
+            <div class="col-md-3 text-center">
+                <div class="step-number">2</div>
+                <h5>Add Funds</h5>
+                <p>Deposit money to your wallet</p>
+            </div>
+
+            <div class="col-md-3 text-center">
+                <div class="step-number">3</div>
+                <h5>Play & Win</h5>
+                <p>Join games and win cash</p>
+            </div>
+
+            <div class="col-md-3 text-center">
+                <div class="step-number">4</div>
+                <h5>Withdraw</h5>
+                <p>Get your winnings instantly</p>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .min-vh-75 {
+            min-height: 75vh;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: var(--bs-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+    </style>
+
+    <%- include('partials/footer') %>

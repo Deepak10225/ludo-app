@@ -1,0 +1,866 @@
+<%- include('../partials/header') %>
+
+    <div class="history-container">
+        <div class="container">
+            <!-- Header -->
+            <div class="history-header">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="history-title">
+                            <i class="fas fa-history"></i> Game History
+                        </h1>
+                        <p class="history-subtitle">Track all your games and performance</p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <div class="history-stats-summary">
+                            <span class="stat-badge">
+                                <i class="fas fa-gamepad"></i> Total: <%= pagination?.total || 0 %>
+                            </span>
+                            <span class="stat-badge">
+                                <i class="fas fa-trophy text-warning"></i> Wins: <%= user.totalWins || 0 %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-card">
+                <div class="row align-items-center">
+                    <div class="col-md-3">
+                        <select class="form-control filter-select" id="statusFilter">
+                            <option value="all">All Games</option>
+                            <option value="waiting">Waiting</option>
+                            <option value="active">Active</option>
+                            <option value="completed">Completed</option>
+                            <option value="disputed">Disputed</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control filter-select" id="resultFilter">
+                            <option value="all">All Results</option>
+                            <option value="won">Won</option>
+                            <option value="lost">Lost</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control filter-select" id="rangeFilter">
+                            <option value="all">All Ranges</option>
+                            <option value="100-25000">₹100 - ₹25,000</option>
+                            <option value="25000-100000">₹25,000 - ₹1,00,000</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control" id="searchInput" placeholder="Search by Room ID...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Games List -->
+            <div class="games-list-card">
+                <% if (games && games.length> 0) { %>
+                    <div class="games-list">
+                        <% games.forEach(game=> {
+                            const isPlayer1 = game.player1 && game.player1._id.toString() === user._id.toString();
+                            const isPlayer2 = game.player2 && game.player2._id.toString() === user._id.toString();
+                            const opponent = isPlayer1 ? game.player2 : game.player1;
+                            const userWon = game.winner && game.winner._id.toString() === user._id.toString();
+                            const gameStatus = game.status;
+                            const betAmount = game.betAmount || 0;
+                            const winnings = game.winnings || betAmount * 2;
+                            %>
+                            <div class="game-item" data-status="<%= game.status %>"
+                                data-result="<%= game.winner ? (userWon ? 'won' : 'lost') : 'pending' %>"
+                                data-range="<%= game.betRange %>" data-room="<%= game.roomId %>">
+
+                                <!-- Game Header -->
+                                <div class="game-header">
+                                    <div class="game-room">
+                                        <span class="room-label">Room ID:</span>
+                                        <span class="room-value">
+                                            <%= game.roomId %>
+                                        </span>
+                                        <button class="btn-copy" onclick="copyRoomId('<%= game.roomId %>')">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                    <div class="game-date">
+                                        <i class="far fa-calendar"></i>
+                                        <%= new Date(game.createdAt).toLocaleDateString('en-IN', { day: 'numeric' ,
+                                            month: 'short' , year: 'numeric' , hour: '2-digit' , minute: '2-digit' }) %>
+                                    </div>
+                                </div>
+
+                                <!-- Game Content -->
+                                <div class="game-content">
+                                    <!-- Players -->
+                                    <div class="players-section">
+                                        <div class="player player1 <%= isPlayer1 ? 'current-user' : '' %>">
+                                            <div class="player-avatar">
+                                                <span class="avatar-initials">
+                                                    <%= game.player1 ? game.player1.username.charAt(0).toUpperCase()
+                                                        : '?' %>
+                                                </span>
+                                                <% if (game.winner &&
+                                                    game.winner._id.toString()===game.player1._id.toString()) { %>
+                                                    <span class="winner-badge">
+                                                        <i class="fas fa-crown"></i>
+                                                    </span>
+                                                    <% } %>
+                                            </div>
+                                            <div class="player-info">
+                                                <div class="player-name">
+                                                    <%= game.player1 ? game.player1.username : 'Player 1' %>
+                                                        <% if (isPlayer1) { %>
+                                                            <span class="you-badge">(You)</span>
+                                                            <% } %>
+                                                </div>
+                                                <% if (game.player1 && game.player1._id) { %>
+                                                    <div class="player-stats">
+                                                        <span><i class="fas fa-trophy"></i>
+                                                            <%= game.player1.totalWins || 0 %> wins
+                                                        </span>
+                                                    </div>
+                                                    <% } %>
+                                            </div>
+                                        </div>
+
+                                        <div class="vs-divider">
+                                            <span>VS</span>
+                                        </div>
+
+                                        <div class="player player2 <%= isPlayer2 ? 'current-user' : '' %>">
+                                            <div class="player-avatar">
+                                                <span class="avatar-initials">
+                                                    <%= game.player2 ? game.player2.username.charAt(0).toUpperCase()
+                                                        : '?' %>
+                                                </span>
+                                                <% if (game.winner && game.player2 &&
+                                                    game.winner._id.toString()===game.player2._id.toString()) { %>
+                                                    <span class="winner-badge">
+                                                        <i class="fas fa-crown"></i>
+                                                    </span>
+                                                    <% } %>
+                                            </div>
+                                            <div class="player-info">
+                                                <div class="player-name">
+                                                    <%= game.player2 ? game.player2.username : 'Waiting...' %>
+                                                        <% if (isPlayer2) { %>
+                                                            <span class="you-badge">(You)</span>
+                                                            <% } %>
+                                                </div>
+                                                <% if (game.player2 && game.player2._id) { %>
+                                                    <div class="player-stats">
+                                                        <span><i class="fas fa-trophy"></i>
+                                                            <%= game.player2.totalWins || 0 %> wins
+                                                        </span>
+                                                    </div>
+                                                    <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Game Details -->
+                                    <div class="game-details">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Bet Amount</span>
+                                            <span class="detail-value bet">₹<%= betAmount.toLocaleString() %></span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Total Pot</span>
+                                            <span class="detail-value pot">₹<%= (betAmount * 2).toLocaleString() %>
+                                                    </span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Your Result</span>
+                                            <% if (game.status==='completed' && game.winner) { %>
+                                                <% if (userWon) { %>
+                                                    <span class="result-badge win">
+                                                        <i class="fas fa-trophy"></i> Won ₹<%= winnings.toLocaleString()
+                                                            %>
+                                                    </span>
+                                                    <% } else { %>
+                                                        <span class="result-badge lose">
+                                                            <i class="fas fa-times-circle"></i> Lost
+                                                        </span>
+                                                        <% } %>
+                                                            <% } else if (game.status==='waiting' ) { %>
+                                                                <span class="result-badge waiting">
+                                                                    <i class="fas fa-clock"></i> Waiting
+                                                                </span>
+                                                                <% } else if (game.status==='active' ) { %>
+                                                                    <span class="result-badge active">
+                                                                        <i class="fas fa-play"></i> In Progress
+                                                                    </span>
+                                                                    <% } else if (game.status==='disputed' ) { %>
+                                                                        <span class="result-badge disputed">
+                                                                            <i class="fas fa-exclamation-triangle"></i>
+                                                                            Disputed
+                                                                        </span>
+                                                                        <% } %>
+                                        </div>
+                                    </div>
+
+                                    <!-- Game Actions -->
+                                    <div class="game-actions">
+                                        <% if (game.status==='waiting' && !game.player2) { %>
+                                            <span class="status-badge waiting">Waiting for player</span>
+                                            <% } else if (game.status==='active' ) { %>
+                                                <a href="/games/<%= game._id %>/play" class="action-btn play">
+                                                    <i class="fas fa-play"></i> Continue Game
+                                                </a>
+                                                <% } else if (game.status==='completed' ) { %>
+                                                    <a href="/games/<%= game._id %>" class="action-btn view">
+                                                        <i class="fas fa-eye"></i> View Details
+                                                    </a>
+                                                    <% if (game.screenshot) { %>
+                                                        <button class="action-btn screenshot"
+                                                            onclick="viewScreenshot('<%= game.screenshot %>')">
+                                                            <i class="fas fa-image"></i> Screenshot
+                                                        </button>
+                                                        <% } %>
+                                                            <% } else if (game.status==='disputed' ) { %>
+                                                                <a href="/games/<%= game._id %>"
+                                                                    class="action-btn dispute">
+                                                                    <i class="fas fa-exclamation-circle"></i> View
+                                                                    Dispute
+                                                                </a>
+                                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }) %>
+                    </div>
+
+                    <!-- Pagination -->
+                    <% if (pagination && pagination.pages> 1) { %>
+                        <nav class="pagination-nav">
+                            <ul class="pagination">
+                                <li class="page-item <%= pagination.page === 1 ? 'disabled' : '' %>">
+                                    <a class="page-link" href="?page=<%= pagination.page - 1 %>">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+
+                                <% for(let i=1; i <=pagination.pages; i++) { %>
+                                    <li class="page-item <%= pagination.page === i ? 'active' : '' %>">
+                                        <a class="page-link" href="?page=<%= i %>">
+                                            <%= i %>
+                                        </a>
+                                    </li>
+                                    <% } %>
+
+                                        <li
+                                            class="page-item <%= pagination.page === pagination.pages ? 'disabled' : '' %>">
+                                            <a class="page-link" href="?page=<%= pagination.page + 1 %>">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </a>
+                                        </li>
+                            </ul>
+                        </nav>
+                        <% } %>
+                            <% } else { %>
+                                <div class="empty-state">
+                                    <i class="fas fa-dice fa-4x text-muted mb-4"></i>
+                                    <h3>No Games Yet</h3>
+                                    <p class="text-muted">You haven't played any games yet. Start playing now!</p>
+                                    <a href="/games" class="btn btn-primary mt-3">
+                                        <i class="fas fa-gamepad me-2"></i>Play Now
+                                    </a>
+                                </div>
+                                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screenshot Modal -->
+    <div class="modal fade" id="screenshotModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Game Screenshot</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="" id="screenshotImage" class="img-fluid rounded" alt="Game Screenshot">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* History Container */
+        .history-container {
+            padding: 40px 0;
+            background: #f8f9fc;
+            min-height: calc(100vh - 76px);
+        }
+
+        /* History Header */
+        .history-header {
+            margin-bottom: 30px;
+        }
+
+        .history-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .history-title i {
+            color: #667eea;
+        }
+
+        .history-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .history-stats-summary {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .stat-badge {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            font-weight: 500;
+            color: #333;
+        }
+
+        .stat-badge i {
+            margin-right: 5px;
+            color: #667eea;
+        }
+
+        /* Filters Card */
+        .filters-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: #f8f9fc;
+        }
+
+        .filter-select:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            z-index: 10;
+        }
+
+        .search-box input {
+            padding-left: 45px;
+        }
+
+        /* Games List Card */
+        .games-list-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .games-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Game Item */
+        .game-item {
+            background: #f8f9fc;
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .game-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-item[data-status="completed"] {
+            border-left-color: #1cc88a;
+        }
+
+        .game-item[data-status="active"] {
+            border-left-color: #667eea;
+        }
+
+        .game-item[data-status="waiting"] {
+            border-left-color: #f6c23e;
+        }
+
+        .game-item[data-status="disputed"] {
+            border-left-color: #e74a3b;
+        }
+
+        /* Game Header */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .game-room {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .room-label {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .room-value {
+            font-family: monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #667eea;
+            letter-spacing: 1px;
+        }
+
+        .btn-copy {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .btn-copy:hover {
+            color: #667eea;
+        }
+
+        .game-date {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        .game-date i {
+            margin-right: 5px;
+        }
+
+        /* Players Section */
+        .players-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .player {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .player.player2 {
+            flex-direction: row-reverse;
+            text-align: right;
+        }
+
+        .player-avatar {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .player.player2 .player-avatar {
+            background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);
+        }
+
+        .avatar-initials {
+            text-transform: uppercase;
+        }
+
+        .winner-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #f6c23e;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7rem;
+            border: 2px solid white;
+        }
+
+        .player-info {
+            flex: 1;
+        }
+
+        .player.player2 .player-info {
+            text-align: right;
+        }
+
+        .player-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .you-badge {
+            font-size: 0.8rem;
+            color: #999;
+            font-weight: normal;
+            margin-left: 5px;
+        }
+
+        .player.player2 .you-badge {
+            margin-left: 0;
+            margin-right: 5px;
+        }
+
+        .player-stats {
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        .player-stats i {
+            color: #f6c23e;
+            margin-right: 3px;
+        }
+
+        .vs-divider {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #667eea;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin: 0 20px;
+        }
+
+        /* Game Details */
+        .game-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .detail-item {
+            text-align: center;
+        }
+
+        .detail-label {
+            font-size: 0.85rem;
+            color: #999;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .detail-value.bet {
+            color: #e74a3b;
+        }
+
+        .detail-value.pot {
+            color: #1cc88a;
+        }
+
+        .result-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .result-badge.win {
+            background: rgba(28, 200, 138, 0.1);
+            color: #1cc88a;
+        }
+
+        .result-badge.lose {
+            background: rgba(231, 74, 59, 0.1);
+            color: #e74a3b;
+        }
+
+        .result-badge.waiting {
+            background: rgba(246, 194, 62, 0.1);
+            color: #f6c23e;
+        }
+
+        .result-badge.active {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .result-badge.disputed {
+            background: rgba(231, 74, 59, 0.1);
+            color: #e74a3b;
+        }
+
+        /* Game Actions */
+        .game-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .action-btn.play {
+            background: #667eea;
+            color: white;
+        }
+
+        .action-btn.play:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .action-btn.view {
+            background: #f8f9fc;
+            color: #333;
+            border: 1px solid #e0e0e0;
+        }
+
+        .action-btn.view:hover {
+            background: #e0e0e0;
+        }
+
+        .action-btn.screenshot {
+            background: #1cc88a;
+            color: white;
+        }
+
+        .action-btn.screenshot:hover {
+            background: #17a673;
+        }
+
+        .action-btn.dispute {
+            background: #e74a3b;
+            color: white;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            background: #f8f9fc;
+            color: #666;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        /* Pagination */
+        .pagination-nav {
+            margin-top: 30px;
+        }
+
+        .pagination {
+            justify-content: center;
+        }
+
+        .page-link {
+            color: #667eea;
+            border: none;
+            padding: 10px 15px;
+            margin: 0 5px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .page-link:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .page-item.active .page-link {
+            background: #667eea;
+            color: white;
+        }
+
+        .page-item.disabled .page-link {
+            color: #ccc;
+            pointer-events: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .players-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .player {
+                width: 100%;
+            }
+
+            .player.player2 {
+                flex-direction: row;
+                text-align: left;
+            }
+
+            .vs-divider {
+                margin: 10px 0;
+            }
+
+            .game-details {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .game-actions {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .history-stats-summary {
+                justify-content: flex-start;
+                margin-top: 15px;
+            }
+
+            .filters-card .row>div {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+
+    <script>
+        // Filter functionality
+        document.getElementById('statusFilter')?.addEventListener('change', filterGames);
+        document.getElementById('resultFilter')?.addEventListener('change', filterGames);
+        document.getElementById('rangeFilter')?.addEventListener('change', filterGames);
+        document.getElementById('searchInput')?.addEventListener('keyup', filterGames);
+
+        function filterGames() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const resultFilter = document.getElementById('resultFilter').value;
+            const rangeFilter = document.getElementById('rangeFilter').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            const games = document.querySelectorAll('.game-item');
+
+            games.forEach(game => {
+                let show = true;
+
+                if (statusFilter !== 'all' && game.dataset.status !== statusFilter) {
+                    show = false;
+                }
+
+                if (resultFilter !== 'all' && game.dataset.result !== resultFilter) {
+                    show = false;
+                }
+
+                if (rangeFilter !== 'all' && game.dataset.range !== rangeFilter) {
+                    show = false;
+                }
+
+                if (searchTerm && !game.dataset.room.toLowerCase().includes(searchTerm)) {
+                    show = false;
+                }
+
+                game.style.display = show ? 'block' : 'none';
+            });
+        }
+
+        function copyRoomId(roomId) {
+            navigator.clipboard.writeText(roomId).then(() => {
+                alert('Room ID copied to clipboard!');
+            });
+        }
+
+        function viewScreenshot(screenshotPath) {
+            const modal = new bootstrap.Modal(document.getElementById('screenshotModal'));
+            document.getElementById('screenshotImage').src = screenshotPath;
+            modal.show();
+        }
+
+        // Initialize - show all games
+        filterGames();
+    </script>
+
+    <%- include('../partials/footer') %>
