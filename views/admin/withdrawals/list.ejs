@@ -1,0 +1,277 @@
+<%- include('../../partials/header') %>
+
+    <div class="admin-withdrawals">
+        <div class="container-fluid">
+            <!-- Header -->
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-arrow-up"></i> Withdrawal Requests
+                </h1>
+            </div>
+
+            <!-- Status Tabs -->
+            <ul class="nav nav-tabs mb-4">
+                <li class="nav-item">
+                    <a class="nav-link <%= status === 'pending' ? 'active' : '' %>"
+                        href="/admin/withdrawals?status=pending">
+                        Pending <span class="badge bg-warning">
+                            <%= statusCounts.pending || 0 %>
+                        </span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= status === 'completed' ? 'active' : '' %>"
+                        href="/admin/withdrawals?status=completed">
+                        Completed <span class="badge bg-success">
+                            <%= statusCounts.completed || 0 %>
+                        </span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= status === 'failed' ? 'active' : '' %>"
+                        href="/admin/withdrawals?status=failed">
+                        Failed <span class="badge bg-danger">
+                            <%= statusCounts.failed || 0 %>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Withdrawals Table -->
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Amount</th>
+                                    <th>Bank Details</th>
+                                    <th>UPI ID</th>
+                                    <th>Status</th>
+                                    <th>Requested</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (withdrawals && withdrawals.length> 0) { %>
+                                    <% withdrawals.forEach(function(w) { %>
+                                        <tr>
+                                            <td>
+                                                <strong>
+                                                    <%= w.user?.username || 'Unknown' %>
+                                                </strong>
+                                                <br><small>
+                                                    <%= w.user?.email || 'No email' %>
+                                                </small>
+                                                <br><small>₹<%= w.user?.walletBalance?.toFixed(2) || '0.00' %></small>
+                                            </td>
+                                            <td class="fw-bold text-danger">₹<%= w.amount %>
+                                            </td>
+                                            <td>
+                                                <% if (w.bankDetails) { %>
+                                                    <small>
+                                                        <%= w.bankDetails.accountHolderName || 'N/A' %><br>
+                                                            A/C: <%= w.bankDetails.accountNumber || 'N/A' %><br>
+                                                                IFSC: <%= w.bankDetails.ifscCode || 'N/A' %><br>
+                                                                    Bank: <%= w.bankDetails.bankName || 'N/A' %>
+                                                    </small>
+                                                    <% } else { %>
+                                                        -
+                                                        <% } %>
+                                            </td>
+                                            <td>
+                                                <%= w.upiId || '-' %>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-<%= 
+                                                w.status === 'pending' ? 'warning' : 
+                                                w.status === 'completed' ? 'success' : 
+                                                'danger' %>">
+                                                    <%= w.status %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <%= new Date(w.createdAt).toLocaleString() %>
+                                            </td>
+                                            <td>
+                                                <% if (w.status==='pending' ) { %>
+                                                    <button class="btn btn-sm btn-success mb-1"
+                                                        onclick="approveWithdrawal('<%= w._id %>')">
+                                                        <i class="fas fa-check"></i> Approve
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger"
+                                                        onclick="rejectWithdrawal('<%= w._id %>')">
+                                                        <i class="fas fa-times"></i> Reject
+                                                    </button>
+                                                    <% } else { %>
+                                                        <span class="text-muted">Processed</span>
+                                                        <% } %>
+                                            </td>
+                                        </tr>
+                                        <% }); %>
+                                            <% } else { %>
+                                                <tr>
+                                                    <td colspan="7" class="text-center py-5">
+                                                        <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+                                                        <h5 class="text-muted">No withdrawals found</h5>
+                                                        <p>No <%= status %> withdrawal requests at this time.</p>
+                                                    </td>
+                                                </tr>
+                                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <% if (pagination && pagination.pages> 1) { %>
+                        <nav class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item <%= pagination.page === 1 ? 'disabled' : '' %>">
+                                    <a class="page-link" href="?page=<%= pagination.page - 1 %>&status=<%= status %>">
+                                        Previous
+                                    </a>
+                                </li>
+                                <% for(var i=1; i <=pagination.pages; i++) { %>
+                                    <li class="page-item <%= pagination.page === i ? 'active' : '' %>">
+                                        <a class="page-link" href="?page=<%= i %>&status=<%= status %>">
+                                            <%= i %>
+                                        </a>
+                                    </li>
+                                    <% } %>
+                                        <li
+                                            class="page-item <%= pagination.page === pagination.pages ? 'disabled' : '' %>">
+                                            <a class="page-link"
+                                                href="?page=<%= pagination.page + 1 %>&status=<%= status %>">
+                                                Next
+                                            </a>
+                                        </li>
+                            </ul>
+                        </nav>
+                        <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Approve Modal -->
+    <div class="modal fade" id="approveModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Approve Withdrawal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="approveForm" method="POST">
+                    <input type="hidden" name="withdrawalId" id="approveWithdrawalId">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label>Transaction ID (from bank/UPI)</label>
+                            <input type="text" name="transactionId" class="form-control"
+                                placeholder="e.g., UTR123456789">
+                        </div>
+                        <div class="mb-3">
+                            <label>Notes (Optional)</label>
+                            <textarea name="notes" class="form-control" rows="2"
+                                placeholder="Any additional notes"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Confirm Approval</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Modal -->
+    <div class="modal fade" id="rejectModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reject Withdrawal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="rejectForm" method="POST">
+                    <input type="hidden" name="withdrawalId" id="rejectWithdrawalId">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label>Reason for Rejection</label>
+                            <textarea name="reason" class="form-control" rows="3"
+                                placeholder="e.g., Invalid bank details, Insufficient balance, etc."
+                                required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Confirm Rejection</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .admin-withdrawals {
+            padding: 20px;
+            background: #f8f9fc;
+            min-height: 100vh;
+        }
+
+        .nav-tabs .nav-link {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #4e73df;
+            font-weight: 600;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+    </style>
+
+    <script>
+        // ✅ FIXED: IDs properly store and pass
+        function approveWithdrawal(id) {
+            console.log('Approving withdrawal with ID:', id);
+            document.getElementById('approveWithdrawalId').value = id;
+            var modal = new bootstrap.Modal(document.getElementById('approveModal'));
+            modal.show();
+        }
+
+        function rejectWithdrawal(id) {
+            console.log('Rejecting withdrawal with ID:', id);
+            document.getElementById('rejectWithdrawalId').value = id;
+            var modal = new bootstrap.Modal(document.getElementById('rejectModal'));
+            modal.show();
+        }
+
+        // ✅ FIXED: Form submit par ID append karo
+        document.getElementById('approveForm')?.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var id = document.getElementById('approveWithdrawalId').value;
+            if (!id) {
+                alert('Error: No withdrawal ID found');
+                return;
+            }
+            this.action = '/admin/withdrawals/' + id + '/approve';
+            this.submit();
+        });
+
+        document.getElementById('rejectForm')?.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var id = document.getElementById('rejectWithdrawalId').value;
+            if (!id) {
+                alert('Error: No withdrawal ID found');
+                return;
+            }
+            this.action = '/admin/withdrawals/' + id + '/reject';
+            this.submit();
+        });
+    </script>
+
+    <%- include('../../partials/footer') %>

@@ -1,0 +1,261 @@
+<%- include('../partials/header') %>
+
+    <div class="admin-settings">
+        <div class="container-fluid">
+            <!-- Header -->
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-cog"></i> System Settings
+                </h1>
+            </div>
+
+            <!-- System Stats -->
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-icon bg-primary">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stats-details">
+                            <span class="stats-label">Total Users</span>
+                            <span class="stats-value">
+                                <%= stats.totalUsers %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-icon bg-success">
+                            <i class="fas fa-dice"></i>
+                        </div>
+                        <div class="stats-details">
+                            <span class="stats-label">Total Games</span>
+                            <span class="stats-value">
+                                <%= stats.totalGames %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-icon bg-warning">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div class="stats-details">
+                            <span class="stats-label">Transactions</span>
+                            <span class="stats-value">
+                                <%= stats.totalTransactions %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-icon bg-danger">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stats-details">
+                            <span class="stats-label">Profit</span>
+                            <span class="stats-value">₹<%= stats.profit.toLocaleString() %></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tabs -->
+            <div class="card shadow mt-4">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="settingsTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#general">General</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#game">Game Settings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#payment">Payment</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#security">Security</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <!-- General Settings -->
+                    <div id="general" class="tab-pane active">
+                        <form>
+                            <div class="mb-3">
+                                <label>Site Name</label>
+                                <input type="text" class="form-control" value="Ludo Gaming">
+                            </div>
+                            <div class="mb-3">
+                                <label>Site URL</label>
+                                <input type="text" class="form-control" value="http://localhost:3000">
+                            </div>
+                            <div class="mb-3">
+                                <label>Support Email</label>
+                                <input type="email" class="form-control" value="support@ludo.com">
+                            </div>
+                            <div class="mb-3">
+                                <label>Support Phone</label>
+                                <input type="text" class="form-control" value="+91 98765 43210">
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Game Settings -->
+                    <div id="game" class="tab-pane" style="display: none;">
+                        <form>
+                            <div class="mb-3">
+                                <label>Minimum Bet Amount</label>
+                                <input type="number" class="form-control" value="100">
+                            </div>
+                            <div class="mb-3">
+                                <label>Maximum Bet Amount</label>
+                                <input type="number" class="form-control" value="100000">
+                            </div>
+                            <div class="mb-3">
+                                <label>Room Expiry Time (minutes)</label>
+                                <input type="number" class="form-control" value="10">
+                            </div>
+                            <div class="mb-3">
+                                <label>Auto-Refund Enabled</label>
+                                <select class="form-control">
+                                    <option>Yes</option>
+                                    <option>No</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Payment Settings -->
+                    <div id="payment" class="tab-pane" style="display: none;">
+                        <form>
+                            <div class="mb-3">
+                                <label>Razorpay Key ID</label>
+                                <input type="text" class="form-control" value="rzp_test_xxxx">
+                            </div>
+                            <div class="mb-3">
+                                <label>Razorpay Key Secret</label>
+                                <input type="password" class="form-control" value="********">
+                            </div>
+                            <div class="mb-3">
+                                <label>Minimum Withdrawal</label>
+                                <input type="number" class="form-control" value="100">
+                            </div>
+                            <div class="mb-3">
+                                <label>Withdrawal Fee (%)</label>
+                                <input type="number" class="form-control" value="0">
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Security Settings -->
+                    <div id="security" class="tab-pane" style="display: none;">
+                        <form>
+                            <div class="mb-3">
+                                <label>Enable 2FA</label>
+                                <select class="form-control">
+                                    <option>Yes</option>
+                                    <option>No</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label>Session Timeout (minutes)</label>
+                                <input type="number" class="form-control" value="30">
+                            </div>
+                            <div class="mb-3">
+                                <label>Max Login Attempts</label>
+                                <input type="number" class="form-control" value="5">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .admin-settings {
+            padding: 20px;
+            background: #f8f9fc;
+            min-height: 100vh;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .stats-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .stats-details {
+            flex: 1;
+        }
+
+        .stats-label {
+            display: block;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .stats-value {
+            display: block;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .nav-tabs .nav-link {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #4e73df;
+            font-weight: 600;
+        }
+    </style>
+
+    <script>
+        document.querySelectorAll('#settingsTabs .nav-link').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                // Hide all tabs
+                document.querySelectorAll('.tab-pane').forEach(pane => {
+                    pane.style.display = 'none';
+                });
+
+                // Show selected tab
+                const target = tab.getAttribute('href');
+                document.querySelector(target).style.display = 'block';
+
+                // Update active state
+                document.querySelectorAll('#settingsTabs .nav-link').forEach(t => {
+                    t.classList.remove('active');
+                });
+                tab.classList.add('active');
+            });
+        });
+    </script>
+
+    <%- include('../partials/footer') %>

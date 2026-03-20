@@ -23,10 +23,12 @@ router.post('/users/:id/toggle', adminController.toggleUserStatus);
 
 // Manage withdrawals
 router.get('/withdrawals', adminController.listWithdrawals);
+// Withdrawal routes
 router.post('/withdrawals/:id/approve', adminController.approveWithdrawal);
 router.post('/withdrawals/:id/reject', adminController.rejectWithdrawal);
 
 // Reports
 router.get('/reports', adminController.reports);
+router.post('/users/:id/toggle-admin', adminController.toggleAdminStatus);
 
 module.exports = router;

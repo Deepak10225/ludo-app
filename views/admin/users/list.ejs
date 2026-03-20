@@ -1,0 +1,145 @@
+<%- include('../../partials/header') %>
+
+    <div class="admin-users">
+        <div class="container-fluid">
+            <!-- Header -->
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-users"></i> Manage Users
+                </h1>
+            </div>
+
+            <!-- Filters -->
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <form method="GET" class="row">
+                        <div class="col-md-4">
+                            <input type="text" name="search" class="form-control"
+                                placeholder="Search by username, email or phone" value="<%= search %>">
+                        </div>
+                        <div class="col-md-3">
+                            <select name="filter" class="form-control">
+                                <option value="all" <%=filter==='all' ? 'selected' : '' %>>All Users</option>
+                                <option value="active" <%=filter==='active' ? 'selected' : '' %>>Active</option>
+                                <option value="inactive" <%=filter==='inactive' ? 'selected' : '' %>>Inactive</option>
+                                <option value="admin" <%=filter==='admin' ? 'selected' : '' %>>Admins</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                            <a href="/admin/users" class="btn btn-secondary">
+                                <i class="fas fa-redo"></i> Reset
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Wallet</th>
+                                    <th>Games</th>
+                                    <th>Wins</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% users.forEach(user=> { %>
+                                    <tr>
+                                        <td class="fw-bold">
+                                            <%= user.username %>
+                                                <% if (user.isAdmin) { %>
+                                                    <span class="badge bg-primary">Admin</span>
+                                                    <% } %>
+                                        </td>
+                                        <td>
+                                            <%= user.email %>
+                                        </td>
+                                        <td>
+                                            <%= user.phoneNumber || '-' %>
+                                        </td>
+                                        <td class="text-success">₹<%= user.walletBalance.toFixed(2) %>
+                                        </td>
+                                        <td>
+                                            <%= user.totalGames || 0 %>
+                                        </td>
+                                        <td>
+                                            <%= user.totalWins || 0 %>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-<%= user.isActive ? 'success' : 'danger' %>">
+                                                <%= user.isActive ? 'Active' : 'Inactive' %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <%= new Date(user.createdAt).toLocaleDateString() %>
+                                        </td>
+                                        <td>
+                                            <a href="/admin/users/<%= user._id %>" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <% if (pagination.pages> 1) { %>
+                        <nav class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item <%= pagination.page === 1 ? 'disabled' : '' %>">
+                                    <a class="page-link"
+                                        href="?page=<%= pagination.page - 1 %>&filter=<%= filter %>&search=<%= search %>">
+                                        Previous
+                                    </a>
+                                </li>
+                                <% for(let i=1; i <=pagination.pages; i++) { %>
+                                    <li class="page-item <%= pagination.page === i ? 'active' : '' %>">
+                                        <a class="page-link"
+                                            href="?page=<%= i %>&filter=<%= filter %>&search=<%= search %>">
+                                            <%= i %>
+                                        </a>
+                                    </li>
+                                    <% } %>
+                                        <li
+                                            class="page-item <%= pagination.page === pagination.pages ? 'disabled' : '' %>">
+                                            <a class="page-link"
+                                                href="?page=<%= pagination.page + 1 %>&filter=<%= filter %>&search=<%= search %>">
+                                                Next
+                                            </a>
+                                        </li>
+                            </ul>
+                        </nav>
+                        <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .admin-users {
+            padding: 20px;
+            background: #f8f9fc;
+            min-height: 100vh;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+    </style>
+
+    <%- include('../../partials/footer') %>

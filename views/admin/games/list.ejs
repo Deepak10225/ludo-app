@@ -1,0 +1,272 @@
+<%- include('../../partials/header') %>
+
+    <div class="admin-games">
+        <div class="container-fluid">
+            <!-- Header -->
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-dice"></i> Manage Games
+                </h1>
+                <div>
+                    <span class="badge bg-primary">Total: <%= pagination.total %></span>
+                </div>
+            </div>
+
+            <!-- Status Cards -->
+            <div class="row mb-4">
+                <div class="col-md-2">
+                    <div class="status-card all" onclick="filterByStatus('all')">
+                        <div class="status-value">
+                            <%= statusCounts.all || pagination.total %>
+                        </div>
+                        <div class="status-label">All Games</div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="status-card waiting" onclick="filterByStatus('waiting')">
+                        <div class="status-value">
+                            <%= statusCounts.waiting || 0 %>
+                        </div>
+                        <div class="status-label">Waiting</div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="status-card active" onclick="filterByStatus('active')">
+                        <div class="status-value">
+                            <%= statusCounts.active || 0 %>
+                        </div>
+                        <div class="status-label">Active</div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="status-card completed" onclick="filterByStatus('completed')">
+                        <div class="status-value">
+                            <%= statusCounts.completed || 0 %>
+                        </div>
+                        <div class="status-label">Completed</div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="status-card disputed" onclick="filterByStatus('disputed')">
+                        <div class="status-value">
+                            <%= statusCounts.disputed || 0 %>
+                        </div>
+                        <div class="status-label">Disputed</div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="status-card cancelled" onclick="filterByStatus('cancelled')">
+                        <div class="status-value">
+                            <%= statusCounts.cancelled || 0 %>
+                        </div>
+                        <div class="status-label">Cancelled</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold">Filters & Search</h6>
+                </div>
+                <div class="card-body">
+                    <form method="GET" class="row">
+                        <div class="col-md-4">
+                            <input type="text" name="search" class="form-control"
+                                placeholder="Search by Room ID or Username" value="<%= search %>">
+                        </div>
+                        <div class="col-md-3">
+                            <select name="status" class="form-control">
+                                <option value="all" <%=status==='all' ? 'selected' : '' %>>All Status</option>
+                                <option value="waiting" <%=status==='waiting' ? 'selected' : '' %>>Waiting</option>
+                                <option value="active" <%=status==='active' ? 'selected' : '' %>>Active</option>
+                                <option value="completed" <%=status==='completed' ? 'selected' : '' %>>Completed
+                                </option>
+                                <option value="disputed" <%=status==='disputed' ? 'selected' : '' %>>Disputed</option>
+                                <option value="cancelled" <%=status==='cancelled' ? 'selected' : '' %>>Cancelled
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                            <a href="/admin/games" class="btn btn-secondary">
+                                <i class="fas fa-redo"></i> Reset
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Games Table -->
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Room ID</th>
+                                    <th>Player 1</th>
+                                    <th>Player 2</th>
+                                    <th>Bet Amount</th>
+                                    <th>Status</th>
+                                    <th>Winner</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% games.forEach(game=> { %>
+                                    <tr>
+                                        <td><code><%= game.roomId %></code></td>
+                                        <td>
+                                            <%= game.player1?.username || 'N/A' %>
+                                                <br><small>
+                                                    <%= game.player1?.email || '' %>
+                                                </small>
+                                        </td>
+                                        <td>
+                                            <%= game.player2?.username || 'Waiting...' %>
+                                                <br><small>
+                                                    <%= game.player2?.email || '' %>
+                                                </small>
+                                        </td>
+                                        <td class="fw-bold">₹<%= game.betAmount %>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-<%= 
+                                            game.status === 'completed' ? 'success' : 
+                                            game.status === 'active' ? 'primary' : 
+                                            game.status === 'waiting' ? 'warning' : 
+                                            game.status === 'disputed' ? 'danger' : 
+                                            'secondary' %>">
+                                                <%= game.status %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <% if (game.winner) { %>
+                                                <span class="text-success">
+                                                    <i class="fas fa-crown"></i>
+                                                    <%= game.winner.username %>
+                                                </span>
+                                                <% } else { %>
+                                                    <span class="text-muted">-</span>
+                                                    <% } %>
+                                        </td>
+                                        <td>
+                                            <%= new Date(game.createdAt).toLocaleDateString() %>
+                                        </td>
+                                        <td>
+                                            <a href="/admin/games/<%= game._id %>" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <% if (pagination.pages> 1) { %>
+                        <nav class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item <%= pagination.page === 1 ? 'disabled' : '' %>">
+                                    <a class="page-link"
+                                        href="?page=<%= pagination.page - 1 %>&status=<%= status %>&search=<%= search %>">
+                                        Previous
+                                    </a>
+                                </li>
+                                <% for(let i=1; i <=pagination.pages; i++) { %>
+                                    <li class="page-item <%= pagination.page === i ? 'active' : '' %>">
+                                        <a class="page-link"
+                                            href="?page=<%= i %>&status=<%= status %>&search=<%= search %>">
+                                            <%= i %>
+                                        </a>
+                                    </li>
+                                    <% } %>
+                                        <li
+                                            class="page-item <%= pagination.page === pagination.pages ? 'disabled' : '' %>">
+                                            <a class="page-link"
+                                                href="?page=<%= pagination.page + 1 %>&status=<%= status %>&search=<%= search %>">
+                                                Next
+                                            </a>
+                                        </li>
+                            </ul>
+                        </nav>
+                        <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .admin-games {
+            padding: 20px;
+            background: #f8f9fc;
+            min-height: 100vh;
+        }
+
+        .status-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .status-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-card.all {
+            border-left: 4px solid #4e73df;
+        }
+
+        .status-card.waiting {
+            border-left: 4px solid #f6c23e;
+        }
+
+        .status-card.active {
+            border-left: 4px solid #1cc88a;
+        }
+
+        .status-card.completed {
+            border-left: 4px solid #36b9cc;
+        }
+
+        .status-card.disputed {
+            border-left: 4px solid #e74a3b;
+        }
+
+        .status-card.cancelled {
+            border-left: 4px solid #858796;
+        }
+
+        .status-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .status-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+    </style>
+
+    <script>
+        function filterByStatus(status) {
+            window.location.href = `/admin/games?status=${status}`;
+        }
+    </script>
+
+    <%- include('../../partials/footer') %>

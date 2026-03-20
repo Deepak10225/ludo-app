@@ -1,0 +1,171 @@
+<%- include('../partials/header') %>
+
+    <div class="admin-reports">
+        <div class="container-fluid">
+            <!-- Header -->
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-chart-bar"></i> Reports
+                </h1>
+            </div>
+
+            <!-- Date Filter -->
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <form method="GET" class="row">
+                        <div class="col-md-4">
+                            <label>From Date</label>
+                            <input type="date" name="from" class="form-control" value="<%= dateRange.from %>">
+                        </div>
+                        <div class="col-md-4">
+                            <label>To Date</label>
+                            <input type="date" name="to" class="form-control" value="<%= dateRange.to %>">
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-filter"></i> Apply Filter
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- User Registrations Chart -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold">User Registrations</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="usersChart" height="100"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Games Report -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold">Games Report</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="gamesChart" height="100"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Report -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold">Financial Report</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Deposits</th>
+                                            <th>Withdrawals</th>
+                                            <th>Bets</th>
+                                            <th>Wins</th>
+                                            <th>Net Revenue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% financialReport.forEach(day=> { %>
+                                            <tr>
+                                                <td>
+                                                    <%= day.date %>
+                                                </td>
+                                                <td class="text-success">₹<%= (day.deposits || 0).toLocaleString() %>
+                                                </td>
+                                                <td class="text-danger">₹<%= (day.withdrawals || 0).toLocaleString() %>
+                                                </td>
+                                                <td class="text-warning">₹<%= (day.bets || 0).toLocaleString() %>
+                                                </td>
+                                                <td class="text-info">₹<%= (day.wins || 0).toLocaleString() %>
+                                                </td>
+                                                <td
+                                                    class="fw-bold <%= ((day.bets || 0) - (day.wins || 0)) > 0 ? 'text-success' : 'text-danger' %>">
+                                                    ₹<%= ((day.bets || 0) - (day.wins || 0)).toLocaleString() %>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Users Chart
+        const usersCtx = document.getElementById('usersChart').getContext('2d');
+        new Chart(usersCtx, {
+            type: 'line',
+            data: {
+                labels: [<% userRegistrations.forEach(u => { %> '<%= u._id %>', <% }); %>],
+            datasets: [{
+                label: 'New Users',
+                data: [<% userRegistrations.forEach(u => { %><%= u.count %>, <% }); %>],
+            borderColor: '#4e73df',
+            backgroundColor: 'rgba(78, 115, 223, 0.05)',
+            tension: 0.3
+        }]
+    },
+            options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+});
+
+        // Games Chart
+        const gamesCtx = document.getElementById('gamesChart').getContext('2d');
+        new Chart(gamesCtx, {
+            type: 'bar',
+            data: {
+                labels: [<% gamesReport.forEach(g => { %> '<%= g._id %>', <% }); %>],
+            datasets: [
+                {
+                    label: 'Total Games',
+                    data: [<% gamesReport.forEach(g => { %><%= g.total %>, <% }); %>],
+            backgroundColor: '#4e73df'
+        },
+            {
+                label: 'Completed',
+                data: [<% gamesReport.forEach(g => { %><%= g.completed %>, <% }); %>],
+            backgroundColor: '#1cc88a'
+            }
+        ]
+    },
+            options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+});
+    </script>
+
+    <style>
+        .admin-reports {
+            padding: 20px;
+            background: #f8f9fc;
+            min-height: 100vh;
+        }
+
+        canvas {
+            max-height: 300px;
+        }
+    </style>
+
+    <%- include('../partials/footer') %>

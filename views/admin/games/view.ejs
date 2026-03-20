@@ -1,0 +1,289 @@
+<%- include('../../partials/header') %>
+
+    <div class="game-view">
+        <div class="container-fluid">
+            <!-- Header -->
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-dice"></i> Game #<%= game.roomId %>
+                </h1>
+                <a href="/admin/games" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Games
+                </a>
+            </div>
+
+            <div class="row">
+                <!-- Game Details -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold">Game Details</h6>
+                        </div>
+                        <div class="card-body">
+                            <table class="table">
+                                <tr>
+                                    <th>Room ID:</th>
+                                    <td><code><%= game.roomId %></code></td>
+                                </tr>
+                                <tr>
+                                    <th>Status:</th>
+                                    <td>
+                                        <span class="badge bg-<%= 
+                                        game.status === 'completed' ? 'success' : 
+                                        game.status === 'active' ? 'primary' : 
+                                        game.status === 'waiting' ? 'warning' : 
+                                        game.status === 'disputed' ? 'danger' : 
+                                        'secondary' %>">
+                                            <%= game.status %>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Bet Amount:</th>
+                                    <td class="fw-bold">₹<%= game.betAmount %>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Total Pot:</th>
+                                    <td class="fw-bold text-success">₹<%= game.betAmount * 2 %>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Created At:</th>
+                                    <td>
+                                        <%= new Date(game.createdAt).toLocaleString() %>
+                                    </td>
+                                </tr>
+                                <% if (game.completedAt) { %>
+                                    <tr>
+                                        <th>Completed At:</th>
+                                        <td>
+                                            <%= new Date(game.completedAt).toLocaleString() %>
+                                        </td>
+                                    </tr>
+                                    <% } %>
+                                        <% if (game.adminNotes) { %>
+                                            <tr>
+                                                <th>Admin Notes:</th>
+                                                <td class="text-info">
+                                                    <%= game.adminNotes %>
+                                                </td>
+                                            </tr>
+                                            <% } %>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Players Info -->
+                <div class="col-md-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold">Players Information</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div
+                                        class="player-card <%= game.winner?._id.toString() === game.player1?._id.toString() ? 'winner' : '' %>">
+                                        <h5>Player 1</h5>
+                                        <p><strong>Username:</strong>
+                                            <%= game.player1?.username || 'N/A' %>
+                                        </p>
+                                        <p><strong>Email:</strong>
+                                            <%= game.player1?.email || 'N/A' %>
+                                        </p>
+                                        <p><strong>Phone:</strong>
+                                            <%= game.player1?.phoneNumber || 'N/A' %>
+                                        </p>
+                                        <p><strong>Wallet:</strong> ₹<%= game.player1?.walletBalance?.toFixed(2) || 0 %>
+                                        </p>
+                                        <% if (game.winner?._id.toString()===game.player1?._id.toString()) { %>
+                                            <span class="badge bg-warning"><i class="fas fa-crown"></i> Winner</span>
+                                            <% } %>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div
+                                        class="player-card <%= game.winner?._id.toString() === game.player2?._id.toString() ? 'winner' : '' %>">
+                                        <h5>Player 2</h5>
+                                        <p><strong>Username:</strong>
+                                            <%= game.player2?.username || 'N/A' %>
+                                        </p>
+                                        <p><strong>Email:</strong>
+                                            <%= game.player2?.email || 'N/A' %>
+                                        </p>
+                                        <p><strong>Phone:</strong>
+                                            <%= game.player2?.phoneNumber || 'N/A' %>
+                                        </p>
+                                        <p><strong>Wallet:</strong> ₹<%= game.player2?.walletBalance?.toFixed(2) || 0 %>
+                                        </p>
+                                        <% if (game.winner?._id.toString()===game.player2?._id.toString()) { %>
+                                            <span class="badge bg-warning"><i class="fas fa-crown"></i> Winner</span>
+                                            <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screenshot Proof -->
+            <% if (game.screenshot) { %>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold">Game Screenshot</h6>
+                            </div>
+                            <div class="card-body text-center">
+                                <img src="<%= game.screenshot %>" class="img-fluid rounded" style="max-height: 500px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+                    <!-- Transactions -->
+                    <% if (transactions.length> 0) { %>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card shadow mb-4">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold">Related Transactions</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>User</th>
+                                                        <th>Type</th>
+                                                        <th>Amount</th>
+                                                        <th>Status</th>
+                                                        <th>Date</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% transactions.forEach(t=> { %>
+                                                        <tr>
+                                                            <td>
+                                                                <%= t.user?.username %>
+                                                            </td>
+                                                            <td>
+                                                                <span class="badge bg-<%= 
+                                                        t.type === 'deposit' ? 'success' : 
+                                                        t.type === 'withdrawal' ? 'danger' : 
+                                                        t.type === 'bet' ? 'warning' : 
+                                                        t.type === 'win' ? 'info' : 
+                                                        'secondary' %>">
+                                                                    <%= t.type %>
+                                                                </span>
+                                                            </td>
+                                                            <td
+                                                                class="<%= t.type === 'win' || t.type === 'deposit' ? 'text-success' : 'text-danger' %>">
+                                                                <%= t.type==='withdrawal' || t.type==='bet' ? '-' : '+'
+                                                                    %> ₹<%= t.amount %>
+                                                            </td>
+                                                            <td>
+                                                                <span
+                                                                    class="badge bg-<%= t.status === 'completed' ? 'success' : t.status === 'pending' ? 'warning' : 'danger' %>">
+                                                                    <%= t.status %>
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <%= new Date(t.createdAt).toLocaleString() %>
+                                                            </td>
+                                                        </tr>
+                                                        <% }) %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+
+                            <!-- Admin Actions -->
+                            <% if (game.status==='completed' && !game.adminVerified) { %>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card shadow">
+                                            <div class="card-header py-3 bg-warning">
+                                                <h6 class="m-0 font-weight-bold">Admin Actions</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <form action="/admin/games/<%= game._id %>/verify" method="POST"
+                                                    class="row">
+                                                    <div class="col-md-5">
+                                                        <select name="winnerId" class="form-control" required>
+                                                            <option value="">Select Winner</option>
+                                                            <option value="<%= game.player1?._id %>">
+                                                                <%= game.player1?.username %>
+                                                            </option>
+                                                            <% if (game.player2) { %>
+                                                                <option value="<%= game.player2?._id %>">
+                                                                    <%= game.player2?.username %>
+                                                                </option>
+                                                                <% } %>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <input type="text" name="adminNotes" class="form-control"
+                                                            placeholder="Admin Notes (Optional)">
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <button type="submit" class="btn btn-success w-100">
+                                                            <i class="fas fa-check"></i> Verify Game
+                                                        </button>
+                                                    </div>
+                                                </form>
+
+                                                <form action="/admin/games/<%= game._id %>/reject" method="POST"
+                                                    class="row mt-3">
+                                                    <div class="col-md-10">
+                                                        <input type="text" name="reason" class="form-control"
+                                                            placeholder="Reason for rejection" required>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <button type="submit" class="btn btn-danger w-100">
+                                                            <i class="fas fa-times"></i> Reject & Refund
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% } %>
+        </div>
+    </div>
+
+    <style>
+        .game-view {
+            padding: 20px;
+            background: #f8f9fc;
+            min-height: 100vh;
+        }
+
+        .player-card {
+            background: #f8f9fc;
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .player-card.winner {
+            border: 2px solid #f6c23e;
+            background: #fff9e6;
+        }
+
+        .table th {
+            width: 150px;
+            background: #f8f9fc;
+        }
+    </style>
+
+    <%- include('../../partials/footer') %>

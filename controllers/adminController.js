@@ -412,6 +412,154 @@ class AdminController {
             res.redirect('/admin/users');
         }
     }
+    // Make user admin / remove admin
+    async toggleAdminStatus(req, res) {
+        try {
+            const { userId } = req.params;
+
+            const user = await User.findById(userId);
+
+            if (!user) {
+                req.flash('error_msg', 'User not found');
+                return res.redirect('/admin/users');
+            }
+
+            // Don't allow changing own admin status
+            if (user._id.toString() === req.session.user.id) {
+                req.flash('error_msg', 'Cannot change your own admin status');
+                return res.redirect(`/admin/users/${userId}`);
+            }
+
+            user.isAdmin = !user.isAdmin;
+            await user.save();
+
+            req.flash('success_msg', `Admin privileges ${user.isAdmin ? 'granted' : 'revoked'} successfully`);
+            res.redirect(`/admin/users/${userId}`);
+        } catch (error) {
+            console.error('Toggle admin status error:', error);
+            req.flash('error_msg', 'Error updating admin status');
+            res.redirect('/admin/users');
+        }
+    }
+    // Verify game and declare winner
+    async verifyGame(req, res) {
+        const session = await mongoose.startSession();
+        session.startTransaction();
+
+        try {
+            const { gameId } = req.params;
+            const { winnerId, adminNotes } = req.body;
+
+            const game = await Game.findById(gameId).session(session);
+
+            if (!game) {
+                await session.abortTransaction();
+                session.endSession();
+                req.flash('error_msg', 'Game not found');
+                return res.redirect('/admin/games');
+            }
+
+            if (game.status !== 'completed') {
+                await session.abortTransaction();
+                session.endSession();
+                req.flash('error_msg', 'Game is not in completed state');
+                return res.redirect(`/admin/games/${gameId}`);
+            }
+
+            if (game.adminVerified) {
+                await session.abortTransaction();
+                session.endSession();
+                req.flash('error_msg', 'Game already verified');
+                return res.redirect(`/admin/games/${gameId}`);
+            }
+
+            // Use model method to verify winner
+            await game.verifyWinner(req.session.user.id, adminNotes);
+
+            // Calculate winnings (total pot = bet amount * 2)
+            const winnings = game.betAmount * 2;
+
+            // Credit winner
+            await walletService.creditWinnings(game.winnerClaim, game._id, winnings);
+
+            // Update user statistics
+            await User.findByIdAndUpdate(
+                game.winnerClaim,
+                {
+                    $inc: {
+                        totalWins: 1,
+                        totalEarnings: winnings
+                    }
+                },
+                { session }
+            );
+
+            // Update loser's statistics
+            const loserId = game.player1.toString() === game.winnerClaim.toString() ? game.player2 : game.player1;
+            if (loserId) {
+                await User.findByIdAndUpdate(
+                    loserId,
+                    { $inc: { totalLosses: 1 } },
+                    { session }
+                );
+            }
+
+            await session.commitTransaction();
+            session.endSession();
+
+            req.flash('success_msg', '✅ Game verified and winner credited successfully');
+            res.redirect(`/admin/games/${gameId}`);
+
+        } catch (error) {
+            await session.abortTransaction();
+            session.endSession();
+            console.error('Verify game error:', error);
+            req.flash('error_msg', 'Error verifying game');
+            res.redirect(`/admin/games/${req.params.gameId}`);
+        }
+    }
+
+    // Reject game (mark as disputed)
+    async rejectGame(req, res) {
+        const session = await mongoose.startSession();
+        session.startTransaction();
+
+        try {
+            const { gameId } = req.params;
+            const { reason } = req.body;
+
+            const game = await Game.findById(gameId).session(session);
+
+            if (!game) {
+                await session.abortTransaction();
+                session.endSession();
+                req.flash('error_msg', 'Game not found');
+                return res.redirect('/admin/games');
+            }
+
+            // Use model method to reject
+            await game.rejectWinner(req.session.user.id, reason);
+
+            // Refund both players
+            await walletService.refundBet(game.player1, game._id, game.betAmount);
+            if (game.player2) {
+                await walletService.refundBet(game.player2, game._id, game.betAmount);
+            }
+
+            await session.commitTransaction();
+            session.endSession();
+
+            req.flash('success_msg', '❌ Game rejected and players refunded');
+            res.redirect(`/admin/games/${gameId}`);
+
+        } catch (error) {
+            await session.abortTransaction();
+            session.endSession();
+            console.error('Reject game error:', error);
+            req.flash('error_msg', 'Error rejecting game');
+            res.redirect(`/admin/games/${req.params.gameId}`);
+        }
+    }
 
     // Toggle user status (activate/deactivate)
     async toggleUserStatus(req, res) {
@@ -523,39 +671,76 @@ class AdminController {
         }
     }
 
-    // Approve withdrawal
+    // Approve withdrawal - FINAL FIXED VERSION
     async approveWithdrawal(req, res) {
         const session = await mongoose.startSession();
         session.startTransaction();
 
         try {
-            const { withdrawalId } = req.params;
+            const { id } = req.params;  // ✅ YAHI SAHI HAI
             const { transactionId, notes } = req.body;
 
-            const withdrawal = await Transaction.findById(withdrawalId).session(session);
+            console.log('🔍 Approve withdrawal - ID received:', id);
+
+            // Check if ID exists
+            if (!id) {
+                await session.abortTransaction();
+                session.endSession();
+                console.log('❌ No withdrawal ID provided');
+                req.flash('error_msg', 'No withdrawal ID provided');
+                return res.redirect('/admin/withdrawals');
+            }
+
+            // Check if ID is valid MongoDB ObjectId
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                await session.abortTransaction();
+                session.endSession();
+                console.log('❌ Invalid withdrawal ID format:', id);
+                req.flash('error_msg', 'Invalid withdrawal ID format');
+                return res.redirect('/admin/withdrawals');
+            }
+
+            // Find withdrawal
+            const withdrawal = await Transaction.findById(id).session(session);
 
             if (!withdrawal) {
                 await session.abortTransaction();
                 session.endSession();
-                req.flash('error_msg', 'Withdrawal not found');
+                console.log('❌ Withdrawal not found in database:', id);
+                req.flash('error_msg', 'Withdrawal request not found');
+                return res.redirect('/admin/withdrawals');
+            }
+
+            console.log('✅ Withdrawal details:', {
+                id: withdrawal._id,
+                user: withdrawal.user,
+                amount: withdrawal.amount,
+                status: withdrawal.status,
+                type: withdrawal.type
+            });
+
+            if (withdrawal.type !== 'withdrawal') {
+                await session.abortTransaction();
+                session.endSession();
+                req.flash('error_msg', 'This is not a withdrawal transaction');
                 return res.redirect('/admin/withdrawals');
             }
 
             if (withdrawal.status !== 'pending') {
                 await session.abortTransaction();
                 session.endSession();
-                req.flash('error_msg', 'Withdrawal already processed');
+                req.flash('error_msg', `Withdrawal already processed (status: ${withdrawal.status})`);
                 return res.redirect('/admin/withdrawals');
             }
 
             // Update withdrawal status
             withdrawal.status = 'completed';
             withdrawal.paymentDetails = {
-                ...withdrawal.paymentDetails,
-                transactionId,
+                ...(withdrawal.paymentDetails || {}),
+                transactionId: transactionId || 'MANUAL-' + Date.now(),
                 processedBy: req.session.user.id,
                 processedAt: new Date(),
-                notes
+                notes: notes || 'Approved by admin'
             };
             withdrawal.processedAt = new Date();
             await withdrawal.save({ session });
@@ -563,32 +748,56 @@ class AdminController {
             await session.commitTransaction();
             session.endSession();
 
-            req.flash('success_msg', 'Withdrawal approved successfully');
+            req.flash('success_msg', `✅ Withdrawal of ₹${withdrawal.amount} approved successfully`);
             res.redirect('/admin/withdrawals?status=completed');
+
         } catch (error) {
             await session.abortTransaction();
             session.endSession();
-            console.error('Approve withdrawal error:', error);
-            req.flash('error_msg', 'Error approving withdrawal');
+            console.error('❌ Approve withdrawal error:', error);
+            req.flash('error_msg', 'Error approving withdrawal: ' + error.message);
             res.redirect('/admin/withdrawals');
         }
     }
 
-    // Reject withdrawal
+    // Reject withdrawal - FIXED VERSION
     async rejectWithdrawal(req, res) {
         const session = await mongoose.startSession();
         session.startTransaction();
 
         try {
-            const { withdrawalId } = req.params;
+            const { id } = req.params;  // ✅ YAHI SAHI HAI
             const { reason } = req.body;
 
-            const withdrawal = await Transaction.findById(withdrawalId).session(session);
+            console.log('🔍 Reject withdrawal - ID received:', id);
+
+            if (!id) {
+                await session.abortTransaction();
+                session.endSession();
+                req.flash('error_msg', 'No withdrawal ID provided');
+                return res.redirect('/admin/withdrawals');
+            }
+
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                await session.abortTransaction();
+                session.endSession();
+                req.flash('error_msg', 'Invalid withdrawal ID format');
+                return res.redirect('/admin/withdrawals');
+            }
+
+            const withdrawal = await Transaction.findById(id).session(session);
 
             if (!withdrawal) {
                 await session.abortTransaction();
                 session.endSession();
                 req.flash('error_msg', 'Withdrawal not found');
+                return res.redirect('/admin/withdrawals');
+            }
+
+            if (withdrawal.type !== 'withdrawal') {
+                await session.abortTransaction();
+                session.endSession();
+                req.flash('error_msg', 'This is not a withdrawal transaction');
                 return res.redirect('/admin/withdrawals');
             }
 
@@ -602,42 +811,44 @@ class AdminController {
             // Update withdrawal status
             withdrawal.status = 'failed';
             withdrawal.paymentDetails = {
-                ...withdrawal.paymentDetails,
-                reason,
+                ...(withdrawal.paymentDetails || {}),
+                reason: reason || 'Rejected by admin',
                 processedBy: req.session.user.id,
                 processedAt: new Date()
             };
             withdrawal.processedAt = new Date();
             await withdrawal.save({ session });
 
-            // Refund the amount back to user's wallet
+            // Refund user
             const user = await User.findById(withdrawal.user).session(session);
-            user.walletBalance += withdrawal.amount;
-            await user.save({ session });
+            if (user) {
+                user.walletBalance += withdrawal.amount;
+                await user.save({ session });
 
-            // Create refund transaction record
-            const refundTransaction = new Transaction({
-                user: withdrawal.user,
-                type: 'refund',
-                amount: withdrawal.amount,
-                balanceBefore: user.walletBalance - withdrawal.amount,
-                balanceAfter: user.walletBalance,
-                status: 'completed',
-                description: `Refund for rejected withdrawal: ${reason}`,
-                paymentMethod: 'wallet'
-            });
-            await refundTransaction.save({ session });
+                const refundTransaction = new Transaction({
+                    user: withdrawal.user,
+                    type: 'refund',
+                    amount: withdrawal.amount,
+                    balanceBefore: user.walletBalance - withdrawal.amount,
+                    balanceAfter: user.walletBalance,
+                    status: 'completed',
+                    description: `Refund for rejected withdrawal: ${reason || 'No reason provided'}`,
+                    paymentMethod: 'wallet'
+                });
+                await refundTransaction.save({ session });
+            }
 
             await session.commitTransaction();
             session.endSession();
 
-            req.flash('success_msg', 'Withdrawal rejected and amount refunded');
+            req.flash('success_msg', `❌ Withdrawal rejected and ₹${withdrawal.amount} refunded to user`);
             res.redirect('/admin/withdrawals?status=failed');
+
         } catch (error) {
             await session.abortTransaction();
             session.endSession();
-            console.error('Reject withdrawal error:', error);
-            req.flash('error_msg', 'Error rejecting withdrawal');
+            console.error('❌ Reject withdrawal error:', error);
+            req.flash('error_msg', 'Error rejecting withdrawal: ' + error.message);
             res.redirect('/admin/withdrawals');
         }
     }

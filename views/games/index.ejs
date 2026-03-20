@@ -14,7 +14,8 @@
                     <div class="col-md-4 text-md-end">
                         <div class="wallet-quick-info">
                             <span class="wallet-label">Your Balance:</span>
-                            <span class="wallet-amount">₹<%= user.walletBalance.toFixed(2) %></span>
+                            <span class="wallet-amount">₹<%= user.walletBalance ? user.walletBalance.toFixed(2) : '0.00'
+                                    %></span>
                             <a href="/wallet" class="btn btn-sm btn-outline-primary ms-2">
                                 <i class="fas fa-plus-circle"></i> Add
                             </a>
@@ -51,12 +52,15 @@
                         </div>
                         <div class="card-body">
                             <div class="bet-options">
-                                <% options.forEach(function(amount) { %>
+                                <% // ✅ FIX: Use regular function, not arrow function if (options && options.length> 0)
+                                    {
+                                    options.forEach(function(amount) {
+                                    %>
                                     <button class="bet-option" onclick="showCreateModal(<%= amount %>)">
                                         <span class="bet-amount">₹<%= amount.toLocaleString() %></span>
                                         <span class="bet-win">Win ₹<%= (amount * 2).toLocaleString() %></span>
                                     </button>
-                                    <% }); %>
+                                    <% }); } %>
                             </div>
                         </div>
                     </div>
@@ -99,50 +103,49 @@
                             </div>
                             <div class="card-body">
                                 <div class="waiting-games-list">
-                                    <% waitingGames.forEach(function(game) { %>
-                                        <% // Only show games that don't have player2 and are waiting var
-                                            showGame=(!game.player2 && game.status==='waiting' ); %>
-                                            <% if (showGame) { %>
-                                                <div class="waiting-game-item">
-                                                    <div class="game-info">
-                                                        <div class="player-info">
-                                                            <div class="player-avatar">
-                                                                <%= game.player1.username.charAt(0).toUpperCase() %>
-                                                            </div>
-                                                            <div class="player-details">
-                                                                <span class="player-name">
-                                                                    <%= game.player1.username %>
-                                                                </span>
-                                                                <span class="game-time">
-                                                                    <i class="far fa-clock"></i>
-                                                                    <%= new Date(game.createdAt).toLocaleTimeString() %>
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="bet-info">
-                                                            <span class="bet-label">Bet</span>
-                                                            <span class="bet-amount">₹<%=
-                                                                    game.betAmount.toLocaleString() %></span>
-                                                            <span class="win-amount">Win ₹<%= (game.betAmount *
-                                                                    2).toLocaleString() %></span>
-                                                        </div>
+                                    <% // ✅ FIX: Use regular function with proper checks
+                                        waitingGames.forEach(function(game) { var showGame=game && !game.player2 &&
+                                        game.status==='waiting' ; if (showGame) { %>
+                                        <div class="waiting-game-item">
+                                            <div class="game-info">
+                                                <div class="player-info">
+                                                    <div class="player-avatar">
+                                                        <%= game.player1 && game.player1.username ?
+                                                            game.player1.username.charAt(0).toUpperCase() : '?' %>
                                                     </div>
-                                                    <div class="game-actions">
-                                                        <span class="room-code-badge">
-                                                            <i class="fas fa-door-open"></i>
-                                                            <%= game.roomId %>
+                                                    <div class="player-details">
+                                                        <span class="player-name">
+                                                            <%= game.player1 ? game.player1.username : 'Unknown' %>
                                                         </span>
-                                                        <form action="/games/join" method="POST" class="d-inline">
-                                                            <input type="hidden" name="roomId"
-                                                                value="<%= game.roomId %>">
-                                                            <button type="submit" class="btn btn-success btn-sm">
-                                                                <i class="fas fa-play"></i> Join Now
-                                                            </button>
-                                                        </form>
+                                                        <span class="game-time">
+                                                            <i class="far fa-clock"></i>
+                                                            <%= game.createdAt ? new
+                                                                Date(game.createdAt).toLocaleTimeString() : 'N/A' %>
+                                                        </span>
                                                     </div>
                                                 </div>
-                                                <% } %>
-                                                    <% }); %>
+                                                <div class="bet-info">
+                                                    <span class="bet-label">Bet</span>
+                                                    <span class="bet-amount">₹<%= game.betAmount ?
+                                                            game.betAmount.toLocaleString() : '0' %></span>
+                                                    <span class="win-amount">Win ₹<%= game.betAmount ? (game.betAmount *
+                                                            2).toLocaleString() : '0' %></span>
+                                                </div>
+                                            </div>
+                                            <div class="game-actions">
+                                                <span class="room-code-badge">
+                                                    <i class="fas fa-door-open"></i>
+                                                    <%= game.roomId || 'N/A' %>
+                                                </span>
+                                                <form action="/games/join" method="POST" class="d-inline">
+                                                    <input type="hidden" name="roomId" value="<%= game.roomId %>">
+                                                    <button type="submit" class="btn btn-success btn-sm">
+                                                        <i class="fas fa-play"></i> Join Now
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <% } }); %>
                                 </div>
                             </div>
                         </div>
@@ -270,7 +273,8 @@
                             </div>
                             <div class="preview-item">
                                 <i class="fas fa-wallet"></i>
-                                <span>Your Balance: <strong>₹<%= user.walletBalance.toFixed(2) %></strong></span>
+                                <span>Your Balance: <strong>₹<%= user.walletBalance ? user.walletBalance.toFixed(2)
+                                            : '0.00' %></strong></span>
                             </div>
                         </div>
 
@@ -295,6 +299,7 @@
         </div>
     </div>
 
+    <!-- Styles -->
     <style>
         /* Games Container */
         .games-container {

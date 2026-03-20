@@ -1,0 +1,420 @@
+<%- include('../partials/header') %>
+
+    <div class="admin-dashboard">
+        <div class="container-fluid">
+            <!-- Header -->
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                </h1>
+                <div>
+                    <span class="badge bg-primary">
+                        <%= new Date().toLocaleDateString() %>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Stats Cards Row 1 -->
+            <div class="row">
+                <!-- Total Users -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="stats-card primary">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="stats-label">Total Users</div>
+                                    <div class="stats-value">
+                                        <%= stats.totalUsers.toLocaleString() %>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-users fa-2x"></i>
+                                </div>
+                            </div>
+                            <div class="stats-footer">
+                                <span class="text-success"><i class="fas fa-arrow-up"></i>
+                                    <%= stats.activeUsers %>
+                                </span> Active
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Games -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="stats-card success">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="stats-label">Total Games</div>
+                                    <div class="stats-value">
+                                        <%= stats.totalGames.toLocaleString() %>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-dice fa-2x"></i>
+                                </div>
+                            </div>
+                            <div class="stats-footer">
+                                <span class="text-success">
+                                    <%= stats.completedGames %>
+                                </span> Completed
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Deposits -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="stats-card info">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="stats-label">Total Deposits</div>
+                                    <div class="stats-value">₹<%= stats.totalDeposits.toLocaleString() %>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-arrow-down fa-2x"></i>
+                                </div>
+                            </div>
+                            <div class="stats-footer">
+                                <span class="text-info">Total Inflow</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Withdrawals -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="stats-card warning">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="stats-label">Total Withdrawals</div>
+                                    <div class="stats-value">₹<%= stats.totalWithdrawals.toLocaleString() %>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-arrow-up fa-2x"></i>
+                                </div>
+                            </div>
+                            <div class="stats-footer">
+                                <span class="text-warning">Total Outflow</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards Row 2 -->
+            <div class="row">
+                <!-- Total Bets -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="stats-card dark">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="stats-label">Total Bets</div>
+                                    <div class="stats-value">₹<%= stats.totalBets.toLocaleString() %>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-gamepad fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Winnings -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="stats-card success">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="stats-label">Total Winnings</div>
+                                    <div class="stats-value">₹<%= stats.totalWinnings.toLocaleString() %>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-trophy fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Platform Revenue -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="stats-card danger">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="stats-label">Platform Revenue</div>
+                                    <div class="stats-value">₹<%= stats.platformRevenue.toLocaleString() %>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-chart-line fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Games -->
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="stats-card warning">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="stats-label">Pending Games</div>
+                                    <div class="stats-value">
+                                        <%= stats.pendingGames %>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-clock fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Games and Pending Withdrawals -->
+            <div class="row">
+                <!-- Recent Games -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header py-3 d-flex justify-content-between">
+                            <h6 class="m-0 font-weight-bold">Recent Games</h6>
+                            <a href="/admin/games" class="btn btn-sm btn-primary">View All</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Room ID</th>
+                                            <th>Players</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% recentGames.forEach(game=> { %>
+                                            <tr>
+                                                <td><code><%= game.roomId %></code></td>
+                                                <td>
+                                                    <%= game.player1?.username || '?' %> vs
+                                                        <%= game.player2?.username || '?' %>
+                                                </td>
+                                                <td>₹<%= game.betAmount %>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-<%= 
+                                                    game.status === 'completed' ? 'success' : 
+                                                    game.status === 'active' ? 'primary' : 
+                                                    game.status === 'waiting' ? 'warning' : 
+                                                    'secondary' %>">
+                                                        <%= game.status %>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <a href="/admin/games/<%= game._id %>" class="btn btn-sm btn-info">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Withdrawals -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header py-3 d-flex justify-content-between">
+                            <h6 class="m-0 font-weight-bold">Pending Withdrawals</h6>
+                            <a href="/admin/withdrawals" class="btn btn-sm btn-primary">View All</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                            <th>Amount</th>
+                                            <th>Date</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% pendingWithdrawals.forEach(w=> { %>
+                                            <tr>
+                                                <td>
+                                                    <%= w.user?.username %>
+                                                </td>
+                                                <td class="text-danger">₹<%= w.amount %>
+                                                </td>
+                                                <td>
+                                                    <%= new Date(w.createdAt).toLocaleDateString() %>
+                                                </td>
+                                                <td>
+                                                    <a href="/admin/withdrawals" class="btn btn-sm btn-success">
+                                                        <i class="fas fa-check"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Verifications -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold">Pending Game Verifications</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Room ID</th>
+                                            <th>Player 1</th>
+                                            <th>Player 2</th>
+                                            <th>Amount</th>
+                                            <th>Completed At</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% pendingVerifications.forEach(game=> { %>
+                                            <tr>
+                                                <td><code><%= game.roomId %></code></td>
+                                                <td>
+                                                    <%= game.player1?.username %>
+                                                </td>
+                                                <td>
+                                                    <%= game.player2?.username || 'N/A' %>
+                                                </td>
+                                                <td>₹<%= game.betAmount %>
+                                                </td>
+                                                <td>
+                                                    <%= new Date(game.completedAt).toLocaleString() %>
+                                                </td>
+                                                <td>
+                                                    <a href="/admin/games/<%= game._id %>"
+                                                        class="btn btn-sm btn-warning">
+                                                        <i class="fas fa-check-circle"></i> Verify
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .admin-dashboard {
+            padding: 20px;
+            background: #f8f9fc;
+            min-height: 100vh;
+        }
+
+        .stats-card {
+            border-radius: 15px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            transition: transform 0.3s;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stats-card.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .stats-card.success {
+            background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);
+            color: white;
+        }
+
+        .stats-card.info {
+            background: linear-gradient(135deg, #36b9cc 0%, #258391 100%);
+            color: white;
+        }
+
+        .stats-card.warning {
+            background: linear-gradient(135deg, #f6c23e 0%, #d4ac0d 100%);
+            color: white;
+        }
+
+        .stats-card.danger {
+            background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .stats-card.dark {
+            background: linear-gradient(135deg, #5a5c69 0%, #3a3b45 100%);
+            color: white;
+        }
+
+        .stats-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .stats-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .stats-footer {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.9rem;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fc, #ffffff);
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .table th {
+            border-top: none;
+            color: #4e73df;
+            font-weight: 600;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+    </style>
+
+    <%- include('../partials/footer') %>

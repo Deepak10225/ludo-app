@@ -38,15 +38,113 @@ class GameController {
             res.redirect('/');
         }
     }
+    async submitResult(req, res) {
+        try {
+            const gameId = req.params.id;
+            const userId = req.session.user.id;
+            const screenshot = req.file;
+
+            if (!screenshot) {
+                req.flash('error_msg', 'Please upload a screenshot');
+                return res.redirect(`/games/${gameId}/play`);
+            }
+
+            const game = await Game.findById(gameId);
+
+            if (!game) {
+                req.flash('error_msg', 'Game not found');
+                return res.redirect('/games');
+            }
+
+            // Check if user is part of this game
+            const isPlayer1 = game.player1.toString() === userId;
+            const isPlayer2 = game.player2 && game.player2.toString() === userId;
+
+            if (!isPlayer1 && !isPlayer2) {
+                req.flash('error_msg', 'You are not part of this game');
+                return res.redirect('/games');
+            }
+
+            // Check if game is active
+            if (game.status !== 'active') {
+                req.flash('error_msg', 'Game is not active');
+                return res.redirect(`/games/${gameId}`);
+            }
+
+            // Save screenshot path
+            const screenshotPath = `/uploads/${screenshot.filename}`;
+
+            // Use the complete method from model
+            await game.complete(userId, screenshotPath);
+
+            // Update confirmation based on player
+            if (isPlayer1) {
+                game.player1Confirmed = true;
+            } else {
+                game.player2Confirmed = true;
+            }
+            await game.save();
+
+            req.flash('success_msg', '✅ Result submitted successfully! Waiting for opponent confirmation and admin verification.');
+            res.redirect(`/games/${gameId}`);
+
+        } catch (error) {
+            console.error('Submit result error:', error);
+            req.flash('error_msg', 'Error submitting result');
+            res.redirect(`/games/${req.params.id}/play`);
+        }
+    }
+
+    // Confirm opponent's result
+    async confirmResult(req, res) {
+        try {
+            const gameId = req.params.id;
+            const userId = req.session.user.id;
+
+            const game = await Game.findById(gameId);
+
+            if (!game) {
+                return res.status(404).json({ error: 'Game not found' });
+            }
+
+            // Check if user is the opponent
+            const isPlayer1 = game.player1.toString() === userId;
+            const isPlayer2 = game.player2 && game.player2.toString() === userId;
+
+            if (!isPlayer1 && !isPlayer2) {
+                return res.status(403).json({ error: 'Not authorized' });
+            }
+
+            // Mark confirmation
+            if (isPlayer1) {
+                game.player1Confirmed = true;
+            } else {
+                game.player2Confirmed = true;
+            }
+
+            await game.save();
+
+            res.json({
+                success: true,
+                message: 'Result confirmed',
+                bothConfirmed: game.player1Confirmed && game.player2Confirmed
+            });
+
+        } catch (error) {
+            console.error('Confirm result error:', error);
+            res.status(500).json({ error: 'Server error' });
+        }
+    }
 
     // Create new game - FIXED METHOD
     // Create new game
+    // Create new game - FIXED VERSION
     async create(req, res) {
         try {
             const { betAmount, betRange } = req.body;
             const userId = req.session.user.id;
 
-            console.log('Creating game with:', { betAmount, betRange, userId });
+            console.log('🎮 Creating game with:', { betAmount, betRange, userId });
 
             // Validate bet amount within range
             if (!this.validateBetRange(parseFloat(betAmount), betRange)) {
@@ -66,40 +164,68 @@ class GameController {
                 return res.redirect('/wallet');
             }
 
-            // Generate room ID using API
-            console.log('📡 Generating room ID from API...');
+            // ✅ FIX - Pehle check kar ki koi waiting game hai ya nahi same amount ki
+            const waitingGame = await Game.findOne({
+                betAmount: parseFloat(betAmount),
+                status: 'waiting',
+                player2: null  // Jisme player2 nahi hai
+            }).populate('player1');
+
+            if (waitingGame) {
+                // ✅ Agar waiting game mil gayi to use join karo
+                console.log('✅ Found waiting game for ₹' + betAmount + ':', waitingGame.roomId);
+
+                // Check ki user apna game join to nahi kar raha
+                if (waitingGame.player1._id.toString() === userId) {
+                    req.flash('error_msg', 'You already have a waiting game');
+                    return res.redirect('/games');
+                }
+
+                // Game mein player2 add kar
+                waitingGame.player2 = userId;
+                waitingGame.status = 'active';
+                await waitingGame.save();
+
+                // Player2 ka bet deduct kar
+                await walletService.placeBet(userId, waitingGame._id, parseFloat(betAmount));
+
+                req.flash('success_msg', `✅ Opponent found! Game ready. Room ID: ${waitingGame.roomId}`);
+                return res.redirect(`/games/${waitingGame._id}`);
+            }
+
+            // ❌ Koi waiting game nahi mila to naya bana
+            console.log('🆕 No waiting game found, creating new for ₹' + betAmount);
+
+            // API se room ID lo
             const roomResult = await ludoKingService.generateRoomId();
 
-            console.log('📡 Room generation result:', roomResult);
-
             if (!roomResult.success) {
-                req.flash('error_msg', 'Failed to create game room. Please try again.');
+                req.flash('error_msg', 'Failed to create game room');
                 return res.redirect('/games');
             }
 
-            // Create game record
+            // Naya game create kar
             const game = new Game({
                 roomId: roomResult.roomId,
                 player1: userId,
                 betAmount: parseFloat(betAmount),
                 betRange,
-                status: 'waiting'
+                status: 'waiting',
+                player1Confirmed: false,
+                player2Confirmed: false,
+                createdAt: new Date()
             });
 
             await game.save();
-            console.log('✅ Game created with ID:', game._id, 'Room ID:', game.roomId);
 
-            // Place bet
+            // Player1 ka bet deduct kar
             await walletService.placeBet(userId, game._id, parseFloat(betAmount));
 
-            req.flash('success_msg', `✅ Game created! Room ID: ${game.roomId}`);
+            req.flash('success_msg', `✅ Game created! Room ID: ${game.roomId}. Waiting for opponent...`);
             res.redirect(`/games/${game._id}`);
 
         } catch (error) {
-            console.error('❌ Game creation error:', {
-                message: error.message,
-                stack: error.stack
-            });
+            console.error('❌ Game creation error:', error);
             req.flash('error_msg', 'Error creating game: ' + error.message);
             res.redirect('/games');
         }
@@ -111,73 +237,49 @@ class GameController {
             const { roomId } = req.body;
             const userId = req.session.user.id;
 
-            console.log('🔍 Joining game with room ID:', roomId);
-
-            // Find game by room ID that is waiting for players
+            // Game find kar
             const game = await Game.findOne({
                 roomId: roomId.trim(),
                 status: 'waiting'
             });
 
             if (!game) {
-                console.log('❌ Game not found or not waiting:', roomId);
-                req.flash('error_msg', 'Invalid room ID or game already started');
+                req.flash('error_msg', 'Invalid room ID');
                 return res.redirect('/games');
             }
 
-            console.log('✅ Game found:', {
-                gameId: game._id,
-                player1: game.player1,
-                player2: game.player2,
-                status: game.status
+            // ✅ Check - Agar user already waiting game mein hai to use join na karne de
+            const userWaitingGame = await Game.findOne({
+                $or: [
+                    { player1: userId, status: 'waiting' },
+                    { player2: userId, status: 'waiting' }
+                ]
             });
 
-            // Check if user is trying to join their own game
-            if (game.player1.toString() === userId) {
-                console.log('❌ User trying to join own game');
-                req.flash('error_msg', 'You cannot join your own game');
-                return res.redirect('/games');
-            }
-
-            // Check if player2 already exists
-            if (game.player2) {
-                console.log('❌ Game already has player2:', game.player2);
-                req.flash('error_msg', 'This game already has two players');
+            if (userWaitingGame) {
+                req.flash('error_msg', 'You already have a waiting game. Complete or cancel it first.');
                 return res.redirect('/games');
             }
 
             // Check user balance
             const user = await User.findById(userId);
-            if (!user) {
-                req.flash('error_msg', 'User not found');
-                return res.redirect('/login');
-            }
-
             if (user.walletBalance < game.betAmount) {
-                req.flash('error_msg', 'Insufficient balance to join this game');
+                req.flash('error_msg', 'Insufficient balance');
                 return res.redirect('/wallet');
             }
 
-            // Update game with second player
+            // Game join kar
             game.player2 = userId;
             game.status = 'active';
             await game.save();
 
-            console.log('✅ Game updated:', {
-                gameId: game._id,
-                player1: game.player1,
-                player2: game.player2,
-                status: game.status
-            });
-
-            // Place bet for second player
             await walletService.placeBet(userId, game._id, game.betAmount);
 
-            req.flash('success_msg', '✅ Successfully joined the game!');
+            req.flash('success_msg', '✅ Joined game successfully!');
             res.redirect(`/games/${game._id}/play`);
 
         } catch (error) {
-            console.error('❌ Join game error:', error);
+            console.error('❌ Join error:', error);
             req.flash('error_msg', 'Error joining game');
             res.redirect('/games');
         }
@@ -221,6 +323,8 @@ class GameController {
     // Play game page
     async play(req, res) {
         try {
+            console.log('ahssfdhga');
+
             const game = await Game.findById(req.params.id)
                 .populate('player1', 'username')
                 .populate('player2', 'username');
@@ -426,5 +530,6 @@ class GameController {
         return false;
     }
 }
+
 
 module.exports = new GameController();

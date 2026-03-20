@@ -1,0 +1,407 @@
+<%- include('../../partials/header') %>
+
+    <div class="user-view">
+        <div class="container-fluid">
+            <!-- Header -->
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-user"></i> User: <%= user.username %>
+                </h1>
+                <div>
+                    <a href="/admin/users" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Users
+                    </a>
+                    <button onclick="toggleUserStatus()" class="btn btn-<%= user.isActive ? 'warning' : 'success' %>">
+                        <i class="fas fa-<%= user.isActive ? 'ban' : 'check' %>"></i>
+                        <%= user.isActive ? 'Deactivate' : 'Activate' %> User
+                    </button>
+                    <% if (!user.isAdmin) { %>
+                        <button onclick="makeAdmin()" class="btn btn-primary">
+                            <i class="fas fa-crown"></i> Make Admin
+                        </button>
+                        <% } else { %>
+                            <button onclick="removeAdmin()" class="btn btn-danger">
+                                <i class="fas fa-times-circle"></i> Remove Admin
+                            </button>
+                            <% } %>
+                </div>
+            </div>
+
+            <!-- User Info -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold">User Information</h6>
+                        </div>
+                        <div class="card-body">
+                            <table class="table">
+                                <tr>
+                                    <th>Username:</th>
+                                    <td>
+                                        <%= user.username %>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Email:</th>
+                                    <td>
+                                        <%= user.email %>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Phone:</th>
+                                    <td>
+                                        <%= user.phoneNumber || '-' %>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Full Name:</th>
+                                    <td>
+                                        <%= user.fullName || '-' %>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Gender:</th>
+                                    <td>
+                                        <%= user.gender || '-' %>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Referral Code:</th>
+                                    <td><code><%= user.referralCode || '-' %></code></td>
+                                </tr>
+                                <tr>
+                                    <th>Joined:</th>
+                                    <td>
+                                        <%= new Date(user.createdAt).toLocaleString() %>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Last Login:</th>
+                                    <td>
+                                        <%= user.lastLogin ? new Date(user.lastLogin).toLocaleString() : '-' %>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold">Wallet & Stats</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="wallet-card">
+                                <div class="wallet-balance">
+                                    <span class="label">Wallet Balance</span>
+                                    <span class="value">₹<%= user.walletBalance.toFixed(2) %></span>
+                                </div>
+                                <div class="stats-grid">
+                                    <div class="stat">
+                                        <span class="stat-value">
+                                            <%= user.totalGames || 0 %>
+                                        </span>
+                                        <span class="stat-label">Total Games</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-value">
+                                            <%= user.totalWins || 0 %>
+                                        </span>
+                                        <span class="stat-label">Wins</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-value">
+                                            <%= ((user.totalWins || 0) / (user.totalGames || 1) * 100).toFixed(1) %>%
+                                        </span>
+                                        <span class="stat-label">Win Rate</span>
+                                    </div>
+                                </div>
+                                <div class="earnings">
+                                    <span class="label">Total Earnings</span>
+                                    <span class="value text-success">₹<%= (user.totalEarnings || 0).toFixed(2) %></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold">Account Status</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="status-card">
+                                <div class="status-item">
+                                    <span class="label">Status:</span>
+                                    <span class="badge bg-<%= user.isActive ? 'success' : 'danger' %>">
+                                        <%= user.isActive ? 'Active' : 'Inactive' %>
+                                    </span>
+                                </div>
+                                <div class="status-item">
+                                    <span class="label">Role:</span>
+                                    <span class="badge bg-<%= user.isAdmin ? 'primary' : 'secondary' %>">
+                                        <%= user.isAdmin ? 'Admin' : 'User' %>
+                                    </span>
+                                </div>
+                                <div class="status-item">
+                                    <span class="label">Referral:</span>
+                                    <span class="badge bg-info">
+                                        <%= user.referralCode || 'None' %>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Games History -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold">Game History</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Room ID</th>
+                                            <th>Opponent</th>
+                                            <th>Bet Amount</th>
+                                            <th>Result</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% games.forEach(game=> {
+                                            const isPlayer1 = game.player1?._id.toString() === user._id.toString();
+                                            const opponent = isPlayer1 ? game.player2 : game.player1;
+                                            const won = game.winner?._id.toString() === user._id.toString();
+                                            %>
+                                            <tr>
+                                                <td><code><%= game.roomId %></code></td>
+                                                <td>
+                                                    <%= opponent?.username || 'N/A' %>
+                                                </td>
+                                                <td>₹<%= game.betAmount %>
+                                                </td>
+                                                <td>
+                                                    <% if (game.status==='completed' && game.winner) { %>
+                                                        <span class="badge bg-<%= won ? 'success' : 'danger' %>">
+                                                            <%= won ? 'Won' : 'Lost' %>
+                                                        </span>
+                                                        <% } else { %>
+                                                            <span class="badge bg-secondary">Pending</span>
+                                                            <% } %>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-<%= 
+                                                    game.status === 'completed' ? 'success' : 
+                                                    game.status === 'active' ? 'primary' : 
+                                                    'warning' %>">
+                                                        <%= game.status %>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <%= new Date(game.createdAt).toLocaleDateString() %>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction History -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold">Transaction History</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Amount</th>
+                                            <th>Balance After</th>
+                                            <th>Status</th>
+                                            <th>Description</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% transactions.forEach(t=> { %>
+                                            <tr>
+                                                <td>
+                                                    <span class="badge bg-<%= 
+                                                    t.type === 'deposit' ? 'success' : 
+                                                    t.type === 'withdrawal' ? 'danger' : 
+                                                    t.type === 'win' ? 'info' : 
+                                                    'warning' %>">
+                                                        <%= t.type %>
+                                                    </span>
+                                                </td>
+                                                <td
+                                                    class="<%= t.type === 'win' || t.type === 'deposit' ? 'text-success' : 'text-danger' %>">
+                                                    <%= t.type==='withdrawal' || t.type==='bet' ? '-' : '+' %> ₹<%=
+                                                            t.amount %>
+                                                </td>
+                                                <td>₹<%= t.balanceAfter %>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-<%= 
+                                                    t.status === 'completed' ? 'success' : 
+                                                    t.status === 'pending' ? 'warning' : 
+                                                    'danger' %>">
+                                                        <%= t.status %>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <%= t.description || '-' %>
+                                                </td>
+                                                <td>
+                                                    <%= new Date(t.createdAt).toLocaleString() %>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Forms for Actions -->
+    <form id="toggleStatusForm" action="/admin/users/<%= user._id %>/toggle" method="POST" style="display: none;">
+    </form>
+    <form id="toggleAdminForm" action="/admin/users/<%= user._id %>/toggle-admin" method="POST" style="display: none;">
+    </form>
+
+    <style>
+        .user-view {
+            padding: 20px;
+            background: #f8f9fc;
+            min-height: 100vh;
+        }
+
+        .wallet-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+        }
+
+        .wallet-balance {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .wallet-balance .label {
+            display: block;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .wallet-balance .value {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .earnings {
+            text-align: center;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .earnings .label {
+            display: block;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .earnings .value {
+            display: block;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .status-card {
+            background: #f8f9fc;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-item .label {
+            font-weight: 600;
+            color: #666;
+        }
+    </style>
+
+    <script>
+        function toggleUserStatus() {
+            if (confirm('Are you sure you want to change this user\'s status?')) {
+                document.getElementById('toggleStatusForm').submit();
+            }
+        }
+
+        function makeAdmin() {
+            if (confirm('Are you sure you want to make this user an admin?')) {
+                document.getElementById('toggleAdminForm').submit();
+            }
+        }
+
+        function removeAdmin() {
+            if (confirm('Are you sure you want to remove admin privileges?')) {
+                document.getElementById('toggleAdminForm').submit();
+            }
+        }
+    </script>
+
+    <%- include('../../partials/footer') %>

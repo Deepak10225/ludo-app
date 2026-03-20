@@ -36,10 +36,22 @@ const gameSchema = new mongoose.Schema({
         ref: 'User',
         default: null
     },
+    // Screenshot fields
     screenshot: {
         type: String,
         default: null
     },
+    winnerClaim: {  // Kaun winner hone ka claim kar raha hai
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
+    },
+    screenshotUploadedAt: {
+        type: Date,
+        default: null
+    },
+
+    // Confirmation fields
     player1Confirmed: {
         type: Boolean,
         default: false
@@ -48,6 +60,8 @@ const gameSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+
+    // Admin verification
     adminVerified: {
         type: Boolean,
         default: false
@@ -56,6 +70,8 @@ const gameSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+
+    // Timestamps
     completedAt: {
         type: Date,
         default: null
@@ -79,12 +95,29 @@ gameSchema.methods.isReady = function () {
     return this.player1 && this.player2;
 };
 
-// Mark game as completed
+// Mark game as completed with winner claim
 gameSchema.methods.complete = async function (winnerId, screenshotPath) {
-    this.status = 'completed';
-    this.winner = winnerId;
+    this.winnerClaim = winnerId;
     this.screenshot = screenshotPath;
+    this.screenshotUploadedAt = new Date();
+    this.status = 'completed';
     this.completedAt = new Date();
+    await this.save();
+};
+
+// Admin verify winner
+gameSchema.methods.verifyWinner = async function (adminId, notes) {
+    this.winner = this.winnerClaim;
+    this.adminVerified = true;
+    this.adminNotes = notes || 'Verified by admin';
+    await this.save();
+};
+
+// Reject winner claim
+gameSchema.methods.rejectWinner = async function (adminId, reason) {
+    this.status = 'disputed';
+    this.adminNotes = `Rejected: ${reason}`;
+    this.adminVerified = false;
     await this.save();
 };
 
