@@ -2,85 +2,83 @@
 
     <!-- Hero Section -->
     <section class="hero-section">
+        <div class="hero-bg"></div>
         <div class="container">
-            <div class="row min-vh-100 align-items-center">
+            <div class="row align-items-center">
                 <div class="col-lg-6" data-aos="fade-right">
-                    <h1 class="hero-title">
-                        Play Ludo & <br>
-                        <span class="text-gradient">Win Real Cash</span>
-                    </h1>
-                    <p class="hero-description">
-                        Join India's most trusted Ludo gaming platform. Play with real players,
-                        win real money, and withdraw instantly to your bank account.
-                    </p>
+                    <div class="hero-content">
+                        <span class="hero-badge">
+                            <i class="fas fa-trophy"></i> India's #1 Ludo Platform
+                        </span>
+                        <h1 class="hero-title">
+                            Play Ludo & <br>
+                            <span class="text-gradient">Win Real Cash</span>
+                        </h1>
+                        <p class="hero-description">
+                            Join India's most trusted Ludo gaming platform. Play with real players,
+                            win real money, and withdraw instantly to your bank account.
+                        </p>
 
-                    <% if (!user) { %>
                         <div class="hero-buttons">
-                            <!-- <a href="/register" class="btn btn-primary btn-lg">
-                                <i class="fas fa-user-plus"></i> Create Account
-                            </a> -->
-                            <a href="/login" class="btn btn-outline-light btn-lg ms-3">
-                                <i class="fas fa-sign-in-alt"></i> Login
-                            </a>
+                            <% if (!user) { %>
+                                <a href="/register" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-user-plus"></i> Create Free Account
+                                </a>
+                                <a href="/login" class="btn btn-outline-light btn-lg">
+                                    <i class="fas fa-sign-in-alt"></i> Login
+                                </a>
+                                <% } else { %>
+                                    <a href="/games" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-gamepad"></i> Start Playing
+                                    </a>
+                                    <a href="/wallet" class="btn btn-outline-light btn-lg">
+                                        <i class="fas fa-wallet"></i> Add Funds
+                                    </a>
+                                    <% } %>
                         </div>
-                        <% } else { %>
-                            <div class="hero-buttons">
-                                <a href="/games" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-gamepad"></i> Start Playing
-                                </a>
-                                <a href="/wallet" class="btn btn-outline-light btn-lg ms-3">
-                                    <i class="fas fa-wallet"></i> Add Funds
-                                </a>
-                            </div>
-                            <% } %>
 
-                                <!-- Stats -->
-                                <div class="hero-stats mt-5">
-                                    <div class="row">
-                                        <div class="col-4">
-                                            <h3>10K+</h3>
-                                            <p>Active Players</p>
-                                        </div>
-                                        <div class="col-4">
-                                            <h3>₹50L+</h3>
-                                            <p>Total Winnings</p>
-                                        </div>
-                                        <div class="col-4">
-                                            <h3>24/7</h3>
-                                            <p>Quick Support</p>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="trust-badges">
+                            <div class="trust-item"><i class="fas fa-shield-alt"></i> <span>Secure & Trusted</span>
+                            </div>
+                            <div class="trust-item"><i class="fas fa-bolt"></i> <span>Instant Withdrawals</span></div>
+                            <div class="trust-item"><i class="fas fa-headset"></i> <span>24/7 Support</span></div>
+                        </div>
+
+                        <div class="hero-stats">
+                            <div class="stat-item">
+                                <h3>50K+</h3>
+                                <p>Active Players</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3>₹10Cr+</h3>
+                                <p>Total Winnings</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3>4.9★</h3>
+                                <p>User Rating</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="col-lg-6" data-aos="fade-left">
-                    <div class="hero-image">
-                        <img src="https://cdn3d.iconscout.com/3d/premium/thumb/ludo-3d-icon-download-in-png-blend-fbx-gltf-file-formats--board-game-ludogame-pack-games-icons-8053419.png?f=webp"
-                            alt="Ludo Game" class="img-fluid floating">
-
-                        <!-- Floating Cards -->
-                        <div class="floating-card card-1">
-                            <i class="fas fa-trophy text-warning"></i>
-                            <span>Win ₹10,000</span>
-                        </div>
-                        <div class="floating-card card-2">
-                            <i class="fas fa-users text-primary"></i>
-                            <span>2 Players</span>
-                        </div>
-                        <div class="floating-card card-3">
-                            <i class="fas fa-clock text-success"></i>
-                            <span>Quick Match</span>
+                    <div class="hero-image-wrapper">
+                        <div class="hero-image">
+                            <img src="https://cdn-icons-png.flaticon.com/512/2851/2851298.png" alt="Ludo Game"
+                                class="hero-main-img">
+                            <div class="floating-card card-1"><i class="fas fa-trophy"></i><span>Win ₹10,000</span>
+                            </div>
+                            <div class="floating-card card-2"><i class="fas fa-users"></i><span>2 Players</span></div>
+                            <div class="floating-card card-3"><i class="fas fa-clock"></i><span>Quick Match</span></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Wave Divider -->
-        <div class="wave-divider">
-            <svg viewBox="0 0 1440 320">
-                <path fill="#ffffff" fill-opacity="1"
-                    d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z">
+        <div class="hero-wave">
+            <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+                <path fill="#ffffff"
+                    d="M0,64L80,69.3C160,75,320,85,480,85.3C640,85,800,75,960,69.3C1120,64,1280,64,1360,64L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z">
                 </path>
             </svg>
         </div>
@@ -89,362 +87,250 @@
     <!-- Features Section -->
     <section class="features-section" id="features">
         <div class="container">
-            <div class="section-header text-center" data-aos="fade-up">
-                <span class="section-subtitle">WHY CHOOSE US</span>
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-badge">Why Choose Us</span>
                 <h2 class="section-title">Experience the Best <span class="text-gradient">Ludo Gaming</span></h2>
-                <p class="section-description">
-                    We provide the most secure and exciting platform for Ludo lovers
-                </p>
+                <p class="section-description">We provide the most secure and exciting platform for Ludo lovers</p>
             </div>
 
-            <div class="row g-4 mt-4">
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <h4>100% Secure</h4>
-                        <p>Your money is safe with our encrypted payment system and secure wallet</p>
-                    </div>
+            <div class="features-grid">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h4>100% Secure</h4>
+                    <p>Your money is safe with our encrypted payment system</p>
                 </div>
-
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-bolt"></i>
-                        </div>
-                        <h4>Instant Withdrawals</h4>
-                        <p>Withdraw your winnings instantly to your bank account or UPI</p>
-                    </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                    <h4>Instant Withdrawals</h4>
+                    <p>Withdraw your winnings instantly to your bank account</p>
                 </div>
-
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-headset"></i>
-                        </div>
-                        <h4>24/7 Support</h4>
-                        <p>Our support team is always available to help you with any issues</p>
-                    </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-icon"><i class="fas fa-headset"></i></div>
+                    <h4>24/7 Support</h4>
+                    <p>Our support team is always available to help you</p>
                 </div>
-
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-trophy"></i>
-                        </div>
-                        <h4>Big Wins</h4>
-                        <p>Win up to ₹1,00,000 in a single game with our high-stakes tables</p>
-                    </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-icon"><i class="fas fa-trophy"></i></div>
+                    <h4>Big Wins</h4>
+                    <p>Win up to ₹1,00,000 in a single game</p>
                 </div>
-
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="500">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <h4>Real Players</h4>
-                        <p>Play against real opponents, not bots, for a fair gaming experience</p>
-                    </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="feature-icon"><i class="fas fa-users"></i></div>
+                    <h4>Real Players</h4>
+                    <p>Play against real opponents, not bots</p>
                 </div>
-
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="600">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <h4>Mobile Friendly</h4>
-                        <p>Play seamlessly on your mobile device anytime, anywhere</p>
-                    </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="600">
+                    <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <h4>Mobile Friendly</h4>
+                    <p>Play seamlessly on your mobile device</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- How It Works Section -->
+    <!-- How It Works -->
     <section class="how-it-works-section" id="how-it-works">
         <div class="container">
-            <div class="section-header text-center" data-aos="fade-up">
-                <span class="section-subtitle">SIMPLE PROCESS</span>
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-badge">Simple Process</span>
                 <h2 class="section-title">How to <span class="text-gradient">Start Playing</span></h2>
-                <p class="section-description">
-                    Get started in just a few simple steps
-                </p>
+                <p class="section-description">Get started in just a few simple steps</p>
             </div>
 
-            <div class="row mt-5">
-                <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
-                    <div class="step-card">
-                        <div class="step-number">1</div>
-                        <div class="step-icon">
-                            <i class="fas fa-user-plus"></i>
-                        </div>
-                        <h4>Create Account</h4>
-                        <p>Sign up with your email or phone number in seconds</p>
-                    </div>
+            <div class="steps-container">
+                <div class="step-item" data-aos="fade-up" data-aos-delay="100">
+                    <div class="step-number">1</div>
+                    <div class="step-icon"><i class="fas fa-user-plus"></i></div>
+                    <h4>Create Account</h4>
+                    <p>Sign up with your email or phone number</p>
                 </div>
-
-                <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
-                    <div class="step-card">
-                        <div class="step-number">2</div>
-                        <div class="step-icon">
-                            <i class="fas fa-wallet"></i>
-                        </div>
-                        <h4>Add Funds</h4>
-                        <p>Deposit money securely via UPI, card, or netbanking</p>
-                    </div>
+                <div class="step-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="step-number">2</div>
+                    <div class="step-icon"><i class="fas fa-wallet"></i></div>
+                    <h4>Add Funds</h4>
+                    <p>Deposit money securely via UPI, card, or netbanking</p>
                 </div>
-
-                <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
-                    <div class="step-card">
-                        <div class="step-number">3</div>
-                        <div class="step-icon">
-                            <i class="fas fa-gamepad"></i>
-                        </div>
-                        <h4>Play & Win</h4>
-                        <p>Join games and compete with players to win cash</p>
-                    </div>
+                <div class="step-item" data-aos="fade-up" data-aos-delay="300">
+                    <div class="step-number">3</div>
+                    <div class="step-icon"><i class="fas fa-gamepad"></i></div>
+                    <h4>Play & Win</h4>
+                    <p>Join games and compete with players to win cash</p>
                 </div>
-
-                <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
-                    <div class="step-card">
-                        <div class="step-number">4</div>
-                        <div class="step-icon">
-                            <i class="fas fa-hand-holding-usd"></i>
-                        </div>
-                        <h4>Withdraw</h4>
-                        <p>Withdraw your winnings instantly to your bank account</p>
-                    </div>
+                <div class="step-item" data-aos="fade-up" data-aos-delay="400">
+                    <div class="step-number">4</div>
+                    <div class="step-icon"><i class="fas fa-hand-holding-usd"></i></div>
+                    <h4>Withdraw</h4>
+                    <p>Withdraw your winnings instantly to your bank account</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Games Preview Section -->
+    <!-- Games Preview -->
     <section class="games-preview-section">
         <div class="container">
-            <div class="section-header text-center" data-aos="fade-up">
-                <span class="section-subtitle">PLAY NOW</span>
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-badge">Play Now</span>
                 <h2 class="section-title">Choose Your <span class="text-gradient">Betting Range</span></h2>
-                <p class="section-description">
-                    Select from multiple game categories based on your budget
-                </p>
+                <p class="section-description">Select from multiple game categories based on your budget</p>
             </div>
 
-            <div class="row mt-5">
-                <div class="col-md-6 mb-4" data-aos="fade-right">
-                    <div class="game-card beginner-card">
-                        <div class="game-card-content">
-                            <span class="game-badge beginner">BEGINNER</span>
-                            <h3>₹100 - ₹25,000</h3>
-                            <p>Perfect for beginners and casual players. Start with small bets and learn the game.</p>
-                            <ul class="game-features">
-                                <li><i class="fas fa-check-circle text-success"></i> Minimum bet: ₹100</li>
-                                <li><i class="fas fa-check-circle text-success"></i> Maximum bet: ₹25,000</li>
-                                <li><i class="fas fa-check-circle text-success"></i> Win up to ₹50,000</li>
-                            </ul>
-                            <a href="/games?range=100-25000" class="btn btn-outline-light">Play Now →</a>
-                        </div>
+            <div class="games-grid">
+                <div class="game-card beginner-card" data-aos="fade-right">
+                    <div class="game-card-image">
+                        <div class="game-icon"><i class="fas fa-dice-d6"></i></div>
+                        <div class="game-badge beginner">BEGINNER</div>
+                    </div>
+                    <div class="game-card-content">
+                        <h3>₹100 - ₹25,000</h3>
+                        <p>Perfect for beginners and casual players. Start with small bets and learn the game.</p>
+                        <ul class="game-features">
+                            <li><i class="fas fa-check-circle"></i> Minimum bet: ₹100</li>
+                            <li><i class="fas fa-check-circle"></i> Maximum bet: ₹25,000</li>
+                            <li><i class="fas fa-check-circle"></i> Win up to ₹50,000</li>
+                        </ul>
+                        <a href="/games?range=100-25000" class="btn-game">Play Now <i
+                                class="fas fa-arrow-right"></i></a>
                     </div>
                 </div>
 
-                <div class="col-md-6 mb-4" data-aos="fade-left">
-                    <div class="game-card pro-card">
-                        <div class="game-card-content">
-                            <span class="game-badge pro">PRO</span>
-                            <h3>₹25,000 - ₹1,00,000</h3>
-                            <p>For professional players looking for high-stakes action and big wins.</p>
-                            <ul class="game-features">
-                                <li><i class="fas fa-check-circle text-success"></i> Minimum bet: ₹25,000</li>
-                                <li><i class="fas fa-check-circle text-success"></i> Maximum bet: ₹1,00,000</li>
-                                <li><i class="fas fa-check-circle text-success"></i> Win up to ₹2,00,000</li>
-                            </ul>
-                            <a href="/games?range=25000-100000" class="btn btn-outline-light">Play Now →</a>
-                        </div>
+                <div class="game-card pro-card" data-aos="fade-left">
+                    <div class="game-card-image">
+                        <div class="game-icon"><i class="fas fa-crown"></i></div>
+                        <div class="game-badge pro">PRO</div>
+                    </div>
+                    <div class="game-card-content">
+                        <h3>₹25,000 - ₹1,00,000</h3>
+                        <p>For professional players looking for high-stakes action and big wins.</p>
+                        <ul class="game-features">
+                            <li><i class="fas fa-check-circle"></i> Minimum bet: ₹25,000</li>
+                            <li><i class="fas fa-check-circle"></i> Maximum bet: ₹1,00,000</li>
+                            <li><i class="fas fa-check-circle"></i> Win up to ₹2,00,000</li>
+                        </ul>
+                        <a href="/games?range=25000-100000" class="btn-game">Play Now <i
+                                class="fas fa-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials Section -->
+    <!-- Testimonials -->
     <section class="testimonials-section">
         <div class="container">
-            <div class="section-header text-center" data-aos="fade-up">
-                <span class="section-subtitle">TESTIMONIALS</span>
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-badge">Testimonials</span>
                 <h2 class="section-title">What Our <span class="text-gradient">Players Say</span></h2>
-                <p class="section-description">
-                    Join thousands of happy players who trust us
-                </p>
+                <p class="section-description">Join thousands of happy players who trust us</p>
             </div>
 
-            <div class="row mt-5">
-                <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
-                    <div class="testimonial-card">
-                        <div class="testimonial-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <p class="testimonial-text">
-                            "Best platform for Ludo! Won ₹15,000 in my first week. Withdrawal was instant to my bank
-                            account."
-                        </p>
-                        <div class="testimonial-author">
-                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
-                            <div>
-                                <h5>Rahul Sharma</h5>
-                                <span>Won ₹15,000</span>
-                            </div>
-                        </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="testimonial-img"><i class="fas fa-user-circle fa-3x text-primary"></i></div>
+                    <div class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p class="testimonial-text">"Best platform for Ludo! Won ₹15,000 in my first week. Withdrawal was
+                        instant!"</p>
+                    <div class="testimonial-author">
+                        <h5>Rahul Sharma</h5><span>Won ₹15,000</span>
                     </div>
                 </div>
-
-                <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
-                    <div class="testimonial-card">
-                        <div class="testimonial-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <p class="testimonial-text">
-                            "Very trustworthy platform. The customer support is excellent. Highly recommended!"
-                        </p>
-                        <div class="testimonial-author">
-                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User">
-                            <div>
-                                <h5>Priya Patel</h5>
-                                <span>Won ₹25,000</span>
-                            </div>
-                        </div>
+                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="testimonial-img"><i class="fas fa-user-circle fa-3x text-primary"></i></div>
+                    <div class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p class="testimonial-text">"Very trustworthy platform. Customer support is excellent. Highly
+                        recommended!"</p>
+                    <div class="testimonial-author">
+                        <h5>Priya Patel</h5><span>Won ₹25,000</span>
                     </div>
                 </div>
-
-                <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="300">
-                    <div class="testimonial-card">
-                        <div class="testimonial-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <p class="testimonial-text">
-                            "The interface is smooth and games start quickly. Already made ₹50,000+ in winnings!"
-                        </p>
-                        <div class="testimonial-author">
-                            <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="User">
-                            <div>
-                                <h5>Amit Kumar</h5>
-                                <span>Won ₹50,000+</span>
-                            </div>
-                        </div>
+                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="testimonial-img"><i class="fas fa-user-circle fa-3x text-primary"></i></div>
+                    <div class="testimonial-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p class="testimonial-text">"The interface is smooth and games start quickly. Already made ₹50,000+
+                        in winnings!"</p>
+                    <div class="testimonial-author">
+                        <h5>Amit Kumar</h5><span>Won ₹50,000+</span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- FAQ Section -->
+    <!-- FAQ -->
     <section class="faq-section" id="faq">
         <div class="container">
-            <div class="section-header text-center" data-aos="fade-up">
-                <span class="section-subtitle">FAQ</span>
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-badge">FAQ</span>
                 <h2 class="section-title">Frequently Asked <span class="text-gradient">Questions</span></h2>
-                <p class="section-description">
-                    Got questions? We've got answers
-                </p>
+                <p class="section-description">Got questions? We've got answers</p>
             </div>
 
-            <div class="row justify-content-center mt-5">
-                <div class="col-lg-8">
-                    <div class="accordion" id="faqAccordion">
-                        <div class="accordion-item" data-aos="fade-up">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#faq1">
-                                    How do I start playing?
-                                </button>
-                            </h2>
-                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Simply create an account, add funds to your wallet, choose a game with your
-                                    preferred bet amount, and start playing!
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item" data-aos="fade-up" data-aos-delay="100">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#faq2">
-                                    How fast are withdrawals?
-                                </button>
-                            </h2>
-                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Withdrawals are processed instantly for most payment methods. Bank transfers may
-                                    take 24-48 hours.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item" data-aos="fade-up" data-aos-delay="200">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#faq3">
-                                    Is it safe to play here?
-                                </button>
-                            </h2>
-                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Absolutely! We use 256-bit encryption for all transactions and never store your
-                                    payment details.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="accordion-item" data-aos="fade-up" data-aos-delay="300">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#faq4">
-                                    Can I play on mobile?
-                                </button>
-                            </h2>
-                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Yes! Our platform is fully responsive and works perfectly on all mobile devices.
-                                </div>
-                            </div>
-                        </div>
+            <div class="faq-container">
+                <div class="faq-item" data-aos="fade-up">
+                    <div class="faq-question">
+                        <div class="faq-icon"><i class="fas fa-question-circle"></i></div>
+                        <h4>How do I start playing?</h4>
+                        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Simply create an account, add funds to your wallet, choose a game with your preferred bet
+                            amount, and start playing!</p>
+                    </div>
+                </div>
+                <div class="faq-item" data-aos="fade-up" data-aos-delay="100">
+                    <div class="faq-question">
+                        <div class="faq-icon"><i class="fas fa-rocket"></i></div>
+                        <h4>How fast are withdrawals?</h4>
+                        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Withdrawals are processed instantly for most payment methods. Bank transfers may take 24-48
+                            hours.</p>
+                    </div>
+                </div>
+                <div class="faq-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="faq-question">
+                        <div class="faq-icon"><i class="fas fa-shield-alt"></i></div>
+                        <h4>Is it safe to play here?</h4>
+                        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Absolutely! We use 256-bit encryption for all transactions and never store your payment
+                            details.</p>
+                    </div>
+                </div>
+                <div class="faq-item" data-aos="fade-up" data-aos-delay="300">
+                    <div class="faq-question">
+                        <div class="faq-icon"><i class="fas fa-mobile-alt"></i></div>
+                        <h4>Can I play on mobile?</h4>
+                        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes! Our platform is fully responsive and works perfectly on all mobile devices.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
+    <!-- CTA -->
     <section class="cta-section">
         <div class="container">
             <div class="cta-card" data-aos="zoom-in">
-                <div class="row align-items-center">
-                    <div class="col-lg-8">
+                <div class="cta-content">
+                    <div class="cta-text">
                         <h2>Ready to Start Winning?</h2>
-                        <p class="mb-0">Join thousands of players and start winning real cash today!</p>
+                        <p>Join thousands of players and start winning real cash today!</p>
                     </div>
-                    <div class="col-lg-4 text-lg-end">
+                    <div class="cta-button">
                         <% if (!user) { %>
-                            <a href="/register" class="btn btn-warning btn-lg">
-                                <i class="fas fa-user-plus"></i> Create Free Account
-                            </a>
+                            <a href="/register" class="btn-cta"><span>Create Free Account</span><i
+                                    class="fas fa-arrow-right"></i></a>
                             <% } else { %>
-                                <a href="/games" class="btn btn-warning btn-lg">
-                                    <i class="fas fa-gamepad"></i> Play Now
-                                </a>
+                                <a href="/games" class="btn-cta"><span>Play Now</span><i class="fas fa-gamepad"></i></a>
                                 <% } %>
                     </div>
                 </div>
@@ -454,14 +340,688 @@
 
     <%- include('partials/footer') %>
 
-        <!-- Scripts -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+        <style>
+            /* Hero Section */
+            .hero-section {
+                position: relative;
+                background: linear-gradient(135deg, #0a0f1f 0%, #0f172a 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                overflow: hidden;
+                padding: 80px 0;
+            }
+
+            .hero-bg {
+                position: absolute;
+                inset: 0;
+                background-image: radial-gradient(circle at 20% 50%, rgba(251, 191, 36, 0.08) 0%, transparent 50%);
+            }
+
+            .hero-content {
+                position: relative;
+                z-index: 2;
+            }
+
+            .hero-badge {
+                display: inline-block;
+                background: rgba(251, 191, 36, 0.15);
+                padding: 8px 20px;
+                border-radius: 50px;
+                font-size: 0.9rem;
+                color: #fbbf24;
+                margin-bottom: 20px;
+                border: 1px solid rgba(251, 191, 36, 0.3);
+            }
+
+            .hero-title {
+                font-size: 3.5rem;
+                font-weight: 800;
+                color: white;
+                line-height: 1.2;
+                margin-bottom: 20px;
+            }
+
+            .text-gradient {
+                background: linear-gradient(135deg, #fbbf24, #f59e0b);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .hero-description {
+                font-size: 1.1rem;
+                color: rgba(255, 255, 255, 0.7);
+                margin-bottom: 30px;
+                line-height: 1.6;
+            }
+
+            .hero-buttons {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 30px;
+                flex-wrap: wrap;
+            }
+
+            .btn-primary {
+                background: linear-gradient(135deg, #fbbf24, #f59e0b);
+                border: none;
+                padding: 12px 30px;
+                border-radius: 50px;
+                font-weight: 600;
+                color: #0f172a;
+                transition: all 0.3s;
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 25px rgba(251, 191, 36, 0.3);
+            }
+
+            .btn-outline-light {
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                padding: 12px 30px;
+                border-radius: 50px;
+                font-weight: 600;
+                background: transparent;
+                color: white;
+                transition: all 0.3s;
+            }
+
+            .btn-outline-light:hover {
+                background: white;
+                color: #0f172a;
+                border-color: white;
+            }
+
+            .trust-badges {
+                display: flex;
+                gap: 25px;
+                margin-bottom: 30px;
+                flex-wrap: wrap;
+            }
+
+            .trust-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: rgba(255, 255, 255, 0.6);
+                font-size: 0.85rem;
+            }
+
+            .trust-item i {
+                color: #fbbf24;
+            }
+
+            .hero-stats {
+                display: flex;
+                gap: 40px;
+                flex-wrap: wrap;
+            }
+
+            .stat-item h3 {
+                font-size: 1.8rem;
+                font-weight: 700;
+                color: white;
+                margin-bottom: 5px;
+            }
+
+            .stat-item p {
+                color: rgba(255, 255, 255, 0.6);
+                font-size: 0.9rem;
+            }
+
+            .hero-image-wrapper {
+                position: relative;
+                text-align: center;
+            }
+
+            .hero-main-img {
+                width: 100%;
+                max-width: 400px;
+                animation: float 3s ease-in-out infinite;
+                filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.3));
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0)
+                }
+
+                50% {
+                    transform: translateY(-20px)
+                }
+            }
+
+            .floating-card {
+                position: absolute;
+                background: white;
+                padding: 8px 16px;
+                border-radius: 50px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                animation: floatCard 4s ease-in-out infinite;
+            }
+
+            .card-1 {
+                top: 10%;
+                right: 10%;
+                animation-delay: 0s;
+            }
+
+            .card-2 {
+                bottom: 20%;
+                left: 5%;
+                animation-delay: 1s;
+            }
+
+            .card-3 {
+                top: 40%;
+                right: 20%;
+                animation-delay: 2s;
+            }
+
+            @keyframes floatCard {
+
+                0%,
+                100% {
+                    transform: translateY(0)
+                }
+
+                50% {
+                    transform: translateY(-10px)
+                }
+            }
+
+            .hero-wave {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                line-height: 0;
+            }
+
+            /* Features */
+            .features-section {
+                padding: 80px 0;
+                background: white;
+            }
+
+            .section-header {
+                text-align: center;
+                margin-bottom: 60px;
+            }
+
+            .section-badge {
+                display: inline-block;
+                background: #fef3c7;
+                padding: 6px 16px;
+                border-radius: 50px;
+                font-size: 0.85rem;
+                color: #f59e0b;
+                font-weight: 600;
+                margin-bottom: 15px;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+                font-weight: 800;
+                color: #0f172a;
+                margin-bottom: 15px;
+            }
+
+            .section-description {
+                color: #64748b;
+                font-size: 1rem;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            .features-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 30px;
+            }
+
+            .feature-card {
+                background: white;
+                border-radius: 20px;
+                padding: 30px;
+                text-align: center;
+                transition: all 0.3s;
+                border: 1px solid #e2e8f0;
+            }
+
+            .feature-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                border-color: #fbbf24;
+            }
+
+            .feature-icon {
+                width: 80px;
+                height: 80px;
+                background: #fef3c7;
+                border-radius: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 20px;
+                font-size: 2rem;
+                color: #f59e0b;
+            }
+
+            .feature-card h4 {
+                font-size: 1.2rem;
+                font-weight: 700;
+                margin-bottom: 10px;
+            }
+
+            .feature-card p {
+                color: #64748b;
+            }
+
+            /* How It Works */
+            .how-it-works-section {
+                padding: 80px 0;
+                background: #f8fafc;
+            }
+
+            .steps-container {
+                display: flex;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 30px;
+            }
+
+            .step-item {
+                flex: 1;
+                min-width: 200px;
+                text-align: center;
+            }
+
+            .step-number {
+                width: 50px;
+                height: 50px;
+                background: linear-gradient(135deg, #fbbf24, #f59e0b);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin: 0 auto 20px;
+            }
+
+            .step-icon {
+                width: 80px;
+                height: 80px;
+                background: white;
+                border-radius: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 20px;
+                font-size: 2rem;
+                color: #f59e0b;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            }
+
+            .step-item h4 {
+                font-size: 1.1rem;
+                font-weight: 700;
+                margin-bottom: 10px;
+            }
+
+            .step-item p {
+                color: #64748b;
+                font-size: 0.9rem;
+            }
+
+            /* Games Preview */
+            .games-preview-section {
+                padding: 80px 0;
+                background: white;
+            }
+
+            .games-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+                gap: 30px;
+            }
+
+            .game-card {
+                background: white;
+                border-radius: 24px;
+                overflow: hidden;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                transition: all 0.3s;
+            }
+
+            .game-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            }
+
+            .game-card-image {
+                background: linear-gradient(135deg, #fef3c7, #fde68a);
+                padding: 40px;
+                text-align: center;
+                position: relative;
+            }
+
+            .game-icon {
+                font-size: 4rem;
+                color: #f59e0b;
+            }
+
+            .game-badge {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                padding: 6px 14px;
+                border-radius: 50px;
+                font-size: 0.8rem;
+                font-weight: 700;
+            }
+
+            .game-badge.beginner {
+                background: linear-gradient(135deg, #10b981, #059669);
+                color: white;
+            }
+
+            .game-badge.pro {
+                background: linear-gradient(135deg, #f59e0b, #d97706);
+                color: white;
+            }
+
+            .game-card-content {
+                padding: 25px;
+            }
+
+            .game-card-content h3 {
+                font-size: 1.5rem;
+                font-weight: 800;
+                margin-bottom: 10px;
+            }
+
+            .game-features {
+                list-style: none;
+                padding: 0;
+                margin: 15px 0;
+            }
+
+            .game-features li {
+                padding: 5px 0;
+                color: #475569;
+                font-size: 0.9rem;
+            }
+
+            .game-features li i {
+                color: #10b981;
+                margin-right: 8px;
+            }
+
+            .btn-game {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background: linear-gradient(135deg, #fbbf24, #f59e0b);
+                color: #0f172a;
+                padding: 10px 24px;
+                border-radius: 50px;
+                text-decoration: none;
+                font-weight: 600;
+                transition: all 0.3s;
+            }
+
+            .btn-game:hover {
+                gap: 12px;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(251, 191, 36, 0.3);
+            }
+
+            /* Testimonials */
+            .testimonials-section {
+                padding: 80px 0;
+                background: #f8fafc;
+            }
+
+            .testimonials-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+                gap: 30px;
+            }
+
+            .testimonial-card {
+                background: white;
+                border-radius: 20px;
+                padding: 30px;
+                text-align: center;
+                transition: all 0.3s;
+            }
+
+            .testimonial-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            }
+
+            .testimonial-img i {
+                margin-bottom: 15px;
+            }
+
+            .testimonial-rating {
+                color: #fbbf24;
+                margin-bottom: 15px;
+            }
+
+            .testimonial-text {
+                color: #475569;
+                font-style: italic;
+                margin-bottom: 20px;
+            }
+
+            .testimonial-author h5 {
+                font-size: 1rem;
+                font-weight: 700;
+                margin-bottom: 5px;
+            }
+
+            .testimonial-author span {
+                font-size: 0.85rem;
+                color: #f59e0b;
+                font-weight: 600;
+            }
+
+            /* FAQ */
+            .faq-section {
+                padding: 80px 0;
+                background: white;
+            }
+
+            .faq-container {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            .faq-item {
+                margin-bottom: 15px;
+                border-radius: 16px;
+                overflow: hidden;
+                border: 1px solid #e2e8f0;
+            }
+
+            .faq-question {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                padding: 20px;
+                cursor: pointer;
+                background: white;
+                transition: all 0.3s;
+            }
+
+            .faq-question:hover {
+                background: #fef3c7;
+            }
+
+            .faq-icon {
+                width: 40px;
+                height: 40px;
+                background: #fef3c7;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
+                color: #f59e0b;
+            }
+
+            .faq-question h4 {
+                flex: 1;
+                font-size: 1rem;
+                font-weight: 600;
+                margin: 0;
+            }
+
+            .faq-toggle {
+                color: #94a3b8;
+                transition: transform 0.3s;
+            }
+
+            .faq-item.active .faq-toggle {
+                transform: rotate(180deg);
+            }
+
+            .faq-answer {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+                padding: 0 20px;
+            }
+
+            .faq-item.active .faq-answer {
+                max-height: 200px;
+                padding: 0 20px 20px;
+            }
+
+            .faq-answer p {
+                color: #475569;
+                margin: 0;
+            }
+
+            /* CTA */
+            .cta-section {
+                padding: 80px 0;
+                background: linear-gradient(135deg, #0a0f1f, #0f172a);
+            }
+
+            .cta-card {
+                background: linear-gradient(135deg, #fbbf24, #f59e0b);
+                border-radius: 30px;
+                padding: 50px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            }
+
+            .cta-content {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 30px;
+            }
+
+            .cta-text h2 {
+                font-size: 2rem;
+                font-weight: 800;
+                color: #0f172a;
+                margin-bottom: 10px;
+            }
+
+            .cta-text p {
+                color: #0f172a;
+                opacity: 0.9;
+            }
+
+            .btn-cta {
+                display: inline-flex;
+                align-items: center;
+                gap: 12px;
+                background: #0f172a;
+                color: #fbbf24;
+                padding: 14px 32px;
+                border-radius: 50px;
+                text-decoration: none;
+                font-weight: 700;
+                transition: all 0.3s;
+            }
+
+            .btn-cta:hover {
+                transform: translateY(-3px);
+                gap: 15px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .hero-title {
+                    font-size: 2rem;
+                    text-align: center;
+                }
+
+                .hero-description {
+                    text-align: center;
+                }
+
+                .hero-buttons {
+                    justify-content: center;
+                }
+
+                .trust-badges {
+                    justify-content: center;
+                }
+
+                .hero-stats {
+                    justify-content: center;
+                    text-align: center;
+                }
+
+                .floating-card {
+                    display: none;
+                }
+
+                .section-title {
+                    font-size: 1.8rem;
+                }
+
+                .games-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .steps-container {
+                    flex-direction: column;
+                }
+
+                .cta-content {
+                    flex-direction: column;
+                    text-align: center;
+                }
+
+                .cta-card {
+                    padding: 30px;
+                }
+            }
+        </style>
+
         <script>
-            // Initialize AOS
-            AOS.init({
-                duration: 1000,
-                once: true,
-                offset: 100
+            document.querySelectorAll('.faq-question').forEach(q => {
+                q.addEventListener('click', () => { q.parentElement.classList.toggle('active'); });
             });
+            AOS.init({ duration: 1000, once: true, offset: 100 });
         </script>

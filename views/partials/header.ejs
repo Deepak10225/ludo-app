@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>
         <%= title %> | Ludo Gaming
     </title>
@@ -23,73 +23,172 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/style.css">
+
     <style>
+        /* ========== NAVBAR - ALWAYS SOLID ========== */
+        .navbar {
+            background: #0f172a !important;
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+            z-index: 1030;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar.scrolled {
+            background: #0f172a !important;
+            padding: 0.8rem 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white !important;
+        }
+
+        .navbar-brand span {
+            color: #fbbf24;
+        }
+
+        .navbar-toggler {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 12px;
+            outline: none !important;
+            box-shadow: none !important;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-toggler:hover {
+            border-color: #fbbf24;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+            outline: none;
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            margin: 0 0.5rem;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+            background: rgba(251, 191, 36, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Mobile Menu */
         @media (max-width: 991px) {
-            .navbar-collapse {
-                background: linear-gradient(135deg, #1a2634 0%, #2c3e50 100%);
-                border-radius: 0 0 20px 20px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-                padding: 1rem;
-                margin-top: 0.5rem;
-                animation: slideDown 0.3s ease;
+            .navbar {
+                background: #0f172a !important;
             }
 
-            @keyframes slideDown {
-                from {
-                    opacity: 0;
-                    transform: translateY(-10px);
-                }
-
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
+            .navbar-collapse {
+                background: #0f172a !important;
+                padding: 20px;
+                border-radius: 0 0 20px 20px;
+                margin-top: 10px;
+                max-height: 80vh;
+                overflow-y: auto;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
             }
 
             .nav-link {
-                border-radius: 10px;
+                padding: 12px 15px !important;
                 margin: 5px 0;
-                transition: all 0.3s ease;
-                padding: 12px 20px !important;
+                text-align: center;
             }
 
             .nav-link:hover {
-                background: rgba(102, 126, 234, 0.2);
+                background: rgba(251, 191, 36, 0.15);
                 transform: translateX(5px);
             }
 
             .nav-link.btn {
                 margin: 10px 0 !important;
-                border-radius: 50px;
             }
 
             .dropdown-menu {
-                background: rgba(0, 0, 0, 0.3);
+                background: rgba(0, 0, 0, 0.4);
                 border: none;
-                border-radius: 10px;
+                border-radius: 12px;
                 margin-top: 5px;
+                padding: 10px;
             }
 
             .dropdown-item {
                 color: white;
                 border-radius: 8px;
                 padding: 10px 20px;
+                text-align: center;
             }
 
             .dropdown-item:hover {
-                background: #667eea;
+                background: #fbbf24;
+                color: #0f172a;
+            }
+        }
+
+        /* Desktop Menu */
+        @media (min-width: 992px) {
+            .nav-link {
+                padding: 0.5rem 1rem !important;
             }
 
-            .navbar-toggler {
-                border: 2px solid rgba(255, 255, 255, 0.2);
-                padding: 8px 12px;
-                transition: all 0.3s ease;
+            .dropdown-menu {
+                background: #0f172a;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                margin-top: 10px;
+                border-radius: 12px;
             }
 
-            .navbar-toggler:hover {
-                border-color: #667eea;
-                transform: scale(1.05);
+            .dropdown-item {
+                color: rgba(255, 255, 255, 0.8);
+                padding: 8px 20px;
             }
+
+            .dropdown-item:hover {
+                background: #fbbf24;
+                color: #0f172a;
+            }
+        }
+
+        /* Flash Messages */
+        .alert {
+            margin-top: 90px;
+            border-radius: 12px;
+            animation: slideDown 0.3s ease;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        main {
+            margin-top: 0;
+            padding-top: 0;
+        }
+
+        body {
+            padding-top: 76px;
         }
     </style>
 </head>
@@ -99,7 +198,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <i class="fas fa-dice"></i> Ludo<span class="text-warning">Win</span>
+                <i class="fas fa-dice-d6 me-2"></i> Ludo<span class="text-warning">Win</span>
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -124,32 +223,31 @@
                     <% if (user) { %>
                         <li class="nav-item">
                             <a class="nav-link" href="/games">
-                                <i class="fas fa-gamepad"></i> Play
+                                <i class="fas fa-gamepad me-1"></i> Play
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link wallet-badge" href="/wallet">
-                                <i class="fas fa-wallet"></i>
-                                <span class="badge bg-warning text-dark">₹<%= user.walletBalance?.toFixed(2) || '0.00'
-                                        %></span>
+                            <a class="nav-link" href="/wallet">
+                                <i class="fas fa-wallet me-1"></i>
+                                <span class="badge bg-warning text-dark ms-1">₹<%= user.walletBalance?.toFixed(2)
+                                        || '0.00' %></span>
                             </a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle"></i>
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i>
                                 <%= user.username %>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="/profile"><i class="fas fa-id-card"></i> Profile</a>
-                                </li>
-                                <li><a class="dropdown-item" href="/games/history/all"><i class="fas fa-history"></i>
-                                        Game History</a></li>
+                                <li><a class="dropdown-item" href="/profile"><i class="fas fa-id-card me-2"></i>
+                                        Profile</a></li>
+                                <li><a class="dropdown-item" href="/games/history/all"><i
+                                            class="fas fa-history me-2"></i> Game History</a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
                                 <li><a class="dropdown-item text-danger" href="/logout"><i
-                                            class="fas fa-sign-out-alt"></i> Logout</a></li>
+                                            class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
                             </ul>
                         </li>
                         <% } else { %>
@@ -168,7 +266,7 @@
     <!-- Flash Messages -->
     <div class="container mt-5 pt-4">
         <% if (success_msg && success_msg.length> 0) { %>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <div class="alert alert-success alert-dismissible fade show">
                 <i class="fas fa-check-circle me-2"></i>
                 <%= success_msg %>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -176,7 +274,7 @@
             <% } %>
 
                 <% if (error_msg && error_msg.length> 0) { %>
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <div class="alert alert-danger alert-dismissible fade show">
                         <i class="fas fa-exclamation-circle me-2"></i>
                         <%= error_msg %>
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>

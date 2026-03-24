@@ -6,8 +6,7 @@
         <div class="row">
             <div class="col-lg-4 mb-4">
                 <h5>Ludo<span class="text-warning">Win</span></h5>
-                <p class="text-white-50">India's most trusted platform to play Ludo and win real cash prizes. Join
-                    thousands of happy players today!</p>
+                <p class="text-white-50">India's most trusted platform to play Ludo and win real cash prizes.</p>
                 <div class="social-links">
                     <a href="#"><i class="fab fa-facebook-f"></i></a>
                     <a href="#"><i class="fab fa-twitter"></i></a>
@@ -15,7 +14,6 @@
                     <a href="#"><i class="fab fa-telegram"></i></a>
                 </div>
             </div>
-
             <div class="col-lg-2 col-md-4 mb-4">
                 <h5>Quick Links</h5>
                 <ul class="footer-links">
@@ -25,17 +23,14 @@
                     <li><a href="#faq">FAQ</a></li>
                 </ul>
             </div>
-
             <div class="col-lg-2 col-md-4 mb-4">
                 <h5>Games</h5>
                 <ul class="footer-links">
                     <li><a href="/games?range=100-25000">Beginner (₹100-25K)</a></li>
                     <li><a href="/games?range=25000-100000">Pro (₹25K-1L)</a></li>
                     <li><a href="/games/history/all">Game History</a></li>
-                    <li><a href="#">Leaderboard</a></li>
                 </ul>
             </div>
-
             <div class="col-lg-4 col-md-4 mb-4">
                 <h5>Contact Us</h5>
                 <ul class="footer-links">
@@ -43,17 +38,11 @@
                     <li><i class="fas fa-phone me-2"></i> +91 98765 43210</li>
                     <li><i class="fas fa-map-marker-alt me-2"></i> Mumbai, India</li>
                 </ul>
-
-                <div class="mt-3">
-                    <img src="https://via.placeholder.com/150x50/4e73df/ffffff?text=Secure+Payment"
-                        alt="Payment Methods" class="img-fluid">
-                </div>
             </div>
         </div>
-
         <div class="footer-bottom">
-            <p class="mb-0">&copy; 2024 LudoWin. All rights reserved. | <a href="#" class="text-white-50">Terms</a> | <a
-                    href="#" class="text-white-50">Privacy</a></p>
+            <p class="mb-0">&copy; 2026 LudoWin. All rights reserved. | <a href="#">Terms</a> | <a href="#">Privacy</a>
+            </p>
         </div>
     </div>
 </footer>
@@ -63,89 +52,21 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
-    // Initialize AOS
-    AOS.init({
-        duration: 1000,
-        once: true,
-        offset: 100
-    });
-
-    // Navbar scroll effect
+    AOS.init({ duration: 1000, once: true, offset: 100 });
     window.addEventListener('scroll', function () {
-        if (window.scrollY > 50) {
-            document.querySelector('.navbar').classList.add('scrolled');
-        } else {
-            document.querySelector('.navbar').classList.remove('scrolled');
+        var navbar = document.querySelector('.navbar');
+        if (navbar) { window.scrollY > 50 ? navbar.classList.add('scrolled') : navbar.classList.remove('scrolled'); }
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        var toggler = document.querySelector('.navbar-toggler');
+        var menu = document.getElementById('navbarNav');
+        if (toggler && menu) {
+            toggler.setAttribute('data-bs-toggle', 'collapse');
+            toggler.setAttribute('data-bs-target', '#navbarNav');
         }
     });
 </script>
-<script>
-    // Yeh script hamburger menu ko khud handle karega - Bootstrap par depend nahi karega
-    (function () {
-        // Jab page load ho
-        document.addEventListener('DOMContentLoaded', function () {
-            var toggler = document.querySelector('.navbar-toggler');
-            var menu = document.getElementById('navbarNav');
-
-            if (!toggler || !menu) return;
-
-            // Menu open/close function
-            function toggleMenu() {
-                if (menu.classList.contains('show')) {
-                    menu.classList.remove('show');
-                    toggler.classList.add('collapsed');
-                    toggler.setAttribute('aria-expanded', 'false');
-                } else {
-                    menu.classList.add('show');
-                    toggler.classList.remove('collapsed');
-                    toggler.setAttribute('aria-expanded', 'true');
-                }
-            }
-
-            // Toggler click event
-            toggler.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleMenu();
-            });
-
-            // Jab koi link click ho to mobile mein menu band ho
-            var links = menu.querySelectorAll('.nav-link');
-            links.forEach(function (link) {
-                link.addEventListener('click', function () {
-                    if (window.innerWidth < 992 && menu.classList.contains('show')) {
-                        menu.classList.remove('show');
-                        toggler.classList.add('collapsed');
-                        toggler.setAttribute('aria-expanded', 'false');
-                    }
-                });
-            });
-
-            // Bahar click karo to menu band ho (mobile mein)
-            document.addEventListener('click', function (e) {
-                if (window.innerWidth < 992 &&
-                    menu.classList.contains('show') &&
-                    !menu.contains(e.target) &&
-                    !toggler.contains(e.target)) {
-                    menu.classList.remove('show');
-                    toggler.classList.add('collapsed');
-                    toggler.setAttribute('aria-expanded', 'false');
-                }
-            });
-
-            // Window resize par agar mobile se desktop pe jaye to menu band ho
-            window.addEventListener('resize', function () {
-                if (window.innerWidth >= 992 && menu.classList.contains('show')) {
-                    menu.classList.remove('show');
-                    toggler.classList.add('collapsed');
-                    toggler.setAttribute('aria-expanded', 'false');
-                }
-            });
-        });
-    })();
-</script>
 <script src="/js/main.js"></script>
-
 </body>
 
 </html>
