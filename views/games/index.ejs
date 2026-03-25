@@ -45,6 +45,7 @@
                 <!-- Left Column - Game Options -->
                 <div class="col-lg-8">
                     <!-- Quick Bet Cards -->
+                    <!-- Quick Bet Cards -->
                     <div class="quick-bets-card">
                         <div class="card-header">
                             <h4><i class="fas fa-bolt"></i> Quick Bet</h4>
@@ -52,13 +53,19 @@
                         </div>
                         <div class="card-body">
                             <div class="bet-options">
-                                <% // ✅ FIX: Use regular function, not arrow function if (options && options.length> 0)
-                                    {
+                                <% if (options && options.length> 0) {
                                     options.forEach(function(amount) {
+                                    var totalPot = amount * 2;
+                                    var winnerAmount = totalPot * 0.9;
+                                    var platformFee = totalPot * 0.1;
                                     %>
-                                    <button class="bet-option" onclick="showCreateModal(<%= amount %>)">
+                                    <button class="bet-option" onclick="showCreateModal(<%= amount %>)"
+                                        data-amount="<%= amount %>" data-win="<%= winnerAmount %>"
+                                        data-fee="<%= platformFee %>">
                                         <span class="bet-amount">₹<%= amount.toLocaleString() %></span>
-                                        <span class="bet-win">Win ₹<%= (amount * 2).toLocaleString() %></span>
+                                        <span class="bet-win">
+                                            <i class="fas fa-trophy me-1"></i> Win ₹<%= winnerAmount.toLocaleString() %>
+                                        </span>
                                     </button>
                                     <% }); } %>
                             </div>

@@ -21,7 +21,6 @@ const authRoutes = require('./routes/auth');
 const gameRoutes = require('./routes/games');
 const walletRoutes = require('./routes/wallet');
 const adminRoutes = require('./routes/admin');
-
 // Initialize express
 const app = express();
 

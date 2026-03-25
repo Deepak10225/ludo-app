@@ -9,11 +9,11 @@ router.use(isAdmin);
 
 // Dashboard
 router.get('/dashboard', adminController.dashboard);
-
+router.post('/test-verify/:id', adminController.verifyGame);
 // Manage games
 router.get('/games', adminController.listGames);
 router.get('/games/:id', adminController.viewGame);
-router.post('/games/:id/verify', adminController.verifyGame);
+// router.post('/games/:id/verify', adminController.verifyGame);
 router.post('/games/:id/reject', adminController.rejectGame);
 
 // Manage users

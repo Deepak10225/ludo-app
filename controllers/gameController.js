@@ -141,6 +141,7 @@ class GameController {
     // Create new game - FIXED VERSION
     async create(req, res) {
         try {
+
             const { betAmount, betRange } = req.body;
             const userId = req.session.user.id;
 
@@ -366,6 +367,7 @@ class GameController {
     }
 
     // Submit game result (screenshot)
+    // Submit game result with screenshot
     async submitResult(req, res) {
         try {
             const gameId = req.params.id;
@@ -402,28 +404,22 @@ class GameController {
             // Save screenshot path
             const screenshotPath = `/uploads/${screenshot.filename}`;
 
+            // Use the complete method from model
+            await game.complete(userId, screenshotPath);
+
             // Update confirmation based on player
             if (isPlayer1) {
                 game.player1Confirmed = true;
             } else {
                 game.player2Confirmed = true;
             }
-
-            // Save screenshot if not already saved
-            if (!game.screenshot) {
-                game.screenshot = screenshotPath;
-            }
-
-            // If both players confirmed, mark as completed
-            if (game.player1Confirmed && game.player2Confirmed) {
-                game.status = 'completed';
-                game.completedAt = new Date();
-            }
-
             await game.save();
 
-            req.flash('success_msg', 'Result submitted successfully. Waiting for verification.');
+            const winningsData = game.calculateWinnings();
+
+            req.flash('success_msg', `✅ Result submitted! Winner will get ₹${winningsData.winnerShare.toFixed(2)} (90% of ₹${winningsData.totalPot.toFixed(2)}). Waiting for opponent confirmation.`);
             res.redirect(`/games/${gameId}`);
+
         } catch (error) {
             console.error('Submit result error:', error);
             req.flash('error_msg', 'Error submitting result');

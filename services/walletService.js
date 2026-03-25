@@ -1,5 +1,6 @@
 const Transaction = require('../models/Transaction');
 const User = require('../models/User');
+const Game = require('../models/Game');
 
 class WalletService {
     // Deposit money to wallet
@@ -38,7 +39,7 @@ class WalletService {
             amount,
             balanceBefore: user.walletBalance,
             balanceAfter: user.walletBalance - amount,
-            status: 'pending', // Admin approval needed
+            status: 'pending',
             paymentMethod: 'bank',
             bankDetails,
             description: `Withdrawal of ₹${amount} to bank account`
@@ -75,27 +76,55 @@ class WalletService {
         return transaction;
     }
 
-    // Credit winnings
-    async creditWinnings(userId, gameId, amount) {
+    // ✅ UPDATED: Credit winnings - 90% of total pot
+    async creditWinnings(userId, gameId, winningsAmount) {
         const user = await User.findById(userId);
         if (!user) throw new Error('User not found');
+
+        const game = await Game.findById(gameId);
+        const winningsData = game.calculateWinnings();
+
+        // Winner gets 90%
+        const winnerAmount = winningsData.winnerShare;
 
         const transaction = new Transaction({
             user: userId,
             type: 'win',
-            amount,
+            amount: winnerAmount,
             balanceBefore: user.walletBalance,
-            balanceAfter: user.walletBalance + amount,
+            balanceAfter: user.walletBalance + winnerAmount,
             status: 'completed',
             game: gameId,
-            description: `Winnings from game: ₹${amount}`
+            description: `Winnings from game: ₹${winnerAmount} (90% of ₹${winningsData.totalPot})`
         });
 
-        user.walletBalance += amount;
+        user.walletBalance += winnerAmount;
         await user.save();
         await transaction.save();
 
-        return transaction;
+        // ✅ Record platform commission
+        const platformCommission = winningsData.platformCommission;
+        if (platformCommission > 0) {
+            const platformTransaction = new Transaction({
+                user: null, // Platform transaction
+                type: 'commission',
+                amount: platformCommission,
+                balanceBefore: 0,
+                balanceAfter: 0,
+                status: 'completed',
+                game: gameId,
+                description: `Platform commission (10%) for game ₹${game.betAmount}`
+            });
+            await platformTransaction.save();
+
+            console.log(`💰 Platform Commission: ₹${platformCommission} collected from game ${game.roomId}`);
+        }
+
+        return {
+            transaction,
+            winnerAmount,
+            platformCommission
+        };
     }
 
     // Refund bet (if game cancelled)

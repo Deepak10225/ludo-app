@@ -36,12 +36,11 @@ const gameSchema = new mongoose.Schema({
         ref: 'User',
         default: null
     },
-    // Screenshot fields
     screenshot: {
         type: String,
         default: null
     },
-    winnerClaim: {  // Kaun winner hone ka claim kar raha hai
+    winnerClaim: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         default: null
@@ -50,8 +49,6 @@ const gameSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
-
-    // Confirmation fields
     player1Confirmed: {
         type: Boolean,
         default: false
@@ -60,8 +57,6 @@ const gameSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-
-    // Admin verification
     adminVerified: {
         type: Boolean,
         default: false
@@ -70,8 +65,6 @@ const gameSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-
-    // Timestamps
     completedAt: {
         type: Date,
         default: null
@@ -80,14 +73,21 @@ const gameSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// ✅ Calculate winnings - 90% of total pot
+gameSchema.methods.calculateWinnings = function () {
+    const totalPot = this.betAmount * 2;
+    const winnerShare = totalPot * 0.9; // 90% for winner
+    const platformCommission = totalPot * 0.1; // 10% for platform
+    return {
+        totalPot,
+        winnerShare,
+        platformCommission
+    };
+};
+
 // Generate unique room ID
 gameSchema.statics.generateRoomId = function () {
     return Math.floor(100000 + Math.random() * 900000).toString();
-};
-
-// Calculate winnings
-gameSchema.methods.calculateWinnings = function () {
-    return this.betAmount * 2;
 };
 
 // Check if both players have joined
@@ -95,7 +95,7 @@ gameSchema.methods.isReady = function () {
     return this.player1 && this.player2;
 };
 
-// Mark game as completed with winner claim
+// Mark game as completed
 gameSchema.methods.complete = async function (winnerId, screenshotPath) {
     this.winnerClaim = winnerId;
     this.screenshot = screenshotPath;

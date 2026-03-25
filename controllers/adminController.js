@@ -171,7 +171,16 @@ class AdminController {
     // View single game details
     async viewGame(req, res) {
         try {
-            const game = await Game.findById(req.params.id)
+            const { id } = req.params;
+
+            // ✅ Check if ID is valid
+            if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+                console.log('❌ Invalid game ID:', id);
+                req.flash('error_msg', 'Invalid game ID');
+                return res.redirect('/admin/games');
+            }
+
+            const game = await Game.findById(id)
                 .populate('player1', 'username email phoneNumber walletBalance')
                 .populate('player2', 'username email phoneNumber walletBalance')
                 .populate('winner', 'username email');
@@ -200,61 +209,139 @@ class AdminController {
 
     // Verify game and declare winner
     async verifyGame(req, res) {
+        console.log('🔥🔥🔥 VERIFY GAME METHOD CALLED 🔥🔥🔥');
+
         const session = await mongoose.startSession();
         session.startTransaction();
 
         try {
-            const { gameId } = req.params;
+            const gameId = req.params.id;
             const { winnerId, adminNotes } = req.body;
 
+            console.log('🔍 Game ID:', gameId);
+            console.log('🔍 Winner ID:', winnerId);
+
+            // Check if gameId exists
+            if (!gameId || !mongoose.Types.ObjectId.isValid(gameId)) {
+                console.log('❌ Invalid game ID');
+                await session.abortTransaction();
+                session.endSession();
+                req.flash('error_msg', 'Invalid game ID');
+                return res.redirect('/admin/games');
+            }
+
+            // Find game
             const game = await Game.findById(gameId).session(session);
 
             if (!game) {
+                console.log('❌ Game not found');
                 await session.abortTransaction();
                 session.endSession();
                 req.flash('error_msg', 'Game not found');
                 return res.redirect('/admin/games');
             }
 
+            console.log('📊 Game details:', {
+                status: game.status,
+                betAmount: game.betAmount,
+                adminVerified: game.adminVerified
+            });
+
+            // Check if game is completed
             if (game.status !== 'completed') {
+                console.log('❌ Game not completed');
                 await session.abortTransaction();
                 session.endSession();
-                req.flash('error_msg', 'Game is not in completed state');
+                req.flash('error_msg', 'Game is not completed');
                 return res.redirect(`/admin/games/${gameId}`);
             }
 
+            // Check if already verified
             if (game.adminVerified) {
+                console.log('❌ Already verified');
                 await session.abortTransaction();
                 session.endSession();
                 req.flash('error_msg', 'Game already verified');
                 return res.redirect(`/admin/games/${gameId}`);
             }
 
-            // Update game with winner
+            // Check winner
+            if (!winnerId || !mongoose.Types.ObjectId.isValid(winnerId)) {
+                console.log('❌ Invalid winner ID');
+                await session.abortTransaction();
+                session.endSession();
+                req.flash('error_msg', 'Please select a valid winner');
+                return res.redirect(`/admin/games/${gameId}`);
+            }
+
+            // Check if winner is part of game
+            const isPlayer1 = game.player1 && game.player1.toString() === winnerId;
+            const isPlayer2 = game.player2 && game.player2.toString() === winnerId;
+
+            if (!isPlayer1 && !isPlayer2) {
+                console.log('❌ Winner not in game');
+                await session.abortTransaction();
+                session.endSession();
+                req.flash('error_msg', 'Winner not part of this game');
+                return res.redirect(`/admin/games/${gameId}`);
+            }
+
+            // Update game
             game.winner = winnerId;
             game.adminVerified = true;
-            game.adminNotes = adminNotes;
+            game.adminNotes = adminNotes || `Verified by admin on ${new Date().toLocaleString()}`;
             await game.save({ session });
+            console.log('✅ Game updated');
 
-            // Calculate winnings (total pot = bet amount * 2)
-            const winnings = game.betAmount * 2;
+            // Calculate payout
+            const totalPot = game.betAmount * 2;
+            const winnerAmount = totalPot * 0.9;
+            const platformCommission = totalPot * 0.1;
+
+            // Find winner user
+            const user = await User.findById(winnerId).session(session);
+
+            if (!user) {
+                console.log('❌ Winner user not found');
+                await session.abortTransaction();
+                session.endSession();
+                req.flash('error_msg', 'Winner user not found');
+                return res.redirect(`/admin/games/${gameId}`);
+            }
 
             // Credit winner
-            await walletService.creditWinnings(winnerId, game._id, winnings);
+            const oldBalance = user.walletBalance;
+            user.walletBalance += winnerAmount;
+            await user.save({ session });
+            console.log(`💰 Credited ₹${winnerAmount} to ${user.username}`);
 
-            // Update user statistics
+            // Create win transaction
+            const winTransaction = new Transaction({
+                user: winnerId,
+                type: 'win',
+                amount: winnerAmount,
+                balanceBefore: oldBalance,
+                balanceAfter: user.walletBalance,
+                status: 'completed',
+                game: game._id,
+                description: `Won ₹${game.betAmount} game - 90% of ₹${totalPot}`
+            });
+            await winTransaction.save({ session });
+            console.log('✅ Win transaction created');
+
+            // Update winner stats
             await User.findByIdAndUpdate(
                 winnerId,
                 {
                     $inc: {
                         totalWins: 1,
-                        totalEarnings: winnings
+                        totalEarnings: winnerAmount
                     }
                 },
                 { session }
             );
 
-            // Update loser's statistics
+            // Update loser stats
             const loserId = game.player1.toString() === winnerId ? game.player2 : game.player1;
             if (loserId) {
                 await User.findByIdAndUpdate(
@@ -262,18 +349,39 @@ class AdminController {
                     { $inc: { totalLosses: 1 } },
                     { session }
                 );
+                console.log('✅ Loser stats updated');
+            }
+
+            // ✅ FIXED: Record platform commission - user field optional hai
+            if (platformCommission > 0) {
+                const commissionTransaction = new Transaction({
+                    user: null,  // ✅ ab allowed hai
+                    type: 'commission',
+                    amount: platformCommission,
+                    balanceBefore: 0,
+                    balanceAfter: 0,
+                    status: 'completed',
+                    game: game._id,
+                    description: `Platform fee (10%) from ₹${game.betAmount} game`
+                });
+                await commissionTransaction.save({ session });
+                console.log(`💰 Platform commission: ₹${platformCommission}`);
             }
 
             await session.commitTransaction();
             session.endSession();
 
-            req.flash('success_msg', 'Game verified and winner credited successfully');
+            console.log('✅✅✅ VERIFICATION COMPLETE ✅✅✅');
+            req.flash('success_msg', `✅ Winner ${user.username} gets ₹${winnerAmount.toFixed(2)} (90% of ₹${totalPot})`);
             res.redirect(`/admin/games/${gameId}`);
+
         } catch (error) {
             await session.abortTransaction();
             session.endSession();
-            console.error('Verify game error:', error);
-            req.flash('error_msg', 'Error verifying game');
+            console.error('❌❌❌ VERIFICATION ERROR ❌❌❌');
+            console.error('Error:', error.message);
+            console.error('Stack:', error.stack);
+            req.flash('error_msg', 'Error verifying game: ' + error.message);
             res.redirect(`/admin/games/${req.params.gameId}`);
         }
     }
@@ -441,83 +549,7 @@ class AdminController {
             res.redirect('/admin/users');
         }
     }
-    // Verify game and declare winner
-    async verifyGame(req, res) {
-        const session = await mongoose.startSession();
-        session.startTransaction();
 
-        try {
-            const { gameId } = req.params;
-            const { winnerId, adminNotes } = req.body;
-
-            const game = await Game.findById(gameId).session(session);
-
-            if (!game) {
-                await session.abortTransaction();
-                session.endSession();
-                req.flash('error_msg', 'Game not found');
-                return res.redirect('/admin/games');
-            }
-
-            if (game.status !== 'completed') {
-                await session.abortTransaction();
-                session.endSession();
-                req.flash('error_msg', 'Game is not in completed state');
-                return res.redirect(`/admin/games/${gameId}`);
-            }
-
-            if (game.adminVerified) {
-                await session.abortTransaction();
-                session.endSession();
-                req.flash('error_msg', 'Game already verified');
-                return res.redirect(`/admin/games/${gameId}`);
-            }
-
-            // Use model method to verify winner
-            await game.verifyWinner(req.session.user.id, adminNotes);
-
-            // Calculate winnings (total pot = bet amount * 2)
-            const winnings = game.betAmount * 2;
-
-            // Credit winner
-            await walletService.creditWinnings(game.winnerClaim, game._id, winnings);
-
-            // Update user statistics
-            await User.findByIdAndUpdate(
-                game.winnerClaim,
-                {
-                    $inc: {
-                        totalWins: 1,
-                        totalEarnings: winnings
-                    }
-                },
-                { session }
-            );
-
-            // Update loser's statistics
-            const loserId = game.player1.toString() === game.winnerClaim.toString() ? game.player2 : game.player1;
-            if (loserId) {
-                await User.findByIdAndUpdate(
-                    loserId,
-                    { $inc: { totalLosses: 1 } },
-                    { session }
-                );
-            }
-
-            await session.commitTransaction();
-            session.endSession();
-
-            req.flash('success_msg', '✅ Game verified and winner credited successfully');
-            res.redirect(`/admin/games/${gameId}`);
-
-        } catch (error) {
-            await session.abortTransaction();
-            session.endSession();
-            console.error('Verify game error:', error);
-            req.flash('error_msg', 'Error verifying game');
-            res.redirect(`/admin/games/${req.params.gameId}`);
-        }
-    }
 
     // Reject game (mark as disputed)
     async rejectGame(req, res) {

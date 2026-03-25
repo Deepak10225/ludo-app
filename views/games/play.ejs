@@ -64,17 +64,18 @@
                             <small>Total Pot</small>
                             <h3>₹<%= game.betAmount ? (game.betAmount * 2).toLocaleString() : '0' %>
                             </h3>
+                            <small class="text-muted">Winner gets 90% (₹<%= game.betAmount ? ((game.betAmount * 2) *
+                                    0.9).toLocaleString() : '0' %>)</small>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="info-card">
-                        <i class="fas fa-calendar text-info"></i>
+                        <i class="fas fa-percent text-info"></i>
                         <div>
-                            <small>Started</small>
-                            <h6>
-                                <%= game.createdAt ? new Date(game.createdAt).toLocaleString() : 'N/A' %>
-                            </h6>
+                            <small>Platform Fee</small>
+                            <h3>10%</h3>
+                            <small class="text-muted">For secure transactions</small>
                         </div>
                     </div>
                 </div>
