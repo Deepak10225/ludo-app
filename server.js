@@ -1,4 +1,6 @@
 const express = require('express');
+const http = require('http');
+const socketio = require('socket.io');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const flash = require('connect-flash');
@@ -21,6 +23,7 @@ const authRoutes = require('./routes/auth');
 const gameRoutes = require('./routes/games');
 const walletRoutes = require('./routes/wallet');
 const adminRoutes = require('./routes/admin');
+const rewardRoutes = require('./routes/rewards');
 // Initialize express
 const app = express();
 
@@ -77,6 +80,7 @@ app.use('/', authRoutes);
 app.use('/games', gameRoutes);
 app.use('/wallet', walletRoutes);
 app.use('/admin', adminRoutes);
+app.use('/rewards', rewardRoutes);
 
 // Home route
 app.get('/', (req, res) => {
@@ -131,9 +135,24 @@ app.use((err, req, res, next) => {
 });
 
 
+// Create HTTP server
+const server = http.createServer(app);
+
+// Initialize Socket.io
+const io = socketio(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+
+// Import and setup socket handler
+const setupSocket = require('./sockets/gameSocket');
+setupSocket(io);
+
 // Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Visit http://localhost:${PORT} to view the application`);
 });

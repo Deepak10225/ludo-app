@@ -129,16 +129,59 @@
                 </div>
             </div>
 
-            <!-- Screenshot Proof -->
+            <!-- Screenshot Proof & Dispute Resolution -->
             <% if (game.screenshot) { %>
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-lg-8">
                         <div class="card shadow mb-4">
-                            <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold">Game Screenshot</h6>
+                            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 font-weight-bold">Game Evidence</h6>
+                                <span class="badge bg-primary">Submitted by <%= game.winnerClaim?.username || 'Unknown' %></span>
                             </div>
-                            <div class="card-body text-center">
-                                <img src="<%= game.screenshot %>" class="img-fluid rounded" style="max-height: 500px;">
+                            <div class="card-body text-center bg-dark p-0 overflow-hidden" style="border-radius: 0 0 10px 10px;">
+                                <img src="<%= game.screenshot %>" class="img-fluid" style="max-height: 700px; width: auto;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 bg-info text-white">
+                                <h6 class="m-0 font-weight-bold">Claim Summary</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-4">
+                                    <label class="text-muted small d-block">Winner Claimed By</label>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <div class="bg-primary text-white rounded-circle p-2" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <span class="fw-bold"><%= game.winnerClaim?.username || 'N/A' %></span>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="text-muted small d-block">Submission Time</label>
+                                    <div class="mt-1 text-dark">
+                                        <i class="far fa-clock me-2"></i><%= game.screenshotUploadedAt ? new Date(game.screenshotUploadedAt).toLocaleString() : 'N/A' %>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="mb-3">
+                                    <label class="text-muted small d-block">Player Confirmations</label>
+                                    <div class="mt-2">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span><%= game.player1?.username %>:</span>
+                                            <span class="badge bg-<%= game.player1Confirmed ? 'success' : 'secondary' %>">
+                                                <%= game.player1Confirmed ? 'CONFIRMED' : 'PENDING' %>
+                                            </span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span><%= game.player2?.username %>:</span>
+                                            <span class="badge bg-<%= game.player2Confirmed ? 'success' : 'secondary' %>">
+                                                <%= game.player2Confirmed ? 'CONFIRMED' : 'PENDING' %>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

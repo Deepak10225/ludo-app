@@ -22,15 +22,9 @@ router.get('/:id', (req, res) => gameController.show(req, res));
 // Play game
 router.get('/:id/play', (req, res) => gameController.play(req, res));
 
-// Submit result (screenshot)
-router.post('/:id/result',
-    upload.single('screenshot'),
-    handleUploadError,
-    (req, res) => gameController.submitResult(req, res)
-);
+// Leaderboard
+router.get('/leaderboard', (req, res) => gameController.leaderboard(req, res));
 
-// Confirm result
-router.post('/:id/confirm', (req, res) => gameController.confirmResult(req, res));
 // Submit result (screenshot)
 router.post('/:id/result',
     upload.single('screenshot'),
@@ -42,6 +36,7 @@ router.post('/:id/result',
 router.post('/:id/confirm', (req, res) => gameController.confirmResult(req, res));
 
 // Get game status
+const Game = require('../models/Game'); // Ensure Game is imported for the status route
 router.get('/status/:id', async (req, res) => {
     try {
         const game = await Game.findById(req.params.id)

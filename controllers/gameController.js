@@ -38,107 +38,9 @@ class GameController {
             res.redirect('/');
         }
     }
-    async submitResult(req, res) {
-        try {
-            const gameId = req.params.id;
-            const userId = req.session.user.id;
-            const screenshot = req.file;
+    // End of index method
 
-            if (!screenshot) {
-                req.flash('error_msg', 'Please upload a screenshot');
-                return res.redirect(`/games/${gameId}/play`);
-            }
-
-            const game = await Game.findById(gameId);
-
-            if (!game) {
-                req.flash('error_msg', 'Game not found');
-                return res.redirect('/games');
-            }
-
-            // Check if user is part of this game
-            const isPlayer1 = game.player1.toString() === userId;
-            const isPlayer2 = game.player2 && game.player2.toString() === userId;
-
-            if (!isPlayer1 && !isPlayer2) {
-                req.flash('error_msg', 'You are not part of this game');
-                return res.redirect('/games');
-            }
-
-            // Check if game is active
-            if (game.status !== 'active') {
-                req.flash('error_msg', 'Game is not active');
-                return res.redirect(`/games/${gameId}`);
-            }
-
-            // Save screenshot path
-            const screenshotPath = `/uploads/${screenshot.filename}`;
-
-            // Use the complete method from model
-            await game.complete(userId, screenshotPath);
-
-            // Update confirmation based on player
-            if (isPlayer1) {
-                game.player1Confirmed = true;
-            } else {
-                game.player2Confirmed = true;
-            }
-            await game.save();
-
-            req.flash('success_msg', '✅ Result submitted successfully! Waiting for opponent confirmation and admin verification.');
-            res.redirect(`/games/${gameId}`);
-
-        } catch (error) {
-            console.error('Submit result error:', error);
-            req.flash('error_msg', 'Error submitting result');
-            res.redirect(`/games/${req.params.id}/play`);
-        }
-    }
-
-    // Confirm opponent's result
-    async confirmResult(req, res) {
-        try {
-            const gameId = req.params.id;
-            const userId = req.session.user.id;
-
-            const game = await Game.findById(gameId);
-
-            if (!game) {
-                return res.status(404).json({ error: 'Game not found' });
-            }
-
-            // Check if user is the opponent
-            const isPlayer1 = game.player1.toString() === userId;
-            const isPlayer2 = game.player2 && game.player2.toString() === userId;
-
-            if (!isPlayer1 && !isPlayer2) {
-                return res.status(403).json({ error: 'Not authorized' });
-            }
-
-            // Mark confirmation
-            if (isPlayer1) {
-                game.player1Confirmed = true;
-            } else {
-                game.player2Confirmed = true;
-            }
-
-            await game.save();
-
-            res.json({
-                success: true,
-                message: 'Result confirmed',
-                bothConfirmed: game.player1Confirmed && game.player2Confirmed
-            });
-
-        } catch (error) {
-            console.error('Confirm result error:', error);
-            res.status(500).json({ error: 'Server error' });
-        }
-    }
-
-    // Create new game - FIXED METHOD
     // Create new game
-    // Create new game - FIXED VERSION
     async create(req, res) {
         try {
 
@@ -182,13 +84,24 @@ class GameController {
                     return res.redirect('/games');
                 }
 
-                // Game mein player2 add kar
-                waitingGame.player2 = userId;
-                waitingGame.status = 'active';
-                await waitingGame.save();
+                // Player2 ka bet deduct kar safely
+                try {
+                    await walletService.placeBet(userId, waitingGame._id, parseFloat(betAmount));
+                } catch (betError) {
+                    req.flash('error_msg', betError.message || 'Error deducting bet amount');
+                    return res.redirect('/games');
+                }
 
-                // Player2 ka bet deduct kar
-                await walletService.placeBet(userId, waitingGame._id, parseFloat(betAmount));
+                try {
+                    // Game mein player2 add kar
+                    waitingGame.player2 = userId;
+                    waitingGame.status = 'active';
+                    await waitingGame.save();
+                } catch (saveError) {
+                    // Rollback map since bet was already deducted
+                    await walletService.refundBet(userId, waitingGame._id, parseFloat(betAmount));
+                    throw saveError;
+                }
 
                 req.flash('success_msg', `✅ Opponent found! Game ready. Room ID: ${waitingGame.roomId}`);
                 return res.redirect(`/games/${waitingGame._id}`);
@@ -217,10 +130,20 @@ class GameController {
                 createdAt: new Date()
             });
 
-            await game.save();
-
             // Player1 ka bet deduct kar
-            await walletService.placeBet(userId, game._id, parseFloat(betAmount));
+            try {
+                await walletService.placeBet(userId, game._id, parseFloat(betAmount));
+            } catch (betError) {
+                req.flash('error_msg', betError.message || 'Error deducting bet amount');
+                return res.redirect('/games');
+            }
+            
+            try {
+                await game.save();
+            } catch (saveError) {
+                await walletService.refundBet(userId, game._id, parseFloat(betAmount));
+                throw saveError;
+            }
 
             req.flash('success_msg', `✅ Game created! Room ID: ${game.roomId}. Waiting for opponent...`);
             res.redirect(`/games/${game._id}`);
@@ -269,12 +192,22 @@ class GameController {
                 return res.redirect('/wallet');
             }
 
-            // Game join kar
-            game.player2 = userId;
-            game.status = 'active';
-            await game.save();
+            try {
+                await walletService.placeBet(userId, game._id, game.betAmount);
+            } catch (betError) {
+                req.flash('error_msg', betError.message || 'Error deducting bet amount');
+                return res.redirect('/games');
+            }
 
-            await walletService.placeBet(userId, game._id, game.betAmount);
+            try {
+                // Game join kar
+                game.player2 = userId;
+                game.status = 'active';
+                await game.save();
+            } catch (saveError) {
+                await walletService.refundBet(userId, game._id, game.betAmount);
+                throw saveError;
+            }
 
             req.flash('success_msg', '✅ Joined game successfully!');
             res.redirect(`/games/${game._id}/play`);
@@ -524,6 +457,33 @@ class GameController {
             return numAmount >= 25000 && numAmount <= 100000;
         }
         return false;
+    }
+    // Get global leaderboard
+    async leaderboard(req, res) {
+        try {
+            // Get top earners
+            const topEarners = await User.find({ totalEarnings: { $gt: 0 } })
+                .select('username avatar totalEarnings level totalWins')
+                .sort({ totalEarnings: -1 })
+                .limit(20);
+
+            // Get top winners (champions)
+            const topWinners = await User.find({ totalWins: { $gt: 0 } })
+                .select('username avatar totalWins level totalEarnings')
+                .sort({ totalWins: -1 })
+                .limit(20);
+
+            res.render('games/leaderboard', {
+                title: 'Global Leaderboard - Champions',
+                topEarners,
+                topWinners,
+                user: req.session.user
+            });
+        } catch (error) {
+            console.error('Leaderboard error:', error);
+            req.flash('error_msg', 'Error loading leaderboard');
+            res.redirect('/games');
+        }
     }
 }
 

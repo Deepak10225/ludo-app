@@ -20,6 +20,7 @@ router.post('/games/:id/reject', adminController.rejectGame);
 router.get('/users', adminController.listUsers);
 router.get('/users/:id', adminController.viewUser);
 router.post('/users/:id/toggle', adminController.toggleUserStatus);
+router.post('/users/:id/adjust-balance', adminController.adjustBalance);
 
 // Manage withdrawals
 router.get('/withdrawals', adminController.listWithdrawals);

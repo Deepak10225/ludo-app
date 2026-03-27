@@ -1,1001 +1,337 @@
 <%- include('../partials/header') %>
 
-    <div class="game-show-container">
-        <div class="container">
-            <!-- Header -->
-            <div class="game-header">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <a href="/games" class="back-link">
-                            <i class="fas fa-arrow-left"></i> Back to Games
-                        </a>
-                        <h1 class="game-title">
-                            <i class="fas fa-dice"></i> Game Details
-                        </h1>
-                        <p class="game-subtitle">Room ID: <span class="room-id-badge">
-                                <%= game.roomId %>
-                            </span></p>
-                    </div>
-                    <div class="col-md-4 text-md-end">
-                        <div class="game-status <%= game.status %>">
-                            <i class="fas fa-circle"></i>
-                            <%= game.status ? game.status.charAt(0).toUpperCase() + game.status.slice(1) : 'Unknown' %>
-                        </div>
+<div class="game-show-container" style="min-height: 100vh; padding: 100px 0; position: relative;">
+    <div class="hero-bg"></div>
+    <div class="container">
+        <!-- Header -->
+        <div class="row align-items-center mb-5" data-aos="fade-down">
+            <div class="col-md-8">
+                <a href="/games" class="btn btn-outline-light rounded-pill mb-3">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Games
+                </a>
+                <h1 class="fw-bold text-white mb-2">
+                    <i class="fas fa-dice text-gradient me-2"></i> Game Details
+                </h1>
+                <p class="text-white-50 fs-5 d-flex align-items-center mb-0">
+                    Room ID: <span class="badge bg-primary fs-6 ms-2 font-monospace" style="letter-spacing: 0.1em;"><%= game.roomId %></span>
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <span class="badge rounded-pill border px-4 py-2 fs-6
+                    <%= game.status === 'active' ? 'bg-success border-success' : '' %>
+                    <%= game.status === 'completed' ? 'bg-primary border-primary' : '' %>
+                    <%= game.status === 'waiting' ? 'bg-warning text-dark border-warning' : '' %>
+                    <%= game.status === 'disputed' ? 'bg-danger border-danger' : '' %>
+                    <%= !game.status || !['active', 'completed', 'waiting', 'disputed'].includes(game.status) ? 'bg-secondary border-secondary' : '' %>"
+                    style="backdrop-filter: blur(10px); --bs-bg-opacity: .8;">
+                    <i class="fas fa-circle fa-xs me-2"></i>
+                    <%= game.status ? game.status.toUpperCase() : 'UNKNOWN' %>
+                </span>
+            </div>
+        </div>
+
+        <!-- Game Info Card -->
+        <div class="glass-card mb-5 p-4" data-aos="fade-up">
+            <div class="row g-4 justify-content-center text-center">
+                <div class="col-md-4">
+                    <div class="p-3">
+                        <span class="text-white-50 d-block mb-2 text-uppercase small" style="letter-spacing: 0.05em;">Bet Amount</span>
+                        <span class="text-white fw-bold fs-2">₹<%= game.betAmount ? game.betAmount.toLocaleString() : '0' %></span>
                     </div>
                 </div>
-            </div>
-
-            <!-- Game Info Card -->
-            <div class="game-info-card">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="info-item">
-                            <span class="info-label">Bet Amount</span>
-                            <span class="info-value bet">₹<%= game.betAmount ? game.betAmount.toLocaleString() : '0' %>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="info-item">
-                            <span class="info-label">Total Pot</span>
-                            <span class="info-value pot">₹<%= game.betAmount ? (game.betAmount * 2).toLocaleString()
-                                    : '0' %></span>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="info-item">
-                            <span class="info-label">Game Created</span>
-                            <span class="info-value date">
-                                <% if (game.createdAt) { %>
-                                    <%= new Date(game.createdAt).toLocaleDateString('en-IN', { day: 'numeric' ,
-                                        month: 'short' , year: 'numeric' , hour: '2-digit' , minute: '2-digit' }) %>
-                                        <% } else { %>
-                                            N/A
-                                            <% } %>
-                            </span>
-                        </div>
+                <div class="col-md-4 border-start border-end" style="border-color: rgba(255,255,255,0.1) !important;">
+                    <div class="p-3">
+                        <span class="text-white-50 d-block mb-2 text-uppercase small" style="letter-spacing: 0.05em;">Total Pot</span>
+                        <span class="text-warning fw-bold fs-2">₹<%= game.betAmount ? (game.betAmount * 2).toLocaleString() : '0' %></span>
                     </div>
                 </div>
-            </div>
-
-            <!-- Players Section -->
-            <div class="players-section">
-                <h3 class="section-title">Players</h3>
-                <div class="players-grid">
-                    <!-- Player 1 -->
-                    <% if (game.player1) { %>
-                        <% var player1Id=game.player1._id ? game.player1._id.toString() : null; var currentUserId=user
-                            && user._id ? user._id.toString() : null; var isCurrentUser=player1Id && currentUserId &&
-                            player1Id===currentUserId; %>
-                            <div class="player-card <%= isCurrentUser ? 'current-user' : '' %>">
-                                <div class="player-avatar">
-                                    <span class="avatar-initials">
-                                        <%= game.player1.username ? game.player1.username.charAt(0).toUpperCase() : 'P1'
-                                            %>
-                                    </span>
-                                    <% if (game.winner && game.winner._id && game.player1._id &&
-                                        game.winner._id.toString()===game.player1._id.toString()) { %>
-                                        <span class="winner-crown">
-                                            <i class="fas fa-crown"></i>
-                                        </span>
-                                        <% } %>
-                                </div>
-                                <div class="player-info">
-                                    <h4 class="player-name">
-                                        <%= game.player1.username || 'Player 1' %>
-                                            <% if (isCurrentUser) { %>
-                                                <span class="you-badge">(You)</span>
-                                                <% } %>
-                                    </h4>
-                                    <div class="player-stats">
-                                        <span><i class="fas fa-trophy"></i>
-                                            <%= game.player1.totalWins || 0 %> wins
-                                        </span>
-                                        <span><i class="fas fa-gamepad"></i>
-                                            <%= game.player1.totalGames || 0 %> games
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="player-status">
-                                    <span class="status-dot active"></span> Active
-                                </div>
-                            </div>
+                <div class="col-md-4">
+                    <div class="p-3">
+                        <span class="text-white-50 d-block mb-2 text-uppercase small" style="letter-spacing: 0.05em;">Game Created</span>
+                        <span class="text-white fw-medium fs-5">
+                            <% if (game.createdAt) { %>
+                                <%= new Date(game.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
                             <% } else { %>
-                                <div class="player-card">
-                                    <div class="player-avatar">
-                                        <span class="avatar-initials">?</span>
-                                    </div>
-                                    <div class="player-info">
-                                        <h4 class="player-name">Player 1</h4>
-                                        <div class="player-stats">
-                                            <span>Waiting</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <% } %>
-
-                                    <!-- VS Divider -->
-                                    <div class="vs-divider">
-                                        <span>VS</span>
-                                    </div>
-
-                                    <!-- Player 2 -->
-                                    <% if (game.player2) { %>
-                                        <% var player2Id=game.player2._id ? game.player2._id.toString() : null; var
-                                            currentUserId2=user && user._id ? user._id.toString() : null; var
-                                            isCurrentUser2=player2Id && currentUserId2 && player2Id===currentUserId2; %>
-                                            <div class="player-card <%= isCurrentUser2 ? 'current-user' : '' %>">
-                                                <div class="player-avatar">
-                                                    <span class="avatar-initials">
-                                                        <%= game.player2.username ?
-                                                            game.player2.username.charAt(0).toUpperCase() : 'P2' %>
-                                                    </span>
-                                                    <% if (game.winner && game.winner._id && game.player2._id &&
-                                                        game.winner._id.toString()===game.player2._id.toString()) { %>
-                                                        <span class="winner-crown">
-                                                            <i class="fas fa-crown"></i>
-                                                        </span>
-                                                        <% } %>
-                                                </div>
-                                                <div class="player-info">
-                                                    <h4 class="player-name">
-                                                        <%= game.player2.username || 'Player 2' %>
-                                                            <% if (isCurrentUser2) { %>
-                                                                <span class="you-badge">(You)</span>
-                                                                <% } %>
-                                                    </h4>
-                                                    <div class="player-stats">
-                                                        <span><i class="fas fa-trophy"></i>
-                                                            <%= game.player2.totalWins || 0 %> wins
-                                                        </span>
-                                                        <span><i class="fas fa-gamepad"></i>
-                                                            <%= game.player2.totalGames || 0 %> games
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div class="player-status">
-                                                    <span class="status-dot active"></span> Active
-                                                </div>
-                                            </div>
-                                            <% } else { %>
-                                                <div class="player-card">
-                                                    <div class="waiting-player">
-                                                        <div class="waiting-icon">
-                                                            <i class="fas fa-clock"></i>
-                                                        </div>
-                                                        <h4>Waiting for Player</h4>
-                                                        <p>Share the room ID to invite someone</p>
-                                                        <div class="room-id-share">
-                                                            <span class="room-code">
-                                                                <%= game.roomId %>
-                                                            </span>
-                                                            <button class="btn-copy" onclick="copyRoomId()">
-                                                                <i class="fas fa-copy"></i> Copy
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <% } %>
-                </div>
-            </div>
-
-            <!-- Game Actions -->
-            <div class="game-actions-section">
-                <h3 class="section-title">Game Actions</h3>
-
-                <div class="actions-grid">
-                    <!-- Room ID Card -->
-                    <div class="action-card">
-                        <div class="action-icon bg-primary">
-                            <i class="fas fa-door-open"></i>
-                        </div>
-                        <div class="action-content">
-                            <h4>Room ID</h4>
-                            <p class="room-id-display">
-                                <%= game.roomId %>
-                            </p>
-                            <button class="btn btn-sm btn-outline-primary" onclick="copyRoomId()">
-                                <i class="fas fa-copy"></i> Copy Room ID
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Ludo King App Card -->
-                    <div class="action-card">
-                        <div class="action-icon bg-success">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <div class="action-content">
-                            <h4>Open Ludo King</h4>
-                            <p>Enter the room ID in Ludo King app to play</p>
-                            <button class="btn btn-sm btn-success" onclick="openLudoKing()">
-                                <i class="fas fa-external-link-alt"></i> Open App
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Game Status Card -->
-                    <div class="action-card">
-                        <div class="action-icon bg-warning">
-                            <i class="fas fa-info-circle"></i>
-                        </div>
-                        <div class="action-content">
-                            <h4>Game Status</h4>
-                            <p class="status-text">
-                                <%= game.status || 'unknown' %>
-                            </p>
-                            <% if (game.status==='waiting' ) { %>
-                                <p class="text-muted small">Waiting for second player to join</p>
-                                <button class="btn btn-sm btn-primary" onclick="copyRoomId()">
-                                    <i class="fas fa-copy"></i> Copy Room ID
-                                </button>
-                                <% } else if (game.status==='active' ) { %>
-                                    <a href="/games/<%= game._id %>/play" class="btn btn-sm btn-primary">
-                                        <i class="fas fa-play"></i> Continue to Game
-                                    </a>
-                                    <% } else if (game.status==='completed' ) { %>
-                                        <p class="text-muted small">
-                                            Game completed on
-                                            <%= game.completedAt ? new Date(game.completedAt).toLocaleDateString()
-                                                : 'N/A' %>
-                                        </p>
-                                        <% } %>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Game Result Section (if completed) -->
-            <% if (game.status==='completed' && game.winner) { %>
-                <div class="result-section">
-                    <h3 class="section-title">Game Result</h3>
-                    <div class="result-card">
-                        <div class="winner-info">
-                            <i class="fas fa-trophy result-icon"></i>
-                            <div class="winner-details">
-                                <span class="winner-label">Winner</span>
-                                <h2 class="winner-name">
-                                    <%= game.winner.username || 'Player' %>
-                                </h2>
-                                <span class="winner-amount">₹<%= game.betAmount ? (game.betAmount * 2).toLocaleString()
-                                        : '0' %></span>
-                            </div>
-                        </div>
-
-                        <% if (game.screenshot) { %>
-                            <div class="screenshot-section">
-                                <h4>Game Screenshot</h4>
-                                <div class="screenshot-preview">
-                                    <img src="<%= game.screenshot %>" alt="Game Screenshot" class="img-fluid rounded">
-                                    <button class="btn btn-primary btn-sm mt-2" onclick="viewScreenshot()">
-                                        <i class="fas fa-search-plus"></i> View Full Size
-                                    </button>
-                                </div>
-                            </div>
+                                N/A
                             <% } %>
+                        </span>
                     </div>
-                </div>
-                <% } %>
-
-                    <!-- Share Section (if waiting) -->
-                    <% if (game.status==='waiting' ) { %>
-                        <div class="share-section">
-                            <h3 class="section-title">Share Game</h3>
-                            <div class="share-card">
-                                <p>Share this room ID with another player to start the game:</p>
-
-                                <div class="share-room">
-                                    <span class="room-id-large">
-                                        <%= game.roomId %>
-                                    </span>
-                                    <button class="btn btn-primary" onclick="copyRoomId()">
-                                        <i class="fas fa-copy"></i> Copy
-                                    </button>
-                                </div>
-
-                                <div class="share-buttons">
-                                    <h5>Share via</h5>
-                                    <div class="share-grid">
-                                        <button class="share-btn whatsapp" onclick="shareWhatsApp()">
-                                            <i class="fab fa-whatsapp"></i> WhatsApp
-                                        </button>
-                                        <button class="share-btn telegram" onclick="shareTelegram()">
-                                            <i class="fab fa-telegram"></i> Telegram
-                                        </button>
-                                        <button class="share-btn sms" onclick="shareSMS()">
-                                            <i class="fas fa-sms"></i> SMS
-                                        </button>
-                                        <button class="share-btn more" onclick="shareMore()">
-                                            <i class="fas fa-share-alt"></i> More
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <% } %>
-        </div>
-    </div>
-
-    <!-- Screenshot Modal -->
-    <div class="modal fade" id="screenshotModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Game Screenshot</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <img src="<%= game.screenshot %>" class="img-fluid" alt="Game Screenshot">
                 </div>
             </div>
         </div>
+
+        <!-- Players Section -->
+        <div class="row justify-content-center mb-5 align-items-center" data-aos="fade-up" data-aos-delay="100">
+            <div class="col-12 mb-4">
+                <h3 class="text-white fw-bold border-bottom pb-3" style="border-color: rgba(255,255,255,0.1) !important;">
+                    <i class="fas fa-users text-primary me-2"></i> Players
+                </h3>
+            </div>
+            
+            <div class="col-md-5">
+                <!-- Player 1 -->
+                <% if (game.player1) { %>
+                    <% 
+                        var player1Id = game.player1._id ? game.player1._id.toString() : null; 
+                        var currentUserId = user && user._id ? user._id.toString() : null; 
+                        var isCurrentUser = player1Id && currentUserId && player1Id === currentUserId; 
+                    %>
+                    <div class="glass-card p-4 text-center h-100 <%= isCurrentUser ? 'border-primary border border-opacity-50' : '' %> position-relative">
+                        <% if (game.winner && game.winner._id && game.player1._id && game.winner._id.toString() === game.player1._id.toString()) { %>
+                            <div class="position-absolute top-0 start-50 translate-middle">
+                                <span class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center shadow-lg" style="width: 40px; height: 40px; border: 3px solid #1a1a2e;"><i class="fas fa-crown"></i></span>
+                            </div>
+                        <% } %>
+                        
+                        <div class="rounded-circle bg-primary bg-gradient mx-auto d-flex align-items-center justify-content-center text-white fw-bold shadow-lg mb-3 mt-2" style="width: 80px; height: 80px; font-size: 2rem; border: 4px solid rgba(255,255,255,0.1);">
+                            <%= game.player1.username ? game.player1.username.charAt(0).toUpperCase() : 'P1' %>
+                        </div>
+                        
+                        <h4 class="text-white fw-bold mb-1">
+                            <%= game.player1.username || 'Player 1' %>
+                            <% if (isCurrentUser) { %>
+                                <span class="badge bg-primary bg-opacity-25 text-primary border border-primary fw-normal ms-1 fs-6 align-middle">(You)</span>
+                            <% } %>
+                        </h4>
+                        
+                        <div class="d-flex justify-content-center gap-3 mt-3 text-white-50 small">
+                            <span><i class="fas fa-trophy text-warning me-1"></i> <%= game.player1.totalWins || 0 %> wins</span>
+                            <span><i class="fas fa-gamepad text-info me-1"></i> <%= game.player1.totalGames || 0 %> games</span>
+                        </div>
+                        
+                        <div class="mt-4 pt-3 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
+                            <span class="text-success small fw-medium"><i class="fas fa-circle fa-xs me-1"></i> Active</span>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="glass-card p-4 text-center h-100 opacity-75">
+                        <div class="rounded-circle bg-dark mx-auto d-flex align-items-center justify-content-center text-white-50 fw-bold border mb-3 mt-2" style="width: 80px; height: 80px; font-size: 2rem; border-color: rgba(255,255,255,0.1) !important; border-style: dashed !important;">?</div>
+                        <h4 class="text-white-50 fw-bold mb-2">Player 1</h4>
+                        <div class="mt-4 pt-3 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
+                            <span class="text-warning small"><i class="fas fa-clock me-1"></i> Waiting</span>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+            
+            <div class="col-md-2 text-center my-4 my-md-0">
+                <div class="rounded-circle bg-dark bg-opacity-50 mx-auto d-flex align-items-center justify-content-center text-primary fw-bold shadow-lg border" style="width: 60px; height: 60px; font-size: 1.5rem; border-color: rgba(255,255,255,0.1) !important;">VS</div>
+            </div>
+            
+            <div class="col-md-5">
+                <!-- Player 2 -->
+                <% if (game.player2) { %>
+                    <% 
+                        var player2Id = game.player2._id ? game.player2._id.toString() : null; 
+                        var currentUserId2 = user && user._id ? user._id.toString() : null; 
+                        var isCurrentUser2 = player2Id && currentUserId2 && player2Id === currentUserId2; 
+                    %>
+                    <div class="glass-card p-4 text-center h-100 <%= isCurrentUser2 ? 'border-primary border border-opacity-50' : '' %> position-relative">
+                        <% if (game.winner && game.winner._id && game.player2._id && game.winner._id.toString() === game.player2._id.toString()) { %>
+                            <div class="position-absolute top-0 start-50 translate-middle">
+                                <span class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center shadow-lg" style="width: 40px; height: 40px; border: 3px solid #1a1a2e;"><i class="fas fa-crown"></i></span>
+                            </div>
+                        <% } %>
+                        
+                        <div class="rounded-circle bg-danger bg-gradient mx-auto d-flex align-items-center justify-content-center text-white fw-bold shadow-lg mb-3 mt-2" style="width: 80px; height: 80px; font-size: 2rem; border: 4px solid rgba(255,255,255,0.1);">
+                            <%= game.player2.username ? game.player2.username.charAt(0).toUpperCase() : 'P2' %>
+                        </div>
+                        
+                        <h4 class="text-white fw-bold mb-1">
+                            <%= game.player2.username || 'Player 2' %>
+                            <% if (isCurrentUser2) { %>
+                                <span class="badge bg-primary bg-opacity-25 text-primary border border-primary fw-normal ms-1 fs-6 align-middle">(You)</span>
+                            <% } %>
+                        </h4>
+                        
+                        <div class="d-flex justify-content-center gap-3 mt-3 text-white-50 small">
+                            <span><i class="fas fa-trophy text-warning me-1"></i> <%= game.player2.totalWins || 0 %> wins</span>
+                            <span><i class="fas fa-gamepad text-info me-1"></i> <%= game.player2.totalGames || 0 %> games</span>
+                        </div>
+                        
+                        <div class="mt-4 pt-3 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
+                            <span class="text-success small fw-medium"><i class="fas fa-circle fa-xs me-1"></i> Active</span>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="glass-card p-4 text-center h-100 border border-dashed bg-black bg-opacity-25" style="border-color: rgba(255,255,255,0.1) !important;">
+                        <div class="rounded-circle bg-dark mx-auto d-flex align-items-center justify-content-center text-white-50 fw-bold border mb-3 mt-2" style="width: 80px; height: 80px; font-size: 2rem; border-color: rgba(255,255,255,0.1) !important;"><i class="fas fa-clock"></i></div>
+                        <h4 class="text-white mb-2">Waiting for Player</h4>
+                        <p class="text-white-50 small mb-4">Share room ID to invite</p>
+                        
+                        <div class="bg-dark bg-opacity-50 rounded p-2 d-flex align-items-center justify-content-between mx-auto" style="max-width: 200px;">
+                            <span class="font-monospace text-primary fw-bold px-2"><%= game.roomId %></span>
+                            <button class="btn btn-sm btn-outline-light border-0" onclick="copyRoomId()"><i class="fas fa-copy"></i></button>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Game Result Section (if completed) -->
+        <% if (game.status === 'completed' && game.winner) { %>
+            <div class="glass-card mb-5 border-success border border-opacity-25 overflow-hidden" data-aos="zoom-in">
+                <div class="bg-success bg-opacity-25 p-3 border-bottom border-success border-opacity-25 d-flex align-items-center">
+                    <i class="fas fa-trophy text-warning fs-4 me-3"></i>
+                    <h5 class="text-white mb-0 fw-bold">Game Result</h5>
+                </div>
+                <div class="p-4 p-md-5 text-center" style="background: linear-gradient(to bottom, rgba(28, 200, 138, 0.1), transparent);">
+                    <p class="text-success text-uppercase fw-bold mb-2" style="letter-spacing: 0.05em;">Winner</p>
+                    <h1 class="display-3 fw-bold text-white mb-3 text-gradient"><%= game.winner.username || 'Player' %></h1>
+                    <div class="d-inline-block bg-dark bg-opacity-50 rounded-pill px-4 py-2 border mx-auto mb-4" style="border-color: rgba(255,255,255,0.1) !important;">
+                        <span class="text-white-50 me-2">Prize:</span>
+                        <span class="text-warning fs-4 fw-bold">₹<%= game.betAmount ? (game.betAmount * 2).toLocaleString() : '0' %></span>
+                    </div>
+
+                    <% if (game.screenshot) { %>
+                        <div class="mt-4 pt-4 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
+                            <h5 class="text-white mb-3">Winning Evidence</h5>
+                            <button class="btn btn-outline-light rounded-pill px-4" onclick="viewScreenshot()">
+                                <i class="fas fa-image me-2"></i> View Screenshot
+                            </button>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        <% } %>
+
+        <!-- Game Actions -->
+        <h3 class="text-white fw-bold mb-4 border-bottom pb-3" style="border-color: rgba(255,255,255,0.1) !important;" data-aos="fade-up">
+            <i class="fas fa-bolt text-warning me-2"></i> Actions & Info
+        </h3>
+        <style>
+            .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+            .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important; }
+        </style>
+        <div class="row g-4 mb-5" data-aos="fade-up" data-aos-delay="100">
+            <!-- Room ID Card -->
+            <div class="col-md-4">
+                <div class="glass-card p-4 text-center h-100 hover-lift">
+                    <div class="rounded bg-primary bg-gradient text-white d-inline-flex align-items-center justify-content-center p-3 mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                        <i class="fas fa-door-open"></i>
+                    </div>
+                    <h5 class="text-white mb-2">Room ID</h5>
+                    <p class="font-monospace text-gradient fs-4 fw-bold mb-3"><%= game.roomId %></p>
+                    <button class="btn btn-outline-light btn-sm rounded-pill w-100" onclick="copyRoomId()">
+                        <i class="fas fa-copy me-1"></i> Copy Room ID
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ludo King App Card -->
+            <div class="col-md-4">
+                <div class="glass-card p-4 text-center h-100 hover-lift">
+                    <div class="rounded bg-success bg-gradient text-white d-inline-flex align-items-center justify-content-center p-3 mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h5 class="text-white mb-2">Open Ludo King</h5>
+                    <p class="text-white-50 small mb-3">Enter the room ID in Ludo King app to play</p>
+                    <button class="btn btn-success btn-sm rounded-pill w-100" onclick="openLudoKing()">
+                        <i class="fas fa-external-link-alt me-1"></i> Open App
+                    </button>
+                </div>
+            </div>
+
+            <!-- Game Status Action Card -->
+            <div class="col-md-4">
+                <div class="glass-card p-4 text-center h-100 hover-lift">
+                    <div class="rounded bg-warning bg-gradient text-dark d-inline-flex align-items-center justify-content-center p-3 mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h5 class="text-white mb-2">Status</h5>
+                    <p class="text-uppercase fw-bold text-gradient mb-3"><%= game.status || 'unknown' %></p>
+                    
+                    <% if (game.status === 'waiting') { %>
+                        <button class="btn btn-primary btn-sm rounded-pill w-100" onclick="copyRoomId()">
+                            <i class="fas fa-share-alt me-1"></i> Share Room ID
+                        </button>
+                    <% } else if (game.status === 'active') { %>
+                        <a href="/games/<%= game._id %>/play" class="btn btn-primary btn-sm rounded-pill w-100">
+                            <i class="fas fa-play me-1"></i> Continue Game
+                        </a>
+                    <% } else if (game.status === 'completed') { %>
+                        <p class="text-white-50 small mb-0">
+                            Completed <%= game.completedAt ? new Date(game.completedAt).toLocaleDateString() : 'recently' %>
+                        </p>
+                    <% } else if (game.status === 'disputed') { %>
+                        <a href="/support" class="btn btn-danger btn-sm rounded-pill w-100">
+                            <i class="fas fa-headset me-1"></i> Contact Support
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Share Section (if waiting) -->
+        <% if (game.status === 'waiting') { %>
+            <div class="glass-card mb-5 p-4 text-center" data-aos="fade-up">
+                <h3 class="text-white fw-bold mb-3"><i class="fas fa-share-alt text-primary me-2"></i> Share Game</h3>
+                <p class="text-white-50 mb-4">Share this room ID with a friend to play together:</p>
+
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <button class="btn btn-outline-light rounded-pill px-4" style="border-color: #25D366; color: #25D366;" onclick="shareWhatsApp()">
+                        <i class="fab fa-whatsapp me-2"></i> WhatsApp
+                    </button>
+                    <button class="btn btn-outline-light rounded-pill px-4" style="border-color: #0088cc; color: #0088cc;" onclick="shareTelegram()">
+                        <i class="fab fa-telegram me-2"></i> Telegram
+                    </button>
+                    <button class="btn btn-outline-light rounded-pill px-4" onclick="shareSMS()">
+                        <i class="fas fa-sms me-2"></i> SMS
+                    </button>
+                </div>
+            </div>
+        <% } %>
     </div>
-
-    <style>
-        /* Game Show Container */
-        .game-show-container {
-            padding: 40px 0;
-            background: #f8f9fc;
-            min-height: calc(100vh - 76px);
-        }
-
-        /* Header */
-        .game-header {
-            margin-bottom: 30px;
-        }
-
-        .back-link {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 0.95rem;
-            display: inline-block;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .back-link:hover {
-            transform: translateX(-5px);
-            color: #764ba2;
-        }
-
-        .game-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .game-title i {
-            color: #667eea;
-        }
-
-        .game-subtitle {
-            color: #666;
-            font-size: 1.1rem;
-        }
-
-        .room-id-badge {
-            background: #667eea;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 50px;
-            font-family: monospace;
-            font-size: 1.2rem;
-            margin-left: 10px;
-        }
-
-        .game-status {
-            display: inline-block;
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-weight: 500;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-        }
-
-        .game-status.waiting {
-            background: rgba(246, 194, 62, 0.1);
-            color: #f6c23e;
-        }
-
-        .game-status.active {
-            background: rgba(28, 200, 138, 0.1);
-            color: #1cc88a;
-        }
-
-        .game-status.completed {
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
-        }
-
-        .game-status.disputed {
-            background: rgba(231, 74, 59, 0.1);
-            color: #e74a3b;
-        }
-
-        /* Game Info Card */
-        .game-info-card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-        }
-
-        .info-item {
-            text-align: center;
-        }
-
-        .info-label {
-            display: block;
-            font-size: 0.9rem;
-            color: #999;
-            margin-bottom: 10px;
-        }
-
-        .info-value {
-            display: block;
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .info-value.bet {
-            color: #e74a3b;
-        }
-
-        .info-value.pot {
-            color: #1cc88a;
-        }
-
-        .info-value.date {
-            color: #333;
-            font-size: 1.1rem;
-        }
-
-        /* Section Title */
-        .section-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        /* Players Section */
-        .players-section {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-        }
-
-        .players-grid {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 30px;
-            align-items: center;
-        }
-
-        .player-card {
-            background: #f8f9fc;
-            border-radius: 15px;
-            padding: 25px;
-            position: relative;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-            height: 100%;
-        }
-
-        .player-card.current-user {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.05);
-        }
-
-        .player-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .player-avatar {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 15px;
-            position: relative;
-            color: white;
-            font-size: 2rem;
-            font-weight: 700;
-        }
-
-        .player-avatar .avatar-initials {
-            text-transform: uppercase;
-        }
-
-        .winner-crown {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #f6c23e;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1rem;
-            border: 2px solid white;
-        }
-
-        .player-info {
-            text-align: center;
-        }
-
-        .player-name {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .you-badge {
-            font-size: 0.8rem;
-            color: #667eea;
-            font-weight: normal;
-            margin-left: 5px;
-        }
-
-        .player-stats {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            font-size: 0.9rem;
-            color: #999;
-        }
-
-        .player-stats i {
-            color: #f6c23e;
-            margin-right: 5px;
-        }
-
-        .player-status {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            font-size: 0.8rem;
-            color: #999;
-        }
-
-        .status-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 5px;
-        }
-
-        .status-dot.active {
-            background: #1cc88a;
-        }
-
-        /* VS Divider */
-        .vs-divider {
-            width: 50px;
-            height: 50px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: #667eea;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin: 0 auto;
-        }
-
-        /* Waiting Player */
-        .waiting-player {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .waiting-icon {
-            width: 80px;
-            height: 80px;
-            background: #f8f9fc;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 15px;
-            font-size: 2rem;
-            color: #999;
-            border: 2px dashed #e0e0e0;
-        }
-
-        .waiting-player h4 {
-            font-size: 1.1rem;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .waiting-player p {
-            color: #999;
-            margin-bottom: 15px;
-        }
-
-        .room-id-share {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .room-code {
-            font-family: monospace;
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #667eea;
-            background: #f8f9fc;
-            padding: 8px 15px;
-            border-radius: 8px;
-        }
-
-        .btn-copy {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-copy:hover {
-            background: #764ba2;
-            transform: translateY(-2px);
-        }
-
-        /* Actions Section */
-        .game-actions-section {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-        }
-
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-
-        .action-card {
-            background: #f8f9fc;
-            border-radius: 15px;
-            padding: 25px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .action-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .action-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 15px;
-            color: white;
-            font-size: 1.5rem;
-        }
-
-        .action-icon.bg-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .action-icon.bg-success {
-            background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);
-        }
-
-        .action-icon.bg-warning {
-            background: linear-gradient(135deg, #f6c23e 0%, #d4ac0d 100%);
-        }
-
-        .action-content h4 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .action-content p {
-            color: #999;
-            margin-bottom: 15px;
-        }
-
-        .room-id-display {
-            font-family: monospace;
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #667eea;
-            margin: 10px 0;
-        }
-
-        /* Result Section */
-        .result-section {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-        }
-
-        .result-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-            padding: 30px;
-            color: white;
-        }
-
-        .winner-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .result-icon {
-            font-size: 3rem;
-            color: #f6c23e;
-        }
-
-        .winner-details {
-            flex: 1;
-        }
-
-        .winner-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .winner-name {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .winner-amount {
-            font-size: 1.3rem;
-            opacity: 0.9;
-        }
-
-        .screenshot-section {
-            margin-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            padding-top: 20px;
-        }
-
-        .screenshot-section h4 {
-            color: white;
-            margin-bottom: 15px;
-        }
-
-        /* Share Section */
-        .share-section {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-        }
-
-        .share-card {
-            text-align: center;
-        }
-
-        .share-room {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin: 25px 0;
-        }
-
-        .room-id-large {
-            font-family: monospace;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #667eea;
-            background: #f8f9fc;
-            padding: 15px 30px;
-            border-radius: 12px;
-            letter-spacing: 5px;
-        }
-
-        .share-buttons h5 {
-            color: #333;
-            margin-bottom: 15px;
-        }
-
-        .share-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-        }
-
-        .share-btn {
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .share-btn.whatsapp {
-            background: #25D366;
-            color: white;
-        }
-
-        .share-btn.whatsapp:hover {
-            background: #128C7E;
-            transform: translateY(-2px);
-        }
-
-        .share-btn.telegram {
-            background: #0088cc;
-            color: white;
-        }
-
-        .share-btn.telegram:hover {
-            background: #006699;
-            transform: translateY(-2px);
-        }
-
-        .share-btn.sms {
-            background: #667eea;
-            color: white;
-        }
-
-        .share-btn.sms:hover {
-            background: #764ba2;
-            transform: translateY(-2px);
-        }
-
-        .share-btn.more {
-            background: #f8f9fc;
-            color: #333;
-            border: 1px solid #e0e0e0;
-        }
-
-        .share-btn.more:hover {
-            background: #e0e0e0;
-        }
-
-        /* Responsive */
-        @media (max-width: 992px) {
-            .actions-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .players-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .vs-divider {
-                margin: 0 auto;
-            }
-
-            .actions-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .share-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .room-id-large {
-                font-size: 1.8rem;
-                padding: 10px 20px;
-            }
-
-            .share-room {
-                flex-direction: column;
-            }
-        }
-    </style>
-
-    <script>
-        function copyRoomId() {
-            const roomId = '<%= game.roomId %>';
-            navigator.clipboard.writeText(roomId).then(() => {
-                alert('Room ID copied to clipboard!');
-            }).catch(function (err) {
-                alert('Failed to copy: ' + err);
-            });
-        }
-
-        function viewScreenshot() {
-            var modal = new bootstrap.Modal(document.getElementById('screenshotModal'));
-            modal.show();
-        }
-
-        function openLudoKing() {
-            // Try to open Ludo King app
-            window.location.href = 'ludoking://';
-
-            // Fallback to Play Store if app not installed
-            setTimeout(function () {
-                if (confirm('Ludo King app not found. Would you like to download it?')) {
-                    window.open('https://play.google.com/store/apps/details?id=com.ludoking', '_blank');
-                }
-            }, 2000);
-        }
-
-        function shareWhatsApp() {
-            var roomId = '<%= game.roomId %>';
-            var betAmount = '<%= game.betAmount %>';
-            var text = 'Join my Ludo game! Room ID: ' + roomId + ' - Bet: ₹' + betAmount;
-            window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
-        }
-
-        function shareTelegram() {
-            var roomId = '<%= game.roomId %>';
-            var betAmount = '<%= game.betAmount %>';
-            var text = 'Join my Ludo game! Room ID: ' + roomId + ' - Bet: ₹' + betAmount;
-            window.open('https://t.me/share/url?url=&text=' + encodeURIComponent(text), '_blank');
-        }
-
-        function shareSMS() {
-            var roomId = '<%= game.roomId %>';
-            var betAmount = '<%= game.betAmount %>';
-            var text = 'Join my Ludo game! Room ID: ' + roomId + ' - Bet: ₹' + betAmount;
-            window.open('sms:?body=' + encodeURIComponent(text), '_blank');
-        }
-
-        function shareMore() {
-            var roomId = '<%= game.roomId %>';
-            var betAmount = '<%= game.betAmount %>';
-            var text = 'Join my Ludo game! Room ID: ' + roomId + ' - Bet: ₹' + betAmount;
-
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Ludo Game Invite',
-                    text: text
-                }).catch(function (error) {
-                    console.log('Sharing failed', error);
-                });
-            } else {
-                alert('Sharing not supported on this browser. Please copy the room ID manually.');
-            }
-        }
-
-// Auto-refresh if waiting for player
-<% if (game && game.status === 'waiting') { %>
-            setTimeout(function () {
-                location.reload();
-            }, 30000);
-<% } %>
-    </script>
-
-    <%- include('../partials/footer') %>
+</div>
+
+<!-- Screenshot Modal -->
+<div class="modal fade" id="screenshotModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content glass-card border-0 shadow-lg">
+            <div class="modal-header border-bottom" style="border-color: rgba(255,255,255,0.1) !important;">
+                <h5 class="modal-title text-white fw-bold"><i class="fas fa-image text-primary me-2"></i> Game Evidence</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center p-4 bg-dark">
+                <img src="<%= game.screenshot %>" class="img-fluid rounded shadow" alt="Game Screenshot" style="max-height: 70vh; object-fit: contain;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyRoomId() {
+        var roomId = '<%= game.roomId %>';
+        navigator.clipboard.writeText(roomId).then(function () {
+            alert('Room ID copied to clipboard!');
+        }).catch(function (err) {
+            alert('Failed to copy. Please manually copy: ' + roomId);
+        });
+    }
+
+    function viewScreenshot() {
+        var modal = new bootstrap.Modal(document.getElementById('screenshotModal'));
+        modal.show();
+    }
+
+    function openLudoKing() {
+        alert('This would open the Ludo King app directly. For now, please open the app manually and enter room ID: ' + '<%= game.roomId %>');
+    }
+
+    function shareWhatsApp() {
+        var text = encodeURIComponent('Join me on Ludo! My Room ID is *<%= game.roomId %>*. Install Ludo King to play.');
+        window.open('https://api.whatsapp.com/send?text=' + text);
+    }
+
+    function shareTelegram() {
+        var text = encodeURIComponent('Join me on Ludo! My Room ID is ' + '<%= game.roomId %>' + '.');
+        window.open('https://t.me/share/url?url=' + encodeURIComponent(window.location.origin) + '&text=' + text);
+    }
+
+    function shareSMS() {
+        var text = encodeURIComponent('Join me on Ludo! My Room ID is ' + '<%= game.roomId %>' + '.');
+        window.open('sms:?&body=' + text);
+    }
+</script>
+
+<%- include('../partials/footer') %>

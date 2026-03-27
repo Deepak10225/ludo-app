@@ -15,182 +15,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- AOS Animation Library -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-    <!-- Custom CSS -->
+    <!-- Custom CSS (Dark Glassmorphism) -->
     <link rel="stylesheet" href="/css/style.css">
-
-    <style>
-        /* ========== NAVBAR - ALWAYS SOLID ========== */
-        .navbar {
-            background: #0f172a !important;
-            padding: 1rem 0;
-            transition: all 0.3s ease;
-            z-index: 1030;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar.scrolled {
-            background: #0f172a !important;
-            padding: 0.8rem 0;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .navbar-brand {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: white !important;
-        }
-
-        .navbar-brand span {
-            color: #fbbf24;
-        }
-
-        .navbar-toggler {
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            padding: 8px 12px;
-            outline: none !important;
-            box-shadow: none !important;
-            transition: all 0.3s ease;
-        }
-
-        .navbar-toggler:hover {
-            border-color: #fbbf24;
-        }
-
-        .navbar-toggler:focus {
-            box-shadow: none;
-            outline: none;
-        }
-
-        .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-        }
-
-        .nav-link {
-            color: rgba(255, 255, 255, 0.9) !important;
-            font-weight: 500;
-            margin: 0 0.5rem;
-            transition: all 0.3s ease;
-            border-radius: 8px;
-        }
-
-        .nav-link:hover {
-            color: white !important;
-            background: rgba(251, 191, 36, 0.2);
-            transform: translateY(-2px);
-        }
-
-        /* Mobile Menu */
-        @media (max-width: 991px) {
-            .navbar {
-                background: #0f172a !important;
-            }
-
-            .navbar-collapse {
-                background: #0f172a !important;
-                padding: 20px;
-                border-radius: 0 0 20px 20px;
-                margin-top: 10px;
-                max-height: 80vh;
-                overflow-y: auto;
-                border-top: 1px solid rgba(255, 255, 255, 0.1);
-            }
-
-            .nav-link {
-                padding: 12px 15px !important;
-                margin: 5px 0;
-                text-align: center;
-            }
-
-            .nav-link:hover {
-                background: rgba(251, 191, 36, 0.15);
-                transform: translateX(5px);
-            }
-
-            .nav-link.btn {
-                margin: 10px 0 !important;
-            }
-
-            .dropdown-menu {
-                background: rgba(0, 0, 0, 0.4);
-                border: none;
-                border-radius: 12px;
-                margin-top: 5px;
-                padding: 10px;
-            }
-
-            .dropdown-item {
-                color: white;
-                border-radius: 8px;
-                padding: 10px 20px;
-                text-align: center;
-            }
-
-            .dropdown-item:hover {
-                background: #fbbf24;
-                color: #0f172a;
-            }
-        }
-
-        /* Desktop Menu */
-        @media (min-width: 992px) {
-            .nav-link {
-                padding: 0.5rem 1rem !important;
-            }
-
-            .dropdown-menu {
-                background: #0f172a;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                margin-top: 10px;
-                border-radius: 12px;
-            }
-
-            .dropdown-item {
-                color: rgba(255, 255, 255, 0.8);
-                padding: 8px 20px;
-            }
-
-            .dropdown-item:hover {
-                background: #fbbf24;
-                color: #0f172a;
-            }
-        }
-
-        /* Flash Messages */
-        .alert {
-            margin-top: 90px;
-            border-radius: 12px;
-            animation: slideDown 0.3s ease;
-            border: none;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        main {
-            margin-top: 0;
-            padding-top: 0;
-        }
-
-        body {
-            padding-top: 76px;
-        }
-    </style>
 </head>
 
 <body>
@@ -198,7 +29,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <i class="fas fa-dice-d6 me-2"></i> Ludo<span class="text-warning">Win</span>
+                <i class="fas fa-dice-d6 me-2"></i> Ludo<span class="text-gradient">Win</span>
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -238,11 +69,22 @@
                                 <i class="fas fa-user-circle me-1"></i>
                                 <%= user.username %>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
+                            <ul class="dropdown-menu dropdown-menu-end glass">
                                 <li><a class="dropdown-item" href="/profile"><i class="fas fa-id-card me-2"></i>
                                         Profile</a></li>
+                                <li><a class="dropdown-item" href="/rewards/daily"><i class="fas fa-gift me-2 text-warning"></i>
+                                        Daily Rewards</a></li>
+                                <li><a class="dropdown-item" href="/games/leaderboard"><i class="fas fa-trophy me-2 text-primary"></i>
+                                        Leaderboard</a></li>
                                 <li><a class="dropdown-item" href="/games/history/all"><i
                                             class="fas fa-history me-2"></i> Game History</a></li>
+                                <% if (user.isAdmin) { %>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item text-info" href="/admin/dashboard"><i
+                                            class="fas fa-user-shield me-2"></i> Admin Panel</a></li>
+                                <% } %>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
@@ -255,7 +97,7 @@
                                 <a class="nav-link btn btn-outline-light me-2" href="/login">Login</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn btn-warning text-dark" href="/register">Sign Up</a>
+                                <a class="nav-link btn btn-primary text-white" href="/register">Sign Up</a>
                             </li>
                             <% } %>
                 </ul>

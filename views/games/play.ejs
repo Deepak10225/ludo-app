@@ -1,623 +1,473 @@
 <%- include('../partials/header') %>
 
-    <div class="game-play-container">
-        <div class="container">
-            <!-- Header with Back Button -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <a href="/games" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left"></i> Back to Games
-                </a>
-                <div class="game-status-badge">
-                    <span
-                        class="badge 
-                    <%= game.status === 'active' ? 'bg-success' : '' %>
-                    <%= game.status === 'completed' ? 'bg-info' : '' %>
-                    <%= game.status === 'waiting' ? 'bg-warning' : '' %>
-                    <%= !game.status || (game.status !== 'active' && game.status !== 'completed' && game.status !== 'waiting') ? 'bg-secondary' : '' %> p-3">
-                        <i
-                            class="fas 
+<div class="game-play-container" style="min-height: 100vh; padding: 100px 0; position: relative;">
+    <div class="hero-bg"></div>
+    <div class="container">
+        <!-- Header with Back Button -->
+        <div class="d-flex justify-content-between align-items-center mb-4" data-aos="fade-down">
+            <a href="/games" class="btn btn-outline-light rounded-pill">
+                <i class="fas fa-arrow-left me-2"></i> Back to Games
+            </a>
+            <div class="game-status-badge">
+                <span class="badge rounded-pill border <%= game.status === 'active' ? 'bg-success border-success' : '' %>
+                    <%= game.status === 'completed' ? 'bg-primary border-primary' : '' %>
+                    <%= game.status === 'waiting' ? 'bg-warning text-dark border-warning' : '' %>
+                    <%= !game.status || (game.status !== 'active' && game.status !== 'completed' && game.status !== 'waiting') ? 'bg-secondary border-secondary' : '' %> px-4 py-2" style="font-size: 1rem; backdrop-filter: blur(10px); --bs-bg-opacity: .8;">
+                    <i class="fas 
                         <%= game.status === 'active' ? 'fa-play' : '' %>
                         <%= game.status === 'completed' ? 'fa-check-circle' : '' %>
                         <%= game.status === 'waiting' ? 'fa-clock' : '' %>
                         <%= !game.status || (game.status !== 'active' && game.status !== 'completed' && game.status !== 'waiting') ? 'fa-info-circle' : '' %> me-2"></i>
-                        <%= game.status ? game.status.toUpperCase() : 'UNKNOWN' %>
-                    </span>
-                </div>
+                    <%= game.status ? game.status.toUpperCase() : 'UNKNOWN' %>
+                </span>
             </div>
+        </div>
 
-            <!-- Room Info Card -->
-            <div class="room-card text-center mb-4">
-                <div class="card-body p-5">
-                    <h4 class="text-white-50 mb-2">Room ID</h4>
-                    <h1 class="display-1 fw-bold text-white mb-3">
-                        <%= game.roomId %>
-                    </h1>
-                    <button onclick="copyRoomId()" class="btn btn-light btn-lg">
-                        <i class="fas fa-copy me-2"></i> Copy Room ID
-                    </button>
+        <!-- Room Info Card -->
+        <div class="glass-card text-center mb-5 p-5 border-0 shadow-lg" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%); backdrop-filter: blur(20px);" data-aos="zoom-in">
+            <h4 class="text-white-50 mb-3 fw-light">Room ID</h4>
+            <h1 class="display-1 fw-bold text-white mb-4 text-gradient" style="letter-spacing: 2px;">
+                <%= game.roomId %>
+            </h1>
+            <button onclick="copyRoomId()" class="btn btn-primary btn-lg rounded-pill px-5 py-3 shadow-sm hover-lift">
+                <i class="fas fa-copy me-2"></i> Copy Room ID
+            </button>
 
-                    <% if (game.status==='waiting' ) { %>
-                        <div class="mt-4">
-                            <div class="spinner-border text-white me-2" role="status"></div>
-                            <span class="text-white">Waiting for opponent to join...</span>
-                        </div>
-                        <% } %>
+            <% if (game.status === 'waiting') { %>
+                <div class="mt-4 pt-3 border-top border-white-10">
+                    <div class="spinner-grow text-warning spinner-grow-sm me-2" role="status"></div>
+                    <span class="text-white-50">Waiting for opponent to join...</span>
                 </div>
-            </div>
+            <% } %>
+        </div>
 
-            <!-- Game Info -->
-            <div class="row mb-4">
-                <div class="col-md-4">
-                    <div class="info-card">
-                        <i class="fas fa-tag text-primary"></i>
-                        <div>
-                            <small>Bet Amount</small>
-                            <h3>₹<%= game.betAmount ? game.betAmount.toLocaleString() : '0' %>
-                            </h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="info-card">
-                        <i class="fas fa-trophy text-warning"></i>
-                        <div>
-                            <small>Total Pot</small>
-                            <h3>₹<%= game.betAmount ? (game.betAmount * 2).toLocaleString() : '0' %>
-                            </h3>
-                            <small class="text-muted">Winner gets 90% (₹<%= game.betAmount ? ((game.betAmount * 2) *
-                                    0.9).toLocaleString() : '0' %>)</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="info-card">
-                        <i class="fas fa-percent text-info"></i>
-                        <div>
-                            <small>Platform Fee</small>
-                            <h3>10%</h3>
-                            <small class="text-muted">For secure transactions</small>
-                        </div>
+        <!-- Game Info -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="glass-card p-4 d-flex align-items-center gap-3 h-100">
+                    <div class="bg-primary bg-gradient rounded p-3 text-white"><i class="fas fa-tag fa-2x"></i></div>
+                    <div>
+                        <small class="text-white-50">Bet Amount</small>
+                        <h3 class="text-white fw-bold mb-0">₹<%= game.betAmount ? game.betAmount.toLocaleString() : '0' %></h3>
                     </div>
                 </div>
             </div>
-
-            <!-- Players Status -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <div class="player-card <%= game.player1Confirmed ? 'confirmed' : '' %>">
-                        <% if (game.player1) { %>
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="player-avatar bg-primary">
-                                    <%= game.player1.username ? game.player1.username.charAt(0).toUpperCase() : 'P1' %>
-                                </div>
-                                <div class="ms-3">
-                                    <h4 class="mb-0">
-                                        <%= game.player1.username || 'Player 1' %>
-                                    </h4>
-                                    <small class="text-muted">Player 1</small>
-                                </div>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-muted">Status</span>
-                                <span class="badge <%= game.player1Confirmed ? 'bg-success' : 'bg-warning' %> p-2">
-                                    <i
-                                        class="fas <%= game.player1Confirmed ? 'fa-check-circle' : 'fa-clock' %> me-1"></i>
-                                    <%= game.player1Confirmed ? 'Confirmed' : 'Not Confirmed' %>
-                                </span>
-                            </div>
-                            <% } else { %>
-                                <div class="text-center py-4">
-                                    <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
-                                    <h5 class="text-muted">Player 1 Left</h5>
-                                </div>
-                                <% } %>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="player-card <%= game.player2Confirmed ? 'confirmed' : '' %>">
-                        <% if (game.player2) { %>
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="player-avatar bg-success">
-                                    <%= game.player2.username ? game.player2.username.charAt(0).toUpperCase() : 'P2' %>
-                                </div>
-                                <div class="ms-3">
-                                    <h4 class="mb-0">
-                                        <%= game.player2.username || 'Player 2' %>
-                                    </h4>
-                                    <small class="text-muted">Player 2</small>
-                                </div>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-muted">Status</span>
-                                <span class="badge <%= game.player2Confirmed ? 'bg-success' : 'bg-warning' %> p-2">
-                                    <i
-                                        class="fas <%= game.player2Confirmed ? 'fa-check-circle' : 'fa-clock' %> me-1"></i>
-                                    <%= game.player2Confirmed ? 'Confirmed' : 'Not Confirmed' %>
-                                </span>
-                            </div>
-                            <% } else { %>
-                                <div class="text-center py-4">
-                                    <i class="fas fa-user-clock fa-3x text-muted mb-3"></i>
-                                    <h5 class="text-muted">Waiting for Player 2</h5>
-                                    <p class="small">Share the room ID with someone to start</p>
-                                </div>
-                                <% } %>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="glass-card p-4 d-flex align-items-center gap-3 h-100 border-warning border border-opacity-25">
+                    <div class="bg-warning bg-gradient rounded p-3 text-dark"><i class="fas fa-trophy fa-2x"></i></div>
+                    <div>
+                        <small class="text-white-50">Total Pot</small>
+                        <h3 class="text-warning fw-bold mb-0">₹<%= game.betAmount ? (game.betAmount * 2).toLocaleString() : '0' %></h3>
+                        <small class="text-white-50 d-block mt-1">Winner gets 90% (₹<%= game.betAmount ? ((game.betAmount * 2) * 0.9).toLocaleString() : '0' %>)</small>
                     </div>
                 </div>
             </div>
-
-            <!-- Instructions Card -->
-            <div class="instructions-card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> How to Play</h5>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="glass-card p-4 d-flex align-items-center gap-3 h-100">
+                    <div class="bg-info bg-gradient rounded p-3 text-white"><i class="fas fa-percent fa-2x"></i></div>
+                    <div>
+                        <small class="text-white-50">Platform Fee</small>
+                        <h3 class="text-info fw-bold mb-0">10%</h3>
+                        <small class="text-white-50 d-block mt-1">For secure transactions</small>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="instruction-step">
-                                <span class="step-number">1</span>
-                                <p>Copy Room ID above</p>
+            </div>
+        </div>
+
+        <!-- Players Status -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-6" data-aos="fade-right">
+                <div class="glass-card p-4 h-100 <%= game.player1Confirmed ? 'border-success border border-opacity-50' : '' %>">
+                    <% if (game.player1) { %>
+                        <div class="d-flex align-items-center mb-4 pb-3 border-bottom border-white-10">
+                            <div class="rounded-circle bg-primary bg-gradient d-flex align-items-center justify-content-center text-white fw-bold shadow" style="width: 60px; height: 60px; font-size: 1.5rem; border: 3px solid rgba(255,255,255,0.2);">
+                                <%= game.player1.username ? game.player1.username.charAt(0).toUpperCase() : 'P1' %>
+                            </div>
+                            <div class="ms-3">
+                                <h4 class="text-white fw-bold mb-1"><%= game.player1.username || 'Player 1' %></h4>
+                                <span class="badge bg-primary bg-opacity-25 text-primary border border-primary">Player 1</span>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="instruction-step">
-                                <span class="step-number">2</span>
-                                <p>Open Ludo King app</p>
+                        <div class="d-flex justify-content-between align-items-center bg-dark bg-opacity-25 p-3 rounded">
+                            <span class="text-white-50">Status</span>
+                            <span class="badge <%= game.player1Confirmed ? 'bg-success' : 'bg-warning text-dark' %> px-3 py-2 rounded-pill">
+                                <i class="fas <%= game.player1Confirmed ? 'fa-check-circle' : 'fa-clock' %> me-1"></i>
+                                <%= game.player1Confirmed ? 'Confirmed' : 'Not Confirmed' %>
+                            </span>
+                        </div>
+                    <% } else { %>
+                        <div class="text-center py-5 h-100 d-flex flex-column justify-content-center">
+                            <i class="fas fa-user-slash fa-4x text-white-50 mb-3 opacity-50"></i>
+                            <h5 class="text-white-50">Player 1 Left</h5>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            <div class="col-md-6" data-aos="fade-left">
+                <div class="glass-card p-4 h-100 <%= game.player2Confirmed ? 'border-success border border-opacity-50' : '' %>">
+                    <% if (game.player2) { %>
+                        <div class="d-flex align-items-center mb-4 pb-3 border-bottom border-white-10">
+                            <div class="rounded-circle bg-danger bg-gradient d-flex align-items-center justify-content-center text-white fw-bold shadow" style="width: 60px; height: 60px; font-size: 1.5rem; border: 3px solid rgba(255,255,255,0.2);">
+                                <%= game.player2.username ? game.player2.username.charAt(0).toUpperCase() : 'P2' %>
+                            </div>
+                            <div class="ms-3">
+                                <h4 class="text-white fw-bold mb-1"><%= game.player2.username || 'Player 2' %></h4>
+                                <span class="badge bg-danger bg-opacity-25 text-danger border border-danger">Player 2</span>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="instruction-step">
-                                <span class="step-number">3</span>
-                                <p>Join room with ID</p>
-                            </div>
+                        <div class="d-flex justify-content-between align-items-center bg-dark bg-opacity-25 p-3 rounded">
+                            <span class="text-white-50">Status</span>
+                            <span class="badge <%= game.player2Confirmed ? 'bg-success' : 'bg-warning text-dark' %> px-3 py-2 rounded-pill">
+                                <i class="fas <%= game.player2Confirmed ? 'fa-check-circle' : 'fa-clock' %> me-1"></i>
+                                <%= game.player2Confirmed ? 'Confirmed' : 'Not Confirmed' %>
+                            </span>
                         </div>
-                        <div class="col-md-3">
-                            <div class="instruction-step">
-                                <span class="step-number">4</span>
-                                <p>Winner uploads screenshot</p>
-                            </div>
+                    <% } else { %>
+                        <div class="text-center py-5 h-100 d-flex flex-column justify-content-center align-items-center border border-white-10 border-dashed rounded">
+                            <div class="spinner-border text-primary opacity-50 mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+                            <h5 class="text-white mb-2">Waiting for Player 2</h5>
+                            <p class="text-white-50 small mb-0">Share the room ID with someone to start</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions Card -->
+        <div class="glass-card mb-5 overflow-hidden" data-aos="fade-up">
+            <div class="bg-white bg-opacity-10 p-3 border-bottom border-white-10 d-flex align-items-center">
+                <i class="fas fa-info-circle text-primary fs-4 me-3"></i>
+                <h5 class="text-white mb-0 fw-bold">How to Play</h5>
+            </div>
+            <div class="p-4">
+                <div class="row g-4 text-center">
+                    <div class="col-md-3">
+                        <div class="p-3">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow" style="width: 50px; height: 50px; font-size: 1.2rem; font-weight: bold;">1</div>
+                            <p class="text-white-50 fw-medium">Copy Room ID above</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 position-relative">
+                            <div class="d-none d-md-block position-absolute top-50 start-0 translate-middle-y w-100 border-top border-white-10" style="z-index: 0;"></div>
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow position-relative" style="width: 50px; height: 50px; font-size: 1.2rem; font-weight: bold; z-index: 1;">2</div>
+                            <p class="text-white-50 fw-medium">Open Ludo King app</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 position-relative">
+                            <div class="d-none d-md-block position-absolute top-50 start-0 translate-middle-y w-100 border-top border-white-10" style="z-index: 0;"></div>
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow position-relative" style="width: 50px; height: 50px; font-size: 1.2rem; font-weight: bold; z-index: 1;">3</div>
+                            <p class="text-white-50 fw-medium">Join room with ID</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 position-relative">
+                            <div class="d-none d-md-block position-absolute top-50 start-0 translate-middle-y w-100 border-top border-white-10" style="z-index: 0;"></div>
+                            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow position-relative" style="width: 50px; height: 50px; font-size: 1.2rem; font-weight: bold; z-index: 1;">4</div>
+                            <p class="text-white-50 fw-medium">Winner uploads screenshot</p>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Screenshot Upload Section -->
-            <% if (game.status==='active' && !game.screenshot) { %>
-                <div class="upload-card mb-4">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0"><i class="fas fa-camera me-2"></i> Upload Winner Screenshot</h5>
+        <!-- Screenshot Upload Section -->
+        <% if (game.status === 'active' && !game.screenshot) { %>
+            <div class="glass-card mb-5 border-success border border-opacity-50 overflow-hidden shadow-lg" data-aos="zoom-in">
+                <div class="bg-success bg-opacity-25 p-3 border-bottom border-success border-opacity-50 d-flex align-items-center">
+                    <i class="fas fa-camera text-success fs-4 me-3"></i>
+                    <h5 class="text-white mb-0 fw-bold">Upload Winner Screenshot</h5>
+                </div>
+                <div class="p-5 text-center">
+                    <div class="bg-dark bg-opacity-50 rounded-circle d-inline-flex align-items-center justify-content-center mb-4 border border-white-10" style="width: 100px; height: 100px;">
+                        <i class="fas fa-image fa-3x text-white-50"></i>
                     </div>
-                    <div class="card-body text-center p-5">
-                        <i class="fas fa-image fa-4x text-muted mb-4"></i>
-                        <h4 class="mb-3">Game Finished?</h4>
-                        <p class="text-muted mb-4">Take a screenshot of the winner screen in Ludo King and upload here
-                        </p>
+                    <h3 class="text-white fw-bold mb-3">Game Finished?</h3>
+                    <p class="text-white-50 mb-4 mx-auto" style="max-width: 500px;">Take a screenshot of the winner screen in Ludo King and upload it here to claim your winnings.</p>
 
-                        <form id="screenshotForm" enctype="multipart/form-data">
-                            <div class="mb-4">
-                                <input type="file" name="screenshot" id="screenshot"
-                                    class="form-control form-control-lg" accept="image/*" capture="environment"
-                                    required>
-                            </div>
-                            <button type="submit" class="btn btn-success btn-lg px-5">
-                                <i class="fas fa-upload me-2"></i> Upload Screenshot
-                            </button>
-                        </form>
-                        <div id="uploadStatus" class="mt-3"></div>
+                    <form id="screenshotForm" enctype="multipart/form-data" class="mx-auto" style="max-width: 400px;">
+                        <div class="mb-4">
+                            <input type="file" name="screenshot" id="screenshot" class="form-control form-control-lg bg-dark text-white border-white-20" accept="image/*" capture="environment" required>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill shadow-sm hover-lift">
+                            <i class="fas fa-upload me-2"></i> Submit Result Screenshot
+                        </button>
+                    </form>
+                    <div id="uploadStatus" class="mt-4"></div>
+                </div>
+            </div>
+        <% } %>
+
+        <!-- Waiting for Opponent Confirmation -->
+        <% if (game.screenshot && !game.player1Confirmed && !game.player2Confirmed) { %>
+            <div class="glass-card mb-5 border-warning border border-opacity-50 p-5 text-center" data-aos="fade-up">
+                <i class="fas fa-clock fa-4x text-warning mb-4 pulse-animation"></i>
+                <h3 class="text-white fw-bold mb-3">Waiting for Opponent</h3>
+                <p class="text-white-50 mb-4">Screenshot uploaded successfully. Waiting for your opponent to confirm the result...</p>
+                <div class="spinner-border text-warning" role="status"></div>
+            </div>
+        <% } %>
+
+        <!-- Confirm Opponent's Result -->
+        <% if (game.screenshot && game.player1 && game.player2) { %>
+            <% 
+                var currentUserId = user && user._id ? user._id.toString() : ''; 
+                var player1Id = game.player1 && game.player1._id ? game.player1._id.toString() : ''; 
+                var player2Id = game.player2 && game.player2._id ? game.player2._id.toString() : ''; 
+                var isPlayer1 = currentUserId && player1Id && currentUserId === player1Id; 
+                var isPlayer2 = currentUserId && player2Id && currentUserId === player2Id; 
+                var showConfirmation = false; 
+                if (game.player1Confirmed && isPlayer2) { showConfirmation = true; } 
+                if (game.player2Confirmed && isPlayer1) { showConfirmation = true; } 
+            %>
+            <% if (showConfirmation) { %>
+                <div class="glass-card mb-5 border-info border border-opacity-50 p-5 text-center shadow-lg" data-aos="fade-up">
+                    <i class="fas fa-question-circle fa-4x text-info mb-4"></i>
+                    <h3 class="text-white fw-bold mb-3">Opponent Uploaded Screenshot</h3>
+                    <p class="text-white-50 mb-4 text-center mx-auto" style="max-width: 500px;">Please verify and confirm if this result is correct. Dispute if the screenshot is invalid or fake.</p>
+
+                    <div class="mb-5">
+                        <button onclick="viewScreenshot()" class="btn btn-outline-info btn-lg rounded-pill px-4">
+                            <i class="fas fa-eye me-2"></i> View Screenshot
+                        </button>
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <button onclick="confirmResult(true)" class="btn btn-success btn-lg rounded-pill px-4 hover-lift">
+                            <i class="fas fa-check-circle me-2"></i> Yes, Confirm Result
+                        </button>
+                        <button onclick="confirmResult(false)" class="btn btn-danger btn-lg rounded-pill px-4 hover-lift">
+                            <i class="fas fa-times-circle me-2"></i> No, Dispute
+                        </button>
                     </div>
                 </div>
+            <% } %>
+        <% } %>
+
+        <!-- Game Completed -->
+        <% if (game.status === 'completed') { %>
+            <div class="glass-card mb-5 text-center p-5 border-primary border border-opacity-50 shadow-lg" style="background: linear-gradient(135deg, rgba(28, 200, 138, 0.1) 0%, rgba(23, 166, 115, 0.1) 100%);" data-aos="zoom-in">
+                <i class="fas fa-trophy fa-5x text-warning mb-4"></i>
+
+                <% if (game.adminVerified && game.winner) { %>
+                    <h2 class="text-success fw-bold mb-4">Game Completed!</h2>
+                    <div class="bg-dark bg-opacity-50 rounded-4 p-4 mb-4 d-inline-block border border-success border-opacity-25 shadow">
+                        <p class="text-success text-uppercase tracking-wider small fw-bold mb-2">Winner</p>
+                        <h1 class="display-4 fw-bold text-white mb-2 text-gradient">
+                            <%= game.winner.username || 'Unknown' %>
+                        </h1>
+                        <h3 class="text-warning fw-bold mb-0">₹<%= game.betAmount ? (game.betAmount * 2).toLocaleString() : '0' %></h3>
+                    </div>
+                <% } else { %>
+                    <i class="fas fa-hourglass-half fa-3x text-info mb-3 d-block"></i>
+                    <h3 class="text-white fw-bold mb-3">Waiting for Admin Verification</h3>
+                    <p class="text-white-50 max-w-md mx-auto">Both players confirmed. Admin will verify the screenshot and credit the winner shortly.</p>
                 <% } %>
 
-                    <!-- Waiting for Opponent Confirmation -->
-                    <% if (game.screenshot && !game.player1Confirmed && !game.player2Confirmed) { %>
-                        <div class="waiting-card mb-4">
-                            <div class="card-body text-center p-5">
-                                <i class="fas fa-clock fa-4x text-warning mb-4"></i>
-                                <h4 class="mb-3">Waiting for Opponent</h4>
-                                <p class="text-muted mb-3">Your screenshot has been uploaded. Waiting for opponent to
-                                    confirm...</p>
-                                <div class="spinner-border text-primary" role="status"></div>
-                            </div>
-                        </div>
-                        <% } %>
+                <% if (game.screenshot) { %>
+                    <div class="mt-4">
+                        <button onclick="viewScreenshot()" class="btn btn-outline-light rounded-pill px-4">
+                            <i class="fas fa-image me-2"></i> View Screenshot
+                        </button>
+                    </div>
+                <% } %>
+            </div>
+        <% } %>
 
-                            <!-- Confirm Opponent's Result - SIMPLIFIED VERSION -->
-                            <% if (game.screenshot && game.player1 && game.player2) { %>
-                                <% var currentUserId=user && user._id ? user._id.toString() : '' ; var
-                                    player1Id=game.player1 && game.player1._id ? game.player1._id.toString() : '' ; var
-                                    player2Id=game.player2 && game.player2._id ? game.player2._id.toString() : '' ; var
-                                    isPlayer1=currentUserId && player1Id && currentUserId===player1Id; var
-                                    isPlayer2=currentUserId && player2Id && currentUserId===player2Id; var
-                                    showConfirmation=false; if (game.player1Confirmed && isPlayer2) {
-                                    showConfirmation=true; } if (game.player2Confirmed && isPlayer1) {
-                                    showConfirmation=true; } %>
-                                    <% if (showConfirmation) { %>
-                                        <div class="confirm-card mb-4">
-                                            <div class="card-body text-center p-5">
-                                                <i class="fas fa-question-circle fa-4x text-info mb-4"></i>
-                                                <h4 class="mb-3">Opponent Has Uploaded Screenshot</h4>
-                                                <p class="text-muted mb-4">Please verify and confirm if this is correct
-                                                </p>
-
-                                                <div class="mb-4">
-                                                    <button onclick="viewScreenshot()" class="btn btn-info btn-lg me-2">
-                                                        <i class="fas fa-eye"></i> View Screenshot
-                                                    </button>
-                                                </div>
-
-                                                <div>
-                                                    <button onclick="confirmResult(true)"
-                                                        class="btn btn-success btn-lg mx-2">
-                                                        <i class="fas fa-check-circle"></i> Yes, Confirm
-                                                    </button>
-                                                    <button onclick="confirmResult(false)"
-                                                        class="btn btn-danger btn-lg mx-2">
-                                                        <i class="fas fa-times-circle"></i> No, Dispute
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <% } %>
-                                            <% } %>
-
-                                                <!-- Game Completed -->
-                                                <% if (game.status==='completed' ) { %>
-                                                    <div class="completed-card mb-4">
-                                                        <div class="card-body text-center p-5">
-                                                            <i class="fas fa-trophy fa-5x text-warning mb-4"></i>
-
-                                                            <% if (game.adminVerified && game.winner) { %>
-                                                                <h2 class="text-success mb-3">Game Completed!</h2>
-                                                                <div class="winner-box p-4 mb-4">
-                                                                    <h4 class="text-muted mb-2">Winner</h4>
-                                                                    <h1 class="display-4 fw-bold text-primary mb-2">
-                                                                        <%= game.winner.username || 'Unknown' %>
-                                                                    </h1>
-                                                                    <h3 class="text-success">₹<%= game.betAmount ?
-                                                                            (game.betAmount * 2).toLocaleString() : '0'
-                                                                            %>
-                                                                    </h3>
-                                                                </div>
-                                                                <% } else { %>
-                                                                    <i
-                                                                        class="fas fa-hourglass-half fa-3x text-info mb-3"></i>
-                                                                    <h4 class="mb-3">Waiting for Admin Verification</h4>
-                                                                    <p class="text-muted">Admin will verify the
-                                                                        screenshot and credit the winner soon.</p>
-                                                                    <% } %>
-
-                                                                        <% if (game.screenshot) { %>
-                                                                            <button onclick="viewScreenshot()"
-                                                                                class="btn btn-primary btn-lg mt-3">
-                                                                                <i class="fas fa-image"></i> View
-                                                                                Screenshot
-                                                                            </button>
-                                                                            <% } %>
-                                                        </div>
-                                                    </div>
-                                                    <% } %>
-
-                                                        <!-- Disputed Game -->
-                                                        <% if (game.status==='disputed' ) { %>
-                                                            <div class="disputed-card mb-4">
-                                                                <div class="card-body text-center p-5">
-                                                                    <i
-                                                                        class="fas fa-exclamation-triangle fa-5x text-danger mb-4"></i>
-                                                                    <h2 class="text-danger mb-3">Game Disputed</h2>
-                                                                    <p class="text-muted mb-4">Admin will review and
-                                                                        resolve this dispute soon.</p>
-                                                                    <% if (game.screenshot) { %>
-                                                                        <button onclick="viewScreenshot()"
-                                                                            class="btn btn-info btn-lg">
-                                                                            <i class="fas fa-eye"></i> View Screenshot
-                                                                        </button>
-                                                                        <% } %>
-                                                                </div>
-                                                            </div>
-                                                            <% } %>
-        </div>
+        <!-- Disputed Game -->
+        <% if (game.status === 'disputed') { %>
+            <div class="glass-card mb-5 border-danger border border-opacity-50 p-5 text-center" style="background: rgba(231, 74, 59, 0.1);" data-aos="shake">
+                <i class="fas fa-exclamation-triangle fa-5x text-danger mb-4"></i>
+                <h2 class="text-white fw-bold mb-3">Game Disputed</h2>
+                <p class="text-white-50 mb-4 mx-auto" style="max-width: 500px;">Players disagreed on the result. An admin will review the evidence and resolve this dispute soon.</p>
+                <% if (game.screenshot) { %>
+                    <button onclick="viewScreenshot()" class="btn btn-outline-danger btn-lg rounded-pill px-4">
+                        <i class="fas fa-eye me-2"></i> View Evidence
+                    </button>
+                <% } %>
+            </div>
+        <% } %>
     </div>
+</div>
 
-    <!-- Screenshot Modal -->
-    <div class="modal fade" id="screenshotModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Game Screenshot</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <img src="<%= game.screenshot %>" class="img-fluid rounded" alt="Game Screenshot">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
+<!-- Screenshot Modal -->
+<div class="modal fade" id="screenshotModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content glass-card border-0 shadow-lg">
+            <div class="modal-header border-bottom border-white-10">
+                <h5 class="modal-title text-white fw-bold"><i class="fas fa-image text-primary me-2"></i> Game Screenshot</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center p-4 bg-dark">
+                <img src="<%= game.screenshot %>" class="img-fluid rounded shadow" alt="Game Screenshot" style="max-height: 70vh; object-fit: contain;">
+            </div>
+            <div class="modal-footer border-top border-white-10">
+                <button type="button" class="btn btn-outline-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
+</div>
 
-    <style>
-        /* Game Play Container */
-        .game-play-container {
-            padding: 40px 0;
-            background: #f8f9fc;
-            min-height: calc(100vh - 76px);
-        }
+<style>
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: .7; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    .border-white-10 {
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    .border-white-20 {
+        border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+    .border-dashed {
+        border-style: dashed !important;
+    }
+    .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
+    }
+</style>
 
-        /* Room Card */
-        .room-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-        }
+<script>
+    var gameId = '<%= game._id %>';
 
-        /* Info Cards */
-        .info-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
+    // Upload screenshot
+    var screenshotForm = document.getElementById('screenshotForm');
+    if (screenshotForm) {
+        screenshotForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
 
-        .info-card i {
-            font-size: 2rem;
-        }
+            var formData = new FormData();
+            var screenshotFile = document.getElementById('screenshot').files[0];
 
-        /* Player Cards */
-        .player-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            height: 100%;
-        }
-
-        .player-card.confirmed {
-            border-color: #1cc88a;
-            background: #f0fff4;
-        }
-
-        .player-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        /* Instructions Card */
-        .instructions-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        .instruction-step {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .step-number {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            background: #667eea;
-            color: white;
-            border-radius: 50%;
-            line-height: 40px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        /* Upload Card */
-        .upload-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        /* Waiting Card */
-        .waiting-card {
-            background: #fff3cd;
-            border: 2px solid #ffeeba;
-            border-radius: 15px;
-        }
-
-        /* Confirm Card */
-        .confirm-card {
-            background: #d4edda;
-            border: 2px solid #c3e6cb;
-            border-radius: 15px;
-        }
-
-        /* Completed Card */
-        .completed-card {
-            background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);
-            border-radius: 15px;
-            color: white;
-        }
-
-        .winner-box {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            display: inline-block;
-            padding: 20px 40px;
-        }
-
-        /* Disputed Card */
-        .disputed-card {
-            background: #f8d7da;
-            border: 2px solid #f5c6cb;
-            border-radius: 15px;
-        }
-
-        /* Badge */
-        .game-status-badge .badge {
-            font-size: 1rem;
-            padding: 10px 20px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .room-card .display-1 {
-                font-size: 3rem;
-            }
-
-            .info-card {
-                margin-bottom: 15px;
-            }
-
-            .player-card {
-                margin-bottom: 15px;
-            }
-
-            .instruction-step {
-                margin-bottom: 15px;
-            }
-        }
-    </style>
-
-    <script>
-        var gameId = '<%= game._id %>';
-
-        // Upload screenshot
-        var screenshotForm = document.getElementById('screenshotForm');
-        if (screenshotForm) {
-            screenshotForm.addEventListener('submit', async function (e) {
-                e.preventDefault();
-
-                var formData = new FormData();
-                var screenshotFile = document.getElementById('screenshot').files[0];
-
-                if (!screenshotFile) {
-                    alert('Please select a screenshot file');
-                    return;
-                }
-
-                formData.append('screenshot', screenshotFile);
-
-                var statusDiv = document.getElementById('uploadStatus');
-                statusDiv.innerHTML = '<div class="spinner-border text-primary"></div> Uploading...';
-
-                try {
-                    var res = await fetch('/games/' + gameId + '/result', {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    if (res.redirected) {
-                        window.location.href = res.url;
-                    } else {
-                        var data = await res.json();
-                        if (data.error) {
-                            statusDiv.innerHTML = '<div class="alert alert-danger">' + data.error + '</div>';
-                        } else {
-                            location.reload();
-                        }
-                    }
-                } catch (error) {
-                    console.error('Upload error:', error);
-                    statusDiv.innerHTML = '<div class="alert alert-danger">Upload failed. Please try again.</div>';
-                }
-            });
-        }
-
-        // Confirm result
-        async function confirmResult(confirmValue) {
-            if (!confirmValue && !confirm('Are you sure you want to dispute this game? This will notify admin.')) {
+            if (!screenshotFile) {
+                alert('Please select a screenshot file');
                 return;
             }
 
+            formData.append('screenshot', screenshotFile);
+
+            var statusDiv = document.getElementById('uploadStatus');
+            statusDiv.innerHTML = '<div class="spinner-border text-primary spinner-border-sm me-2"></div><span class="text-white-50">Uploading...</span>';
+
             try {
-                var res = await fetch('/games/' + gameId + '/confirm', {
+                var res = await fetch('/games/' + gameId + '/result', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ confirm: confirmValue })
+                    body: formData
                 });
 
-                var data = await res.json();
-                if (data.success) {
-                    if (data.bothConfirmed) {
-                        alert('✅ Both players confirmed! Game will be sent for admin verification.');
-                    }
-                    location.reload();
+                if (res.redirected) {
+                    window.location.href = res.url;
                 } else {
-                    alert('Error: ' + (data.error || 'Unknown error'));
-                }
-            } catch (error) {
-                console.error('Confirm error:', error);
-                alert('Failed to confirm. Please try again.');
-            }
-        }
-
-        // Copy room ID
-        function copyRoomId() {
-            var roomId = '<%= game.roomId %>';
-            navigator.clipboard.writeText(roomId).then(function () {
-                var btn = event.currentTarget;
-                var originalText = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check me-2"></i> Copied!';
-                setTimeout(function () {
-                    btn.innerHTML = originalText;
-                }, 2000);
-            }).catch(function (err) {
-                alert('Failed to copy. Please copy manually: ' + roomId);
-            });
-        }
-
-        // View screenshot
-        function viewScreenshot() {
-            var modal = new bootstrap.Modal(document.getElementById('screenshotModal'));
-            modal.show();
-        }
-
-        // Auto-refresh to check status
-        var refreshCount = 0;
-
-        var interval = setInterval(async function () {
-            refreshCount++;
-
-            try {
-                var res = await fetch('/games/status/' + gameId);
-                var data = await res.json();
-
-                if (data.success) {
-                    var gameData = data.game;
-
-                    if (gameData.status === 'completed' || gameData.bothConfirmed) {
-                        clearInterval(interval);
+                    var data = await res.json();
+                    if (data.error) {
+                        statusDiv.innerHTML = '<div class="alert bg-danger bg-opacity-25 text-danger border-danger border border-opacity-50 rounded-pill"><i class="fas fa-exclamation-circle me-2"></i>' + data.error + '</div>';
+                    } else {
                         location.reload();
                     }
                 }
             } catch (error) {
-                console.error('Status check error:', error);
+                console.error('Upload error:', error);
+                statusDiv.innerHTML = '<div class="alert bg-danger bg-opacity-25 text-danger border-danger border border-opacity-50 rounded-pill"><i class="fas fa-exclamation-circle me-2"></i>Upload failed. Please try again.</div>';
             }
-        }, 5000);
-
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', function () {
-            clearInterval(interval);
         });
+    }
 
-// Show waiting message if needed
-<% if (game && game.status === 'waiting') { %>
-            setTimeout(function () {
-                if (confirm('Still waiting for opponent? Click OK to go back to games.')) {
-                    window.location.href = '/games';
+    // Confirm result
+    async function confirmResult(confirmValue) {
+        if (!confirmValue && !confirm('Are you sure you want to dispute this game? This will notify admin.')) {
+            return;
+        }
+
+        try {
+            var res = await fetch('/games/' + gameId + '/confirm', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ confirm: confirmValue })
+            });
+
+            var data = await res.json();
+            if (data.success) {
+                if (data.bothConfirmed) {
+                    alert('✅ Both players confirmed! Game will be sent for admin verification.');
                 }
-            }, 30000);
-<% } %>
-    </script>
+                location.reload();
+            } else {
+                alert('Error: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Confirm error:', error);
+            alert('Failed to confirm. Please try again.');
+        }
+    }
 
-    <%- include('../partials/footer') %>
+    // Copy room ID
+    function copyRoomId() {
+        var roomId = '<%= game.roomId %>';
+        navigator.clipboard.writeText(roomId).then(function () {
+            var btn = event.currentTarget;
+            var originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check me-2"></i> Copied!';
+            btn.classList.add('bg-success', 'border-success');
+            setTimeout(function () {
+                btn.innerHTML = originalText;
+                btn.classList.remove('bg-success', 'border-success');
+            }, 2000);
+        }).catch(function (err) {
+            alert('Failed to copy. Please copy manually: ' + roomId);
+        });
+    }
+
+    // View screenshot
+    function viewScreenshot() {
+        var modal = new bootstrap.Modal(document.getElementById('screenshotModal'));
+        modal.show();
+    }
+
+    // Auto-refresh to check status
+    var refreshCount = 0;
+
+    var interval = setInterval(async function () {
+        refreshCount++;
+
+        try {
+            var res = await fetch('/games/status/' + gameId);
+            var data = await res.json();
+
+            if (data.success) {
+                var gameData = data.game;
+
+                if (gameData.status === 'completed' || gameData.bothConfirmed) {
+                    clearInterval(interval);
+                    location.reload();
+                }
+            }
+        } catch (error) {
+            console.error('Status check error:', error);
+        }
+    }, 5000);
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', function () {
+        clearInterval(interval);
+    });
+
+    // Show waiting message if needed
+    <% if (game && game.status === 'waiting') { %>
+        setTimeout(function () {
+            if (confirm('Still waiting for opponent? Click OK to go back to games.')) {
+                window.location.href = '/games';
+            }
+        }, 30000);
+    <% } %>
+</script>
+
+<%- include('../partials/footer') %>

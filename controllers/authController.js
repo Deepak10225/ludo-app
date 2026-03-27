@@ -238,6 +238,28 @@ class AuthController {
             res.redirect('/profile');
         }
     }
+
+    // Update avatar
+    async updateAvatar(req, res) {
+        try {
+            if (!req.file) {
+                req.flash('error_msg', 'Please select an image to upload');
+                return res.redirect('/profile');
+            }
+
+            const avatarPath = `/uploads/${req.file.filename}`;
+            const user = await User.findById(req.session.user.id);
+            user.avatar = avatarPath;
+            await user.save();
+
+            req.flash('success_msg', 'Avatar updated successfully');
+            res.redirect('/profile');
+        } catch (error) {
+            console.error('Avatar update error:', error);
+            req.flash('error_msg', 'Error uploading avatar');
+            res.redirect('/profile');
+        }
+    }
 }
 
 module.exports = new AuthController();

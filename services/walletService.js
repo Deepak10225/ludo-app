@@ -22,7 +22,14 @@ class WalletService {
 
         user.walletBalance += amount;
         await user.save();
-        await transaction.save();
+
+        try {
+            await transaction.save();
+        } catch (error) {
+            user.walletBalance -= amount;
+            await user.save();
+            throw new Error('Transaction failed to save. Deposit cancelled.');
+        }
 
         return transaction;
     }
@@ -47,7 +54,14 @@ class WalletService {
 
         user.walletBalance -= amount;
         await user.save();
-        await transaction.save();
+        
+        try {
+            await transaction.save();
+        } catch (error) {
+            user.walletBalance += amount;
+            await user.save();
+            throw new Error('Transaction failed to save. Withdrawal cancelled.');
+        }
 
         return transaction;
     }
@@ -71,7 +85,14 @@ class WalletService {
 
         user.walletBalance -= amount;
         await user.save();
-        await transaction.save();
+        
+        try {
+            await transaction.save();
+        } catch (error) {
+            user.walletBalance += amount;
+            await user.save();
+            throw new Error('Transaction failed to save. Bet cancelled.');
+        }
 
         return transaction;
     }
@@ -100,7 +121,13 @@ class WalletService {
 
         user.walletBalance += winnerAmount;
         await user.save();
-        await transaction.save();
+        try {
+            await transaction.save();
+        } catch (error) {
+            user.walletBalance -= winnerAmount;
+            await user.save();
+            throw new Error('Transaction failed to save. Winnings credit reverted.');
+        }
 
         // ✅ Record platform commission
         const platformCommission = winningsData.platformCommission;
@@ -145,7 +172,13 @@ class WalletService {
 
         user.walletBalance += amount;
         await user.save();
-        await transaction.save();
+        try {
+            await transaction.save();
+        } catch (error) {
+            user.walletBalance -= amount;
+            await user.save();
+            throw new Error('Transaction failed to save. Refund cancelled.');
+        }
 
         return transaction;
     }

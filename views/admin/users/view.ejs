@@ -89,21 +89,23 @@
 
                 <div class="col-md-4">
                     <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold">Wallet & Stats</h6>
+                        <div class="card-header py-3 bg-gradient-primary text-white">
+                            <h6 class="m-0 font-weight-bold">Wallet & Gamification</h6>
                         </div>
                         <div class="card-body">
-                            <div class="wallet-card">
+                            <div class="wallet-card mb-3">
                                 <div class="wallet-balance">
                                     <span class="label">Wallet Balance</span>
                                     <span class="value">₹<%= user.walletBalance.toFixed(2) %></span>
                                 </div>
                                 <div class="stats-grid">
                                     <div class="stat">
-                                        <span class="stat-value">
-                                            <%= user.totalGames || 0 %>
-                                        </span>
-                                        <span class="stat-label">Total Games</span>
+                                        <span class="stat-value">Lvl <%= user.level %></span>
+                                        <span class="stat-label">Level</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-value"><%= user.xp %></span>
+                                        <span class="stat-label">Total XP</span>
                                     </div>
                                     <div class="stat">
                                         <span class="stat-value">
@@ -111,17 +113,27 @@
                                         </span>
                                         <span class="stat-label">Wins</span>
                                     </div>
-                                    <div class="stat">
-                                        <span class="stat-value">
-                                            <%= ((user.totalWins || 0) / (user.totalGames || 1) * 100).toFixed(1) %>%
-                                        </span>
-                                        <span class="stat-label">Win Rate</span>
+                                </div>
+                            </div>
+
+                            <!-- Balance Adjustment Form -->
+                            <div class="p-3 border rounded shadow-sm bg-light">
+                                <h6 class="fw-bold mb-3"><i class="fas fa-coins me-2"></i>Adjust Balance</h6>
+                                <form action="/admin/users/<%= user._id %>/adjust-balance" method="POST">
+                                    <div class="mb-2">
+                                        <div class="input-group">
+                                            <select name="type" class="form-select form-select-sm" style="max-width: 100px;">
+                                                <option value="add">Add (+)</option>
+                                                <option value="subtract">Sub (-)</option>
+                                            </select>
+                                            <input type="number" name="amount" class="form-control form-control-sm" placeholder="Amount" step="0.01" required>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="earnings">
-                                    <span class="label">Total Earnings</span>
-                                    <span class="value text-success">₹<%= (user.totalEarnings || 0).toFixed(2) %></span>
-                                </div>
+                                    <div class="mb-2">
+                                        <input type="text" name="reason" class="form-control form-control-sm" placeholder="Reason (e.g. Compensation)" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-dark w-100">Apply Adjustment</button>
+                                </form>
                             </div>
                         </div>
                     </div>

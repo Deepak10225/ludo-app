@@ -23,9 +23,12 @@ router.post('/register', [
 // Logout
 router.get('/logout', isAuthenticated, authController.logout);
 
+const { upload, handleUploadError } = require('../middleware/upload');
+
 // Profile routes
 router.get('/profile', isAuthenticated, authController.showProfile);
 router.post('/profile', isAuthenticated, authController.updateProfile);
+router.post('/profile/avatar', isAuthenticated, upload.single('avatar'), authController.updateAvatar, handleUploadError);
 
 // Home route
 router.get('/', (req, res) => {

@@ -1,712 +1,296 @@
 <%- include('../partials/header') %>
 
-    <div class="transactions-container">
-        <div class="container">
-            <!-- Header -->
-            <div class="transactions-header">
-                <div class="row align-items-center">
-                    <div class="col-md-6">
-                        <a href="/wallet" class="back-link">
-                            <i class="fas fa-arrow-left"></i> Back to Wallet
-                        </a>
-                        <h1 class="transactions-title">Transaction History</h1>
-                        <p class="transactions-subtitle">View all your financial activities</p>
-                    </div>
-                    <div class="col-md-6 text-md-end">
-                        <div class="balance-summary">
-                            <span>Current Balance:</span>
-                            <strong>₹<%= user.walletBalance.toFixed(2) %></strong>
-                        </div>
-                    </div>
-                </div>
+<div class="transactions-container" style="min-height: 100vh; padding: 100px 0; position: relative;">
+    <div class="hero-bg"></div>
+    <div class="container">
+        <!-- Header -->
+        <div class="row align-items-center mb-5" data-aos="fade-down">
+            <div class="col-md-7">
+                <a href="/wallet" class="btn btn-outline-light rounded-pill mb-3">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Wallet
+                </a>
+                <h1 class="fw-bold text-white mb-2">
+                    <i class="fas fa-history text-gradient me-2"></i> Transaction History
+                </h1>
+                <p class="text-white-50 fs-5 mb-0">Track all your wallet activities</p>
             </div>
-
-            <!-- Summary Cards -->
-            <div class="summary-cards">
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="summary-card deposits">
-                            <div class="summary-icon">
-                                <i class="fas fa-arrow-down"></i>
-                            </div>
-                            <div class="summary-details">
-                                <span class="summary-label">Total Deposits</span>
-                                <span class="summary-value">₹<%= (summary.totalDeposits || 0).toFixed(2) %></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="summary-card withdrawals">
-                            <div class="summary-icon">
-                                <i class="fas fa-arrow-up"></i>
-                            </div>
-                            <div class="summary-details">
-                                <span class="summary-label">Total Withdrawals</span>
-                                <span class="summary-value">₹<%= (summary.totalWithdrawals || 0).toFixed(2) %></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="summary-card bets">
-                            <div class="summary-icon">
-                                <i class="fas fa-gamepad"></i>
-                            </div>
-                            <div class="summary-details">
-                                <span class="summary-label">Total Bets</span>
-                                <span class="summary-value">₹<%= (summary.totalBets || 0).toFixed(2) %></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="summary-card wins">
-                            <div class="summary-icon">
-                                <i class="fas fa-trophy"></i>
-                            </div>
-                            <div class="summary-details">
-                                <span class="summary-label">Total Wins</span>
-                                <span class="summary-value">₹<%= (summary.totalWins || 0).toFixed(2) %></span>
-                            </div>
-                        </div>
-                    </div>
+            <div class="col-md-5 text-md-end mt-4 mt-md-0">
+                <div class="glass-card p-3 rounded-pill d-inline-flex align-items-center border-primary border border-opacity-50">
+                    <span class="text-white-50 me-3">Current Balance</span>
+                    <span class="fs-4 fw-bold text-gradient">₹<%= user.walletBalance.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></span>
                 </div>
-            </div>
-
-            <!-- Filters -->
-            <div class="filters-card">
-                <div class="row align-items-center">
-                    <div class="col-md-4">
-                        <select class="form-control filter-select" id="typeFilter">
-                            <option value="all">All Transactions</option>
-                            <option value="deposit">Deposits</option>
-                            <option value="withdrawal">Withdrawals</option>
-                            <option value="bet">Bets</option>
-                            <option value="win">Wins</option>
-                            <option value="refund">Refunds</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <select class="form-control filter-select" id="statusFilter">
-                            <option value="all">All Status</option>
-                            <option value="completed">Completed</option>
-                            <option value="pending">Pending</option>
-                            <option value="failed">Failed</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="date-range">
-                            <input type="date" class="form-control" id="startDate" placeholder="Start Date">
-                            <span>to</span>
-                            <input type="date" class="form-control" id="endDate" placeholder="End Date">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Transactions List -->
-            <div class="transactions-card">
-                <% if (transactions && transactions.length> 0) { %>
-                    <div class="transactions-list">
-                        <% transactions.forEach(transaction=> { %>
-                            <div class="transaction-item" data-type="<%= transaction.type %>"
-                                data-status="<%= transaction.status %>"
-                                data-date="<%= new Date(transaction.createdAt).toISOString().split('T')[0] %>">
-
-                                <div class="transaction-icon <%= transaction.type %>">
-                                    <% if (transaction.type==='deposit' ) { %>
-                                        <i class="fas fa-arrow-down"></i>
-                                        <% } else if (transaction.type==='withdrawal' ) { %>
-                                            <i class="fas fa-arrow-up"></i>
-                                            <% } else if (transaction.type==='bet' ) { %>
-                                                <i class="fas fa-gamepad"></i>
-                                                <% } else if (transaction.type==='win' ) { %>
-                                                    <i class="fas fa-trophy"></i>
-                                                    <% } else if (transaction.type==='refund' ) { %>
-                                                        <i class="fas fa-undo-alt"></i>
-                                                        <% } %>
-                                </div>
-
-                                <div class="transaction-details">
-                                    <div class="transaction-header">
-                                        <h4 class="transaction-title">
-                                            <%= transaction.description || transaction.type.charAt(0).toUpperCase() +
-                                                transaction.type.slice(1) %>
-                                        </h4>
-                                        <span class="transaction-id">ID: <%= transaction._id.toString().slice(-8) %>
-                                        </span>
-                                    </div>
-
-                                    <div class="transaction-meta">
-                                        <span class="transaction-date">
-                                            <i class="far fa-calendar"></i>
-                                            <%= new Date(transaction.createdAt).toLocaleDateString('en-IN', {
-                                                day: 'numeric' , month: 'short' , year: 'numeric' , hour: '2-digit' ,
-                                                minute: '2-digit' }) %>
-                                        </span>
-
-                                        <% if (transaction.game) { %>
-                                            <span class="transaction-game">
-                                                <i class="fas fa-dice"></i>
-                                                Game #<%= transaction.game.roomId ||
-                                                    transaction.game.toString().slice(-6) %>
-                                            </span>
-                                            <% } %>
-                                    </div>
-
-                                    <% if (transaction.paymentMethod) { %>
-                                        <div class="transaction-payment">
-                                            <i class="fas fa-credit-card"></i>
-                                            <%= transaction.paymentMethod %>
-                                        </div>
-                                        <% } %>
-                                </div>
-
-                                <div class="transaction-amount-section">
-                                    <div class="transaction-amount <%= transaction.type %>">
-                                        <%= transaction.type==='withdrawal' || transaction.type==='bet' ? '-' : '+' %>
-                                            ₹<%= transaction.amount.toFixed(2) %>
-                                    </div>
-                                    <div class="transaction-balance">
-                                        Balance: ₹<%= transaction.balanceAfter.toFixed(2) %>
-                                    </div>
-                                    <div class="transaction-status">
-                                        <span class="status-badge <%= transaction.status %>">
-                                            <%= transaction.status %>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <% }) %>
-                    </div>
-
-                    <!-- Pagination -->
-                    <% if (pagination && pagination.pages> 1) { %>
-                        <nav class="pagination-nav">
-                            <ul class="pagination">
-                                <li class="page-item <%= pagination.page === 1 ? 'disabled' : '' %>">
-                                    <a class="page-link" href="?page=<%= pagination.page - 1 %>">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </a>
-                                </li>
-
-                                <% for(let i=1; i <=pagination.pages; i++) { %>
-                                    <li class="page-item <%= pagination.page === i ? 'active' : '' %>">
-                                        <a class="page-link" href="?page=<%= i %>">
-                                            <%= i %>
-                                        </a>
-                                    </li>
-                                    <% } %>
-
-                                        <li
-                                            class="page-item <%= pagination.page === pagination.pages ? 'disabled' : '' %>">
-                                            <a class="page-link" href="?page=<%= pagination.page + 1 %>">
-                                                <i class="fas fa-chevron-right"></i>
-                                            </a>
-                                        </li>
-                            </ul>
-                        </nav>
-                        <% } %>
-                            <% } else { %>
-                                <div class="empty-state">
-                                    <i class="fas fa-exchange-alt fa-4x text-muted mb-4"></i>
-                                    <h3>No Transactions Yet</h3>
-                                    <p class="text-muted">Your transaction history will appear here</p>
-                                    <a href="/games" class="btn btn-primary mt-3">
-                                        <i class="fas fa-gamepad me-2"></i>Start Playing
-                                    </a>
-                                </div>
-                                <% } %>
             </div>
         </div>
+
+        <!-- Summary Cards -->
+        <div class="row g-4 mb-5" data-aos="fade-up">
+            <!-- Total Deposits -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="glass-card p-4 h-100" style="border-left: 4px solid #1cc88a !important; border-radius: 16px;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-success bg-gradient bg-opacity-25 rounded p-3 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-arrow-down text-white fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="text-white-50 small text-uppercase">Deposits</div>
+                            <div class="fs-4 fw-bold text-white">₹<%= (summary?.totalDeposits || 0).toLocaleString('en-IN') %></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Total Withdrawals -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="glass-card p-4 h-100" style="border-left: 4px solid #e74a3b !important; border-radius: 16px;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-danger bg-gradient bg-opacity-25 rounded p-3 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-arrow-up text-white fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="text-white-50 small text-uppercase">Withdrawals</div>
+                            <div class="fs-4 fw-bold text-white">₹<%= (summary?.totalWithdrawals || 0).toLocaleString('en-IN') %></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Total Bets -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="glass-card p-4 h-100" style="border-left: 4px solid #f6c23e !important; border-radius: 16px;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-warning bg-gradient bg-opacity-25 rounded p-3 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-gamepad text-white fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="text-white-50 small text-uppercase">Total Bets</div>
+                            <div class="fs-4 fw-bold text-white">₹<%= (summary?.totalBets || 0).toLocaleString('en-IN') %></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Total Wins -->
+            <div class="col-sm-6 col-lg-3">
+                <div class="glass-card p-4 h-100" style="border-left: 4px solid #667eea !important; border-radius: 16px;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-primary bg-gradient bg-opacity-25 rounded p-3 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-trophy text-white fs-4"></i>
+                        </div>
+                        <div>
+                            <div class="text-white-50 small text-uppercase">Total Wins</div>
+                            <div class="fs-4 fw-bold text-white">₹<%= (summary?.totalWins || 0).toLocaleString('en-IN') %></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="glass-card p-4 mb-5 shadow" data-aos="fade-up" data-aos-delay="100">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <select class="form-select bg-dark text-white py-2 custom-select" id="typeFilter" style="border-color: rgba(255,255,255,0.2);">
+                        <option value="all">All Transactions</option>
+                        <option value="deposit">Deposits</option>
+                        <option value="withdrawal">Withdrawals</option>
+                        <option value="bet">Bets</option>
+                        <option value="win">Wins</option>
+                        <option value="refund">Refunds</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select bg-dark text-white py-2 custom-select" id="statusFilter" style="border-color: rgba(255,255,255,0.2);">
+                        <option value="all">All Statuses</option>
+                        <option value="completed">Completed</option>
+                        <option value="pending">Pending</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="date" class="form-control bg-dark text-white py-2 shadow-none" id="startDate" placeholder="Start Date" style="border-color: rgba(255,255,255,0.2);">
+                        <span class="input-group-text bg-dark text-white-50" style="border-color: rgba(255,255,255,0.2);">to</span>
+                        <input type="date" class="form-control bg-dark text-white py-2 shadow-none" id="endDate" placeholder="End Date" style="border-color: rgba(255,255,255,0.2);">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions List -->
+        <div class="glass-card p-4 p-md-5 shadow-lg" data-aos="fade-up" data-aos-delay="200">
+            <% if (transactions && transactions.length > 0) { %>
+                <div class="d-flex flex-column gap-3" id="transactionList">
+                    <% transactions.forEach(transaction => { %>
+                        <div class="transaction-item bg-dark bg-opacity-50 rounded-4 p-4 d-flex flex-column flex-md-row align-items-md-center hover-lift position-relative overflow-hidden" 
+                            style="border: 1px solid rgba(255,255,255,0.1);"
+                            data-type="<%= transaction.type %>"
+                            data-status="<%= transaction.status %>"
+                            data-date="<%= new Date(transaction.createdAt).toISOString().split('T')[0] %>">
+                            
+                            <!-- Color accent line -->
+                            <div class="position-absolute top-0 start-0 h-100" style="width: 4px;
+                                <%= transaction.type === 'deposit' ? 'background: #1cc88a;' : '' %>
+                                <%= transaction.type === 'withdrawal' ? 'background: #e74a3b;' : '' %>
+                                <%= transaction.type === 'bet' ? 'background: #f6c23e;' : '' %>
+                                <%= transaction.type === 'win' ? 'background: #667eea;' : '' %>
+                                <%= transaction.type === 'refund' ? 'background: #36b9cc;' : '' %>
+                            "></div>
+
+                            <!-- Icon -->
+                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 mb-3 mb-md-0 me-md-4 shadow ms-2" style="width: 60px; height: 60px; font-size: 1.5rem;
+                                <%= transaction.type === 'deposit' ? 'background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%); color: white;' : '' %>
+                                <%= transaction.type === 'withdrawal' ? 'background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%); color: white;' : '' %>
+                                <%= transaction.type === 'bet' ? 'background: linear-gradient(135deg, #f6c23e 0%, #d4ac0d 100%); color: white;' : '' %>
+                                <%= transaction.type === 'win' ? 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;' : '' %>
+                                <%= transaction.type === 'refund' ? 'background: linear-gradient(135deg, #36b9cc 0%, #258391 100%); color: white;' : '' %>
+                            ">
+                                <% if (transaction.type === 'deposit') { %><i class="fas fa-arrow-down"></i><% } %>
+                                <% if (transaction.type === 'withdrawal') { %><i class="fas fa-arrow-up"></i><% } %>
+                                <% if (transaction.type === 'bet') { %><i class="fas fa-gamepad"></i><% } %>
+                                <% if (transaction.type === 'win') { %><i class="fas fa-trophy"></i><% } %>
+                                <% if (transaction.type === 'refund') { %><i class="fas fa-undo-alt"></i><% } %>
+                            </div>
+
+                            <!-- Details -->
+                            <div class="flex-grow-1 mb-3 mb-md-0">
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <h5 class="text-white fw-bold mb-0">
+                                        <%= transaction.description || transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1) %>
+                                    </h5>
+                                    <span class="badge bg-dark border text-white-50 font-monospace" style="font-size: 0.7rem; border-color: rgba(255,255,255,0.1) !important;">ID: <%= transaction._id.toString().slice(-8).toUpperCase() %></span>
+                                </div>
+                                <div class="d-flex flex-wrap gap-3 text-white-50 small mt-2">
+                                    <div><i class="far fa-calendar-alt me-1 text-primary"></i> <%= new Date(transaction.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></div>
+                                    <% if (transaction.game) { %>
+                                        <div><i class="fas fa-dice me-1 text-warning"></i> Room: <%= transaction.game.roomId || transaction.game.toString().slice(-6) %></div>
+                                    <% } %>
+                                    <% if (transaction.paymentMethod) { %>
+                                        <div><i class="fas fa-credit-card me-1 text-info"></i> <%= transaction.paymentMethod.toUpperCase() %></div>
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <!-- Amount & Status Container -->
+                            <div class="text-start text-md-end ms-md-auto d-flex flex-row flex-md-column justify-content-between align-items-center align-items-md-end border-top border-md-0 pt-3 pt-md-0 mt-3 mt-md-0" style="border-color: rgba(255,255,255,0.1) !important;">
+                                <div class="text-end me-3 me-md-0 mb-md-2">
+                                    <div class="fs-4 fw-bold mb-0 <%= (transaction.type === 'withdrawal' || transaction.type === 'bet') ? 'text-danger' : 'text-success' %>">
+                                        <%= (transaction.type === 'withdrawal' || transaction.type === 'bet') ? '-' : '+' %>₹<%= transaction.amount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) %>
+                                    </div>
+                                    <div class="text-white-50 small font-monospace">Bal: ₹<%= transaction.balanceAfter ? transaction.balanceAfter.toLocaleString('en-IN', {minimumFractionDigits: 2}) : '0.00' %></div>
+                                </div>
+                                <span class="badge rounded-pill align-self-center align-self-md-end px-3 py-2 fs-6
+                                    <%= transaction.status === 'completed' ? 'bg-success bg-opacity-25 text-success border border-success' : '' %>
+                                    <%= transaction.status === 'pending' ? 'bg-warning bg-opacity-25 text-warning border border-warning' : '' %>
+                                    <%= transaction.status === 'failed' ? 'bg-danger bg-opacity-25 text-danger border border-danger' : '' %>
+                                ">
+                                    <%= transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1) %>
+                                </span>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+
+                <!-- Pagination -->
+                <% if (pagination && pagination.pages > 1) { %>
+                    <nav class="mt-5" aria-label="Transactions pagination">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item <%= pagination.page === 1 ? 'disabled' : '' %>">
+                                <a class="page-link bg-dark text-white hover-bg-primary" style="border-color: rgba(255,255,255,0.2);" href="?page=<%= pagination.page - 1 %>">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+
+                            <% for(let i = 1; i <= pagination.pages; i++) { %>
+                                <li class="page-item <%= pagination.page === i ? 'active' : '' %>">
+                                    <a class="page-link <%= pagination.page === i ? 'bg-primary border-primary text-white' : 'bg-dark text-white hover-bg-primary' %>" style="<%= pagination.page !== i ? 'border-color: rgba(255,255,255,0.2) !important;' : '' %>" href="?page=<%= i %>">
+                                        <%= i %>
+                                    </a>
+                                </li>
+                            <% } %>
+
+                            <li class="page-item <%= pagination.page === pagination.pages ? 'disabled' : '' %>">
+                                <a class="page-link bg-dark text-white hover-bg-primary" style="border-color: rgba(255,255,255,0.2);" href="?page=<%= pagination.page + 1 %>">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                <% } %>
+            <% } else { %>
+                <div class="text-center py-5">
+                    <div class="bg-dark bg-opacity-50 rounded-circle d-inline-flex align-items-center justify-content-center mb-4 border" style="width: 120px; height: 120px; border-color: rgba(255,255,255,0.1) !important;">
+                        <i class="fas fa-exchange-alt fa-4x text-white-50 opacity-50"></i>
+                    </div>
+                    <h3 class="text-white fw-bold mb-3">No Transactions Found</h3>
+                    <p class="text-white-50 mb-4 max-w-md mx-auto">You haven't made any transactions yet or no transactions match your current filters.</p>
+                    <a href="/wallet" class="btn btn-outline-light rounded-pill px-4 hover-lift">
+                        <i class="fas fa-wallet me-2"></i> View Wallet
+                    </a>
+                </div>
+            <% } %>
+        </div>
     </div>
-
-    <style>
-        /* Summary Cards */
-        .summary-cards {
-            margin-bottom: 30px;
-        }
-
-        .summary-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
-
-        .summary-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .summary-card.deposits {
-            border-left: 4px solid #1cc88a;
-        }
-
-        .summary-card.withdrawals {
-            border-left: 4px solid #e74a3b;
-        }
-
-        .summary-card.bets {
-            border-left: 4px solid #f6c23e;
-        }
-
-        .summary-card.wins {
-            border-left: 4px solid #667eea;
-        }
-
-        .summary-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: white;
-        }
-
-        .summary-card.deposits .summary-icon {
-            background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);
-        }
-
-        .summary-card.withdrawals .summary-icon {
-            background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%);
-        }
-
-        .summary-card.bets .summary-icon {
-            background: linear-gradient(135deg, #f6c23e 0%, #d4ac0d 100%);
-        }
-
-        .summary-card.wins .summary-icon {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .summary-details {
-            flex: 1;
-        }
-
-        .summary-label {
-            display: block;
-            font-size: 0.85rem;
-            color: #999;
-            margin-bottom: 5px;
-        }
-
-        .summary-value {
-            display: block;
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #333;
-        }
-
-        /* Rest of your existing styles */
-        .transactions-container {
-            padding: 40px 0;
-            background: #f8f9fc;
-            min-height: calc(100vh - 76px);
-        }
-
-        .transactions-header {
-            margin-bottom: 30px;
-        }
-
-        .back-link {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 0.95rem;
-            display: inline-block;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .back-link:hover {
-            transform: translateX(-5px);
-            color: #764ba2;
-        }
-
-        .transactions-title {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .transactions-subtitle {
-            color: #666;
-            font-size: 1.1rem;
-        }
-
-        .balance-summary {
-            background: white;
-            padding: 15px 25px;
-            border-radius: 12px;
-            display: inline-block;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        .balance-summary span {
-            color: #666;
-            margin-right: 10px;
-        }
-
-        .balance-summary strong {
-            font-size: 1.3rem;
-            color: #667eea;
-        }
-
-        .filters-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        .filter-select {
-            padding: 10px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            background: #f8f9fc;
-        }
-
-        .filter-select:focus {
-            border-color: #667eea;
-            outline: none;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
-        }
-
-        .date-range {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .date-range input {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 0.95rem;
-        }
-
-        .date-range span {
-            color: #666;
-            font-weight: 500;
-        }
-
-        .transactions-card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .transactions-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .transaction-item {
-            display: flex;
-            align-items: flex-start;
-            padding: 20px;
-            background: #f8f9fc;
-            border-radius: 15px;
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
-        }
-
-        .transaction-item:hover {
-            transform: translateX(5px);
-            background: #f0f2f5;
-        }
-
-        .transaction-item[data-type="deposit"] {
-            border-left-color: #1cc88a;
-        }
-
-        .transaction-item[data-type="withdrawal"] {
-            border-left-color: #e74a3b;
-        }
-
-        .transaction-item[data-type="bet"] {
-            border-left-color: #f6c23e;
-        }
-
-        .transaction-item[data-type="win"] {
-            border-left-color: #667eea;
-        }
-
-        .transaction-item[data-type="refund"] {
-            border-left-color: #36b9cc;
-        }
-
-        .transaction-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 20px;
-            color: white;
-            font-size: 1.3rem;
-            flex-shrink: 0;
-        }
-
-        .transaction-icon.deposit {
-            background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);
-        }
-
-        .transaction-icon.withdrawal {
-            background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%);
-        }
-
-        .transaction-icon.bet {
-            background: linear-gradient(135deg, #f6c23e 0%, #d4ac0d 100%);
-        }
-
-        .transaction-icon.win {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .transaction-icon.refund {
-            background: linear-gradient(135deg, #36b9cc 0%, #258391 100%);
-        }
-
-        .transaction-details {
-            flex: 1;
-        }
-
-        .transaction-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .transaction-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #333;
-            margin: 0;
-        }
-
-        .transaction-id {
-            font-size: 0.85rem;
-            color: #999;
-            font-family: monospace;
-        }
-
-        .transaction-meta {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
-
-        .transaction-date,
-        .transaction-game {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .transaction-date i,
-        .transaction-game i {
-            margin-right: 5px;
-            color: #999;
-        }
-
-        .transaction-payment {
-            font-size: 0.85rem;
-            color: #999;
-        }
-
-        .transaction-payment i {
-            margin-right: 5px;
-        }
-
-        .transaction-amount-section {
-            text-align: right;
-            min-width: 150px;
-        }
-
-        .transaction-amount {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .transaction-amount.deposit,
-        .transaction-amount.win,
-        .transaction-amount.refund {
-            color: #1cc88a;
-        }
-
-        .transaction-amount.withdrawal,
-        .transaction-amount.bet {
-            color: #e74a3b;
-        }
-
-        .transaction-balance {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 8px;
-        }
-
-        .transaction-status {
-            text-align: right;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            text-transform: capitalize;
-        }
-
-        .status-badge.completed {
-            background: rgba(28, 200, 138, 0.1);
-            color: #1cc88a;
-        }
-
-        .status-badge.pending {
-            background: rgba(246, 194, 62, 0.1);
-            color: #f6c23e;
-        }
-
-        .status-badge.failed {
-            background: rgba(231, 74, 59, 0.1);
-            color: #e74a3b;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 80px 20px;
-        }
-
-        .empty-state h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .pagination-nav {
-            margin-top: 30px;
-        }
-
-        .pagination {
-            justify-content: center;
-        }
-
-        .page-link {
-            color: #667eea;
-            border: none;
-            padding: 10px 15px;
-            margin: 0 5px;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .page-link:hover {
-            background: #667eea;
-            color: white;
-        }
-
-        .page-item.active .page-link {
-            background: #667eea;
-            color: white;
-        }
-
-        .page-item.disabled .page-link {
-            color: #ccc;
-            pointer-events: none;
-        }
-
-        @media (max-width: 768px) {
-            .summary-cards .col-md-3 {
-                margin-bottom: 15px;
-            }
-
-            .transaction-item {
-                flex-direction: column;
-            }
-
-            .transaction-icon {
-                margin-bottom: 15px;
-            }
-
-            .transaction-amount-section {
-                text-align: left;
-                margin-top: 15px;
-                margin-left: 70px;
-            }
-
-            .transaction-status {
-                text-align: left;
-            }
-
-            .date-range {
-                flex-direction: column;
-            }
-
-            .balance-summary {
-                display: block;
-                text-align: center;
-                margin-top: 20px;
-            }
-        }
-    </style>
-
-    <script>
-        // Add mongoose at the top of the controller if not already there
-        const mongoose = require('mongoose');
-
+</div>
+
+<style>
+    .custom-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 16px 12px;
+    }
+    
+    .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .hover-lift:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important; z-index: 10; }
+
+    .page-link { transition: all 0.2s ease; border-radius: 8px !important; margin: 0 3px; }
+    .hover-bg-primary:hover { background-color: var(--primary-color) !important; border-color: var(--primary-color) !important; color: white !important; }
+    .page-item.disabled .page-link { background-color: rgba(0,0,0,0.2) !important; border-color: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.3) !important; }
+    
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
         // Filter functionality
-        document.getElementById('typeFilter')?.addEventListener('change', filterTransactions);
-        document.getElementById('statusFilter')?.addEventListener('change', filterTransactions);
-        document.getElementById('startDate')?.addEventListener('change', filterTransactions);
-        document.getElementById('endDate')?.addEventListener('change', filterTransactions);
+        const typeFilter = document.getElementById('typeFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const startDate = document.getElementById('startDate');
+        const endDate = document.getElementById('endDate');
+        const transactions = document.querySelectorAll('.transaction-item');
 
         function filterTransactions() {
-            const typeFilter = document.getElementById('typeFilter').value;
-            const statusFilter = document.getElementById('statusFilter').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
+            const type = typeFilter.value;
+            const status = statusFilter.value;
+            const start = startDate.value;
+            const end = endDate.value;
 
-            const transactions = document.querySelectorAll('.transaction-item');
+            let visibleCount = 0;
 
             transactions.forEach(transaction => {
                 let show = true;
 
-                if (typeFilter !== 'all' && transaction.dataset.type !== typeFilter) {
-                    show = false;
-                }
+                if (type !== 'all' && transaction.dataset.type !== type) show = false;
+                if (status !== 'all' && transaction.dataset.status !== status) show = false;
+                if (start && transaction.dataset.date < start) show = false;
+                if (end && transaction.dataset.date > end) show = false;
 
-                if (statusFilter !== 'all' && transaction.dataset.status !== statusFilter) {
-                    show = false;
+                if (show) {
+                    transaction.classList.remove('d-none');
+                    transaction.classList.add('d-flex');
+                    visibleCount++;
+                } else {
+                    transaction.classList.remove('d-flex');
+                    transaction.classList.add('d-none');
                 }
-
-                if (startDate && transaction.dataset.date < startDate) {
-                    show = false;
-                }
-
-                if (endDate && transaction.dataset.date > endDate) {
-                    show = false;
-                }
-
-                transaction.style.display = show ? 'flex' : 'none';
             });
-        }
-    </script>
 
-    <%- include('../partials/footer') %>
+        }
+
+        if (typeFilter) typeFilter.addEventListener('change', filterTransactions);
+        if (statusFilter) statusFilter.addEventListener('change', filterTransactions);
+        if (startDate) startDate.addEventListener('change', filterTransactions);
+        if (endDate) endDate.addEventListener('change', filterTransactions);
+    });
+</script>
+
+<%- include('../partials/footer') %>

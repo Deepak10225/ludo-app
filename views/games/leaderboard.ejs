@@ -1,0 +1,209 @@
+<%- include('../partials/header') %>
+
+<div class="container py-5">
+    <div class="row mb-5 text-center" data-aos="fade-up">
+        <div class="col-md-8 mx-auto">
+            <h1 class="display-4 fw-bold text-white mb-3"><i class="fas fa-trophy text-warning me-2"></i>Global Leaderboard</h1>
+            <p class="text-muted fs-5">Recognizing the top earners and champions of the Ludo Gaming Platform.</p>
+        </div>
+    </div>
+
+    <!-- Tabs for Leaderboard Category -->
+    <ul class="nav nav-pills justify-content-center mb-5 gap-3" id="pills-tab" role="tablist" data-aos="fade-up">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active rounded-pill px-4 py-2 fw-bold" id="pills-earners-tab" data-bs-toggle="pill" data-bs-target="#pills-earners" type="button" role="tab">
+                <i class="fas fa-hand-holding-usd me-2"></i>Top Earners
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4 py-2 fw-bold" id="pills-winners-tab" data-bs-toggle="pill" data-bs-target="#pills-winners" type="button" role="tab">
+                <i class="fas fa-medal me-2"></i>Champions (Wins)
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="pills-tabContent">
+        <!-- Top Earners Tab -->
+        <div class="tab-pane fade show active" id="pills-earners" role="tabpanel">
+            <div class="row g-4 mb-5 justify-content-center podium-row" data-aos="zoom-in">
+                <% topEarners.slice(0, 3).forEach((player, index) => { %>
+                    <div class="col-md-4 col-sm-6 podium-col order-<%= index === 0 ? 1 : (index === 1 ? 0 : 2) %>">
+                        <div class="podium-card glass-card p-4 text-center rank-<%= index + 1 %>">
+                            <div class="rank-badge"><%= index + 1 %></div>
+                            <div class="avatar-container mb-3">
+                                <img src="<%= player.avatar || '/images/default-avatar.png' %>" alt="<%= player.username %>" class="rounded-circle">
+                            </div>
+                            <h4 class="text-white fw-bold mb-1">@<%= player.username %></h4>
+                            <div class="text-gradient fw-bold fs-4">₹<%= player.totalEarnings.toLocaleString('en-IN') %></div>
+                            <div class="text-muted small mt-2">Level <%= player.level %></div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+
+            <div class="glass-card overflow-hidden" data-aos="fade-up">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mb-0 align-middle">
+                        <thead class="bg-dark-light">
+                            <tr>
+                                <th class="ps-4 py-3">Rank</th>
+                                <th>Player</th>
+                                <th>Level</th>
+                                <th>Wins</th>
+                                <th class="text-end pe-4">Total Earnings</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% topEarners.slice(3).forEach((player, index) => { %>
+                                <tr>
+                                    <td class="ps-4 fw-bold">#<%= index + 4 %></td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="<%= player.avatar || '/images/default-avatar.png' %>" class="rounded-circle" width="40" height="40">
+                                            <span class="text-white">@<%= player.username %></span>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-primary rounded-pill px-3">Lvl <%= player.level %></span></td>
+                                    <td><%= player.totalWins %></td>
+                                    <td class="text-end pe-4 text-success fw-bold">₹<%= player.totalEarnings.toLocaleString('en-IN') %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Winners Tab -->
+        <div class="tab-pane fade" id="pills-winners" role="tabpanel">
+            <!-- Reuse same structure for winners if needed, or customize -->
+            <div class="row g-4 mb-5 justify-content-center podium-row">
+                <% topWinners.slice(0, 3).forEach((player, index) => { %>
+                    <div class="col-md-4 col-sm-6 podium-col order-<%= index === 0 ? 1 : (index === 1 ? 0 : 2) %>">
+                        <div class="podium-card glass-card p-4 text-center rank-<%= index + 1 %>">
+                            <div class="rank-badge"><%= index + 1 %></div>
+                            <div class="avatar-container mb-3">
+                                <img src="<%= player.avatar || '/images/default-avatar.png' %>" alt="<%= player.username %>" class="rounded-circle">
+                            </div>
+                            <h4 class="text-white fw-bold mb-1">@<%= player.username %></h4>
+                            <div class="text-gradient fw-bold fs-4"><%= player.totalWins %> Wins</div>
+                            <div class="text-muted small mt-2">Level <%= player.level %></div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+
+            <div class="glass-card overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mb-0 align-middle">
+                        <thead class="bg-dark-light">
+                            <tr>
+                                <th class="ps-4 py-3">Rank</th>
+                                <th>Player</th>
+                                <th>Level</th>
+                                <th>Earnings</th>
+                                <th class="text-end pe-4">Total Wins</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% topWinners.slice(3).forEach((player, index) => { %>
+                                <tr>
+                                    <td class="ps-4 fw-bold">#<%= index + 4 %></td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img src="<%= player.avatar || '/images/default-avatar.png' %>" class="rounded-circle" width="40" height="40">
+                                            <span class="text-white">@<%= player.username %></span>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-primary rounded-pill px-3">Lvl <%= player.level %></span></td>
+                                    <td>₹<%= player.totalEarnings.toLocaleString('en-IN') %></td>
+                                    <td class="text-end pe-4 text-warning fw-bold"><%= player.totalWins %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+    }
+
+    .podium-card {
+        position: relative;
+        transition: transform 0.3s ease;
+    }
+
+    .podium-card:hover {
+        transform: translateY(-10px);
+    }
+
+    .rank-badge {
+        position: absolute;
+        top: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 40px;
+        background: var(--accent-gradient);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        z-index: 2;
+    }
+
+    .avatar-container img {
+        width: 100px;
+        height: 100px;
+        border: 4px solid var(--border-glass);
+        object-fit: cover;
+    }
+
+    .rank-1 { border-top: 5px solid #ffd700; transform: scale(1.1); z-index: 3; }
+    .rank-2 { border-top: 5px solid #c0c0c0; }
+    .rank-3 { border-top: 5px solid #cd7f32; }
+
+    .nav-pills .nav-link {
+        color: rgba(255,255,255,0.6);
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .nav-pills .nav-link.active {
+        background: var(--accent-gradient);
+        color: white;
+        box-shadow: 0 0 20px rgba(0, 123, 255, 0.3);
+    }
+
+    .bg-dark-light {
+        background: rgba(255,255,255,0.03);
+    }
+
+    .text-gradient {
+        background: linear-gradient(135deg, #fff720 0%, #3cd500 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    @media (max-width: 768px) {
+        .podium-col {
+            margin-bottom: 30px;
+        }
+        .rank-1 { transform: scale(1); }
+    }
+</style>
+
+<%- include('../partials/footer') %>

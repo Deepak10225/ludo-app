@@ -329,13 +329,24 @@ class AdminController {
             await winTransaction.save({ session });
             console.log('✅ Win transaction created');
 
+            // Function to calculate level from XP
+            const calculateLevel = (xp) => Math.floor(xp / 500) + 1;
+
             // Update winner stats
+            const winnerXP = 100 + Math.floor(game.betAmount / 10);
+            const newWinnerXP = user.xp + winnerXP;
+            const newWinnerLevel = calculateLevel(newWinnerXP);
+
             await User.findByIdAndUpdate(
                 winnerId,
                 {
                     $inc: {
                         totalWins: 1,
-                        totalEarnings: winnerAmount
+                        totalEarnings: winnerAmount,
+                        xp: winnerXP
+                    },
+                    $set: {
+                        level: newWinnerLevel
                     }
                 },
                 { session }
@@ -344,12 +355,22 @@ class AdminController {
             // Update loser stats
             const loserId = game.player1.toString() === winnerId ? game.player2 : game.player1;
             if (loserId) {
-                await User.findByIdAndUpdate(
-                    loserId,
-                    { $inc: { totalLosses: 1 } },
-                    { session }
-                );
-                console.log('✅ Loser stats updated');
+                const loserUser = await User.findById(loserId).session(session);
+                if (loserUser) {
+                    const loserXP = 25;
+                    const newLoserXP = loserUser.xp + loserXP;
+                    const newLoserLevel = calculateLevel(newLoserXP);
+                    
+                    await User.findByIdAndUpdate(
+                        loserId,
+                        { 
+                            $inc: { totalLosses: 1, xp: loserXP },
+                            $set: { level: newLoserLevel }
+                        },
+                        { session }
+                    );
+                }
+                console.log('✅ Loser stats and XP updated');
             }
 
             // ✅ FIXED: Record platform commission - user field optional hai
@@ -620,6 +641,63 @@ class AdminController {
             console.error('Toggle user status error:', error);
             req.flash('error_msg', 'Error updating user status');
             res.redirect('/admin/users');
+        }
+    }
+
+    // Adjust user balance
+    async adjustBalance(req, res) {
+        const session = await mongoose.startSession();
+        session.startTransaction();
+
+        try {
+            const { userId } = req.params;
+            const { amount, type, reason } = req.body;
+            const adjustAmount = parseFloat(amount);
+
+            if (isNaN(adjustAmount) || adjustAmount <= 0) {
+                req.flash('error_msg', 'Invalid amount');
+                return res.redirect(`/admin/users/${userId}`);
+            }
+
+            const user = await User.findById(userId).session(session);
+            if (!user) {
+                req.flash('error_msg', 'User not found');
+                return res.redirect('/admin/users');
+            }
+
+            const oldBalance = user.walletBalance;
+            const newBalance = type === 'add' ? oldBalance + adjustAmount : oldBalance - adjustAmount;
+
+            if (newBalance < 0) {
+                req.flash('error_msg', 'Resulting balance cannot be negative');
+                return res.redirect(`/admin/users/${userId}`);
+            }
+
+            user.walletBalance = newBalance;
+            await user.save({ session });
+
+            const transaction = new Transaction({
+                user: userId,
+                type: type === 'add' ? 'deposit' : 'withdrawal',
+                amount: adjustAmount,
+                balanceBefore: oldBalance,
+                balanceAfter: newBalance,
+                status: 'completed',
+                description: `Admin adjustment: ${reason || 'No reason provided'}`,
+                paymentMethod: 'wallet'
+            });
+            await transaction.save({ session });
+
+            await session.commitTransaction();
+            req.flash('success_msg', `Balance adjusted successfully for ${user.username}`);
+            res.redirect(`/admin/users/${userId}`);
+        } catch (error) {
+            await session.abortTransaction();
+            console.error('Balance adjustment error:', error);
+            req.flash('error_msg', 'Error adjusting balance');
+            res.redirect(`/admin/users/${req.params.userId}`);
+        } finally {
+            session.endSession();
         }
     }
 
