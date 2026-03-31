@@ -436,7 +436,16 @@
     function copyReferralCode() {
         var code = document.getElementById('refCodeText').innerText.trim();
         navigator.clipboard.writeText(code).then(function() {
-            alert('Referral Code copied: ' + code);
+            Swal.fire({
+                icon: 'success',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                title: 'Referral Code Copied!',
+                background: 'var(--bg-nav)',
+                color: 'var(--text-main)'
+            });
         });
     }
 

@@ -14,6 +14,9 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/style.css">
 </head>
@@ -23,21 +26,7 @@
 
         <main class="py-4">
             <div class="container">
-                <% if (success_msg && success_msg.length> 0) { %>
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <%= success_msg %>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                    <% } %>
-
-                        <% if (error_msg && error_msg.length> 0) { %>
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <%= error_msg %>
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                            <% } %>
-
-                                <%- body %>
+                <%- body %>
             </div>
         </main>
 
@@ -48,6 +37,46 @@
 
             <!-- jQuery -->
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+            <!-- SweetAlert2 JS -->
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+
+            <script>
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: 'var(--bg-nav)',
+                    color: 'var(--text-main)',
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+
+                <% if (success_msg && success_msg.length > 0) { %>
+                    Toast.fire({
+                        icon: 'success',
+                        title: '<%= success_msg %>'
+                    });
+                <% } %>
+
+                <% if (error_msg && error_msg.length > 0) { %>
+                    Toast.fire({
+                        icon: 'error',
+                        title: '<%= error_msg %>'
+                    });
+                <% } %>
+                
+                <% if (error && error.length > 0) { %>
+                    Toast.fire({
+                        icon: 'error',
+                        title: '<%= error %>'
+                    });
+                <% } %>
+            </script>
 
             <!-- Custom JS -->
             <script src="/js/main.js"></script>

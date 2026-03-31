@@ -321,14 +321,28 @@
         function validateRoomId() {
             var roomId = document.getElementById('roomId').value;
             if (!/^\d{6}$/.test(roomId)) {
-                alert('Please enter a valid 6-digit room ID');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Room ID',
+                    text: 'Please enter a valid 6-digit room ID',
+                    background: 'var(--bg-nav)',
+                    color: 'var(--text-main)',
+                    confirmButtonColor: 'var(--primary)'
+                });
                 return false;
             }
             return true;
         }
 
         function showSupport() {
-            alert('Live chat coming soon! Please contact support@ludowin.com');
+            Swal.fire({
+                icon: 'info',
+                title: 'Support',
+                text: 'Live chat coming soon! Please contact support@ludowin.com',
+                background: 'var(--bg-nav)',
+                color: 'var(--text-main)',
+                confirmButtonColor: 'var(--primary)'
+            });
         }
 
         // Auto-refresh waiting games every 30 seconds
